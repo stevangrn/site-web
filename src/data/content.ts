@@ -298,18 +298,6 @@ export const photos: Photo[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: 'photo-19',
-    title: "Portrait d'une judokate de l'école de Tenri",
-    description: "Photographie d'une judokate de l'école japonaise de Tenri",
-    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529908/73_3_wbyy9h.jpg",
-    category_id: catId('sports'),
-    featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
-    hero: false, // true = cette photo sera affichée en héros
-    display_order: 19,
-    created_at: new Date().toISOString(),
-  },
-  {
     id: 'photo-20',
     title: "Portrait d'un judoka de l'école de Tenri",
     description: "Photographie d'un judoka de l'école japonaise de Tenri",

@@ -47,7 +47,7 @@ export function Contact({ profile }: ContactProps) {
     setIsSending(true);
 
     try {
-      const recipientEmail = profile?.email || 'stevan.garon@gmail.com';
+      const recipientEmail = profile?.email || 'contacts@stevangaron.fr';
       const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipientEmail)}`, {
         method: 'POST',
         headers: {

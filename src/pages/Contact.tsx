@@ -1,15 +1,32 @@
 import { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import type { Profile } from '../lib/supabase';
 
 interface ContactProps {
   profile: Profile | null;
 }
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+  projectType: string;
+  message: string;
+}
+
+const initialFormData: ContactFormData = {
+  name: '',
+  email: '',
+  phone: '',
+  projectType: '',
+  message: '',
+};
+
 export function Contact({ profile }: ContactProps) {
-  // Indique si le formulaire a bien été envoyé
   const [submitted, setSubmitted] = useState(false);
-  const [projectType, setProjectType] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<ContactFormData>(initialFormData);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
     const stored = window.localStorage.getItem('portfolio-theme');
@@ -17,11 +34,53 @@ export function Contact({ profile }: ContactProps) {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   });
 
-  // Simule l’envoi du formulaire et affiche un message de confirmation
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+    setError(null);
+    setIsSending(true);
+
+    try {
+      const recipientEmail = profile?.email || 'stevan.garon@gmail.com';
+      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipientEmail)}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          projectType: formData.projectType,
+          message: formData.message,
+          recipientEmail,
+          source: 'site-web',
+          _subject: `Nouveau message depuis le site - ${formData.name}`,
+          _captcha: 'false',
+          _template: 'table',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Le service d’envoi a refusé la requête.');
+      }
+
+      setSubmitted(true);
+      setFormData(initialFormData);
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      console.error('Contact form error:', err);
+      setError('L’envoi du message a échoué. Veuillez réessayer ou me contacter directement par email.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   useEffect(() => {
@@ -149,6 +208,9 @@ export function Contact({ profile }: ContactProps) {
                       </label>
                       <input
                         type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
                         className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors"
                         placeholder="Jean Dupont"
                         required
@@ -160,6 +222,9 @@ export function Contact({ profile }: ContactProps) {
                       </label>
                       <input
                         type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors"
                         placeholder="jean@example.com"
                         required
@@ -167,12 +232,26 @@ export function Contact({ profile }: ContactProps) {
                     </div>
                     <div>
                       <label className="block text-sm text-neutral-400 mb-2">
+                        Votre téléphone (optionnel)
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors"
+                        placeholder="06 12 34 56 78"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-neutral-400 mb-2">
                         Type de projet
                       </label>
                       <select
-                        value={projectType}
-                        onChange={(e) => setProjectType(e.target.value)}
-                        className={`contact-select w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${theme === 'dark' ? (projectType === '' ? 'text-white' : 'text-black') : 'text-black'} focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`}
+                        name="projectType"
+                        value={formData.projectType}
+                        onChange={handleChange}
+                        className={`contact-select w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${theme === 'dark' ? (formData.projectType === '' ? 'text-white' : 'text-black') : 'text-black'} focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`}
                       >
                         <option value="">Sélectionnez un type</option>
                         <option value="portrait">Portrait</option>
@@ -186,17 +265,27 @@ export function Contact({ profile }: ContactProps) {
                         Votre message
                       </label>
                       <textarea
+                        name="message"
                         rows={5}
+                        value={formData.message}
+                        onChange={handleChange}
                         className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors resize-none"
                         placeholder="Décrivez votre projet..."
                         required
                       />
                     </div>
+                    {error && (
+                      <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                        <span>{error}</span>
+                      </div>
+                    )}
                     <button
                       type="submit"
-                      className="w-full bg-amber-500 text-neutral-950 py-4 rounded-lg font-medium hover:bg-amber-400 transition-colors flex items-center justify-center gap-2"
+                      disabled={isSending}
+                      className="w-full bg-amber-500 text-neutral-950 py-4 rounded-lg font-medium hover:bg-amber-400 transition-colors flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      <span>Envoyer</span>
+                      <span>{isSending ? 'Envoi en cours...' : 'Envoyer'}</span>
                       <Send className="w-4 h-4" />
                     </button>
                   </form>

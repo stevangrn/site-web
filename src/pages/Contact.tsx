@@ -47,7 +47,7 @@ export function Contact({ profile }: ContactProps) {
     setIsSending(true);
 
     try {
-      const recipientEmail = profile?.email || 'contacts@stevangaron.fr';
+      const recipientEmail = profile?.email || 'stevan.garon@gmail.com';
       const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipientEmail)}`, {
         method: 'POST',
         headers: {
@@ -142,7 +142,7 @@ export function Contact({ profile }: ContactProps) {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm">Email</p>
-                    <p className="text-theme-primary">{profile?.email || 'contacts@stevangaron.fr'}</p>
+                    <p className="text-theme-primary">{profile?.email || 'stevan.garon@gmail.com'}</p>
                   </div>
                 </a>
 

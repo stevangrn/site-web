@@ -17,7 +17,7 @@ export const profile: Profile = {
   name: 'Stevan GARON',
   title: 'Photographe et télépilote de drone',
   bio: 'Capturant les moments précieux de la vie à travers mon objectif. Spécialisée dans les portraits, les paysages et les événements spéciaux.',
-  email: 'contacts@stevangaron.fr',
+  email: 'stevan.garon@gmail.com',
   phone: '06 27 24 56 73',
   location: 'La Chaize-le-Vicomte, Vendée, France',
   social_instagram: '@stevan_raw',

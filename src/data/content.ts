@@ -834,7 +834,7 @@ export const photos: Photo[] = [
     category_id: catId('sports'),
     featured: false, //en vedette sur la page d'acceuil
     featured_home: false, // true = cette photo apparaît dans les travaux en vedette
-    hero: false, // true = cette photo sera affichée en héros
+    hero: false, // true = cette photo sera affichée en héross
     display_order: 63,
     created_at: new Date().toISOString(),
   },

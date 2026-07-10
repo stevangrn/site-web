@@ -1079,16 +1079,4 @@ export const photos: Photo[] = [
     display_order: 84,
     created_at: new Date().toISOString(),
   },
-  {
-    id: 'photo-85',
-    title: "Pilote de Karting",
-    description: "Photo d'un pilote étudiant participant à une activité karting  organisé par AIR RT",
-    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529993/13_th3sql.jpg",
-    category_id: catId('evenements'),
-    featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
-    hero: false, // true = cette photo sera affichée en héros
-    display_order: 85,
-    created_at: new Date().toISOString(),
-  },
 ];

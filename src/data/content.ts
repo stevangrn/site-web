@@ -61,6 +61,7 @@ export const categories: Category[] = [
     display_order: 4,
     created_at: new Date().toISOString(),
   },
+
 ];
 
 // Petit raccourci pour retrouver une catégorie par son slug
@@ -679,6 +680,162 @@ export const photos: Photo[] = [
     featured_home: false, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 50,
+    created_at: new Date().toISOString(),
+  },
+    {
+    id: 'photo-51',
+    title: "Silhouette d'une femme au dessus de la ville",
+    description: "portrait d'une femme lors d'un coucher de soleil au dessus de la ville",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529945/46_bhd8uj.jpg",
+    category_id: catId('portraits'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 51,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-52',
+    title: "Joueur de Basket du BCEBM",
+    description: "Joueur en pleine action lors d'un match de basket",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529974/45_w5c4ox.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 52,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-53',
+    title: "Joueur de Basket du BCEBM en plein saut",
+    description: "Joueur sautant pour marquer un panier lors d'un match",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529971/45_2_hb9mxc.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 53,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-54',
+    title: "Lancer franc",
+    description: "Joueur marquant un panier lors d'un lancer franc",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529969/44_vkputo.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 54,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-55',
+    title: "Cours de Judo",
+    description: "Judoka enfant lors d'un cours de judo à Pass'Yon Judo",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530015/43_fwgzyi.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 55,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-56',
+    title: "Danseuse en plein gala",
+    description: "Danseuse accompagnant des enfants lors dee son gala de danse",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529907/42_egx8jl.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 56,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-57',
+    title: "Silhouette d'une danseuse faisant un solo",
+    description: "Silhouette d'une danseuse en plein gala de danse",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529956/41_gebyea.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 57,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-58',
+    title: "Judoka se rhabillant lors d'un combat",
+    description: "Judoka remettant sa ceinture lors de l'Open de Vendée de judo",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529996/40_bfstgs.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 58,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-59',
+    title: "Kimono d'un judoka vendéen",
+    description: "Close up sur le kimono d'un judoka se préparant à un combat lors de l'Open de Vendée de judo",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530018/39_m95evj.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 59,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-60',
+    title: "Technique de judo",
+    description: "Action interdite de la part d'un judoka lors de l'Open de Vendée",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530010/38_lp6ya3.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 60,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-61',
+    title: "Speaker lors d'un match de Volleyball",
+    description: "Speaker avec un tambour lors d'un match de Volleyball de la Roche-sur-Yon",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529999/37_h9nyyv.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 61,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-62',
+    title: "Focus sur les petits geste du Volleyball",
+    description: "Focus sur la main d'une joueuse de Volleyball indiquant des informations a ces camarades de jeux",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529919/36_rse7ob.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 62,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-63',
+    title: "Joueuse prête pour la réception",
+    description: "Une joueuse de volley-ball en maillot rouge est en position de réception basse, le regard concentré vers le haut",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529959/35_vjxv1b.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 63,
     created_at: new Date().toISOString(),
   },
 ];

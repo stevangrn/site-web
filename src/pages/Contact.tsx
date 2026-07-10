@@ -142,7 +142,7 @@ export function Contact({ profile }: ContactProps) {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm">Email</p>
-                    <p className="text-theme-primary">{profile?.email || 'stevan.garon@gmail.com'}</p>
+                    <p className="text-theme-primary">{profile?.email || 'contacts@stevangaron.fr'}</p>
                   </div>
                 </a>
 

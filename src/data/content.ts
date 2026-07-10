@@ -62,6 +62,7 @@ export const categories: Category[] = [
     created_at: new Date().toISOString(),
   },
 
+  
 ];
 
 // Petit raccourci pour retrouver une catégorie par son slug
@@ -824,6 +825,270 @@ export const photos: Photo[] = [
     featured_home: false, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héross
     display_order: 63,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-64',
+    title: "Joueuse réalisant un service",
+    description: "Une joueuse de volley-ball en maillot bleu dans les airs prête a frapper la balle pour faire son service",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530013/34_dbjvts.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 64,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-65',
+    title: "Seule face à la mer",
+    description: "Femme seule face à la mer",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529985/33_cpswhz.jpg",
+    category_id: catId('portraits'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 65,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-66',
+    title: "Perdu dans la foule",
+    description: "Femme ayant le regard perdu à travers la foule",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529937/32_tqgblo.jpg",
+    category_id: catId('portraits'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 66,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-67',
+    title: "Un phare sur la côte",
+    description: "Photo aérienne d'un phare sur les côtes basque",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529910/31_2_uhrxyd.jpg",
+    category_id: catId('nature'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 67,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-68',
+    title: "Focus sur le buste d'un jour de basket 3X3",
+    description: "Photo d'un joueur de basket de 3X3 lors d'un tournoi organisé par le BCEBM",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530000/30_jmjesm.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 68,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-69',
+    title: "Vu du dessus d'un terrain de basket 3X3",
+    description: "Photo aérienne d'un match de basket de 3X3 lors d'un tournoi organisé par le BCEBM",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529937/29_mtyf88.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 69,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-70',
+    title: "Seul face au panier",
+    description: "Photo aérienne d'un homme tirant un ballon dans le panier lors d'un match de basket de 3X3 lors d'un tournoi organisé par le BCEBM",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529952/28_uoxzao.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 70,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-71',
+    title: "Une équipe ! Une Victoire",
+    description: "Photo de groupe d'une équipe de basket venant de gagner son match",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529930/27_o7pb74.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 71,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-72',
+    title: "Un shoot = un panier",
+    description: "Plan large d'une basketteuse venant de tirer",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529948/25_iwipwa.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 72,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-73',
+    title: "Basketteuse en plein saut pour marquer un panier",
+    description: "Photo d'une basketteuse sautant pour marquer un panier",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529943/24_rijlsi.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 73,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-74',
+    title: "Cycliste en plein triathlon",
+    description: "Photo d'un cycliste lors d'une transition du triathlon",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530019/23_pklbdz.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 74,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-75',
+    title: "Nageur en préparation de son triathlon",
+    description: "Photo d'un nageur qui se prépare a faire son triathlon",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530011/22_vzpsd3.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 75,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-76',
+    title: "Pancarte du mariage d'Elodie&Emeric",
+    description: "Pancarte du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530007/21_ujnt9v.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 76,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-77',
+    title: "Rituel des rubans en mariage",
+    description: "Rituel des rubans du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529969/20_d7okcl.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 77,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-78',
+    title: "Famille d'Elodie et Emeric",
+    description: "Photo de groupe de la famille lors du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530008/19_tfdtly.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 78,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-79',
+    title: "Cérémonie du bouquet du mariage d'Elodie et Emeric",
+    description: "Photo de la cérémonie du bouquet lors du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529991/18_nskbky.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 79,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-80',
+    title: "Défi photo lors du mariage d'Elodie et Emeric",
+    description: "Défi avec photos imposé au invités du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530017/17_ablomn.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 80,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-81',
+    title: "Première danse du mariage d'Elodie et Emeric",
+    description: "Photo lors de la première danse du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530021/15_oy4szh.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 81,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-82',
+    title: "Première danse du mariage d'Elodie et Emeric",
+    description: "Photo lors de la première danse du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530021/15_oy4szh.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 82,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-83',
+    title: "Photo de groupe Karting",
+    description: "Photo d'un groupe participant à une activité karting  organisé par AIR RT",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529979/14_vchchx.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 83,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-84',
+    title: "Pilote de Karting",
+    description: "Photo d'un pilote étudiant participant à une activité karting  organisé par AIR RT",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529993/13_th3sql.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 84,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-85',
+    title: "Pilote de Karting",
+    description: "Photo d'un pilote étudiant participant à une activité karting  organisé par AIR RT",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529993/13_th3sql.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 85,
     created_at: new Date().toISOString(),
   },
 ];

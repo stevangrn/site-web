@@ -1,0 +1,125 @@
+import { useState, useEffect } from 'react';
+import { Menu, X, Camera, Moon, Sun } from 'lucide-react';
+import type { Profile } from '../lib/supabase';
+
+interface NavbarProps {
+  profile: Profile | null;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
+}
+
+type Route = '/' | '/portfolio' | '/about' | '/contact';
+
+export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
+  // État du menu mobile ouvert ou fermé
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Page active pour mettre en surbrillance le bon lien
+  const [currentRoute, setCurrentRoute] = useState<Route>('/');
+
+  // Liste des liens affichés dans la barre de navigation
+  const navLinks = [
+    { name: 'Accueil', path: '/' as Route },
+    { name: 'Portfolio', path: '/portfolio' as Route },
+    { name: 'À Propos', path: '/about' as Route },
+    { name: 'Contact', path: '/contact' as Route },
+  ];
+  const themeLabel = theme === 'dark' ? 'Clair' : 'Sombre';
+  const linkClassName = (active: boolean) =>
+    active
+      ? 'text-amber-500'
+      : 'text-[var(--text-secondary)] hover:text-amber-500';
+  const mobileLinkClassName = (active: boolean) =>
+    active
+      ? 'bg-[var(--surface)] text-amber-500'
+      : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-amber-500';
+
+  // Met à jour la page active quand l’URL change
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) || '/';
+      setCurrentRoute(hash as Route);
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Change la page en modifiant l’ancre de l’URL
+  const navigate = (path: Route) => {
+    window.location.hash = path;
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const isActive = (path: string) => currentRoute === path;
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md border-b border-[var(--border-color)]">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-[var(--text-primary)] font-light tracking-wider"
+        >
+          <Camera className="w-5 h-5 text-amber-500" />
+          <span className="text-lg">{profile?.name?.split(' ')[0] || 'Portfolio'}</span>
+        </button>
+
+        <div className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <button
+              key={link.path}
+              onClick={() => navigate(link.path)}
+              className={`text-sm tracking-wide transition-colors ${linkClassName(isActive(link.path))}`}
+            >
+              {link.name}
+            </button>
+          ))}
+
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
+            aria-label="Basculer le thème"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            <span>{themeLabel}</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] p-2 text-[var(--text-secondary)] transition-colors hover:text-amber-500"
+            aria-label="Basculer le thème"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+
+          <button
+            className="text-[var(--text-primary)] p-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
+
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-[var(--bg-primary)] border-t border-[var(--border-color)]">
+          {navLinks.map((link) => (
+            <button
+              key={link.path}
+              onClick={() => navigate(link.path)}
+              className={`block w-full text-left px-6 py-4 transition-colors ${mobileLinkClassName(isActive(link.path))}`}
+            >
+              {link.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </nav>
+  );
+}

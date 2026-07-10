@@ -7,7 +7,6 @@
 // (une fois publié).
 // ============================================================================
 
-import { TrainFrontTunnelIcon } from 'lucide-react';
 import type { Profile, Category, Photo } from '../lib/supabase';
 
 // ----------------------------------------------------------------------------

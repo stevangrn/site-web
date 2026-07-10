@@ -7,6 +7,7 @@
 // (une fois publié).
 // ============================================================================
 
+import { TrainFrontTunnelIcon } from 'lucide-react';
 import type { Profile, Category, Photo } from '../lib/supabase';
 
 // ----------------------------------------------------------------------------
@@ -61,8 +62,6 @@ export const categories: Category[] = [
     display_order: 4,
     created_at: new Date().toISOString(),
   },
-
-  
 ];
 
 // Petit raccourci pour retrouver une catégorie par son slug
@@ -125,7 +124,7 @@ export const photos: Photo[] = [
     image_url: 'https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529932/88_vcpm9t.jpg',
     category_id: catId('nature'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 4,
     created_at: new Date().toISOString(),
@@ -384,12 +383,12 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-27',
-    title: "Répétition de musique de Chaizy acoustique 3",
+    title: "Répétition de musique de Chaizy acoustique 4",
     description: "Photographie gros plan d'un musicien de l'association chaizy acoustic",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529990/66_kk2ego.jpg",
     category_id: catId('evenements'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 27,
     created_at: new Date().toISOString(),
@@ -413,7 +412,7 @@ export const photos: Photo[] = [
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529952/64_jmkjgf.jpg",
     category_id: catId('evenements'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 29,
     created_at: new Date().toISOString(),
@@ -432,12 +431,12 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-31',
-    title: "Lycée de Saint François d'Assise",
+    title: "Lycée Saint François d'Assise",
     description: "Photographie aérienne du lycée saint françois d'Assise au coucher de soleil",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529977/62_kwjqqz.jpg",
     category_id: catId('evenements'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 31,
     created_at: new Date().toISOString(),
@@ -594,7 +593,7 @@ export const photos: Photo[] = [
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783608854/SG1_3343_awedwm.jpg",
     category_id: catId('evenements'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 44,
     created_at: new Date().toISOString(),
@@ -726,7 +725,7 @@ export const photos: Photo[] = [
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530015/43_fwgzyi.jpg",
     category_id: catId('sports'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 55,
     created_at: new Date().toISOString(),
@@ -870,7 +869,7 @@ export const photos: Photo[] = [
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529910/31_2_uhrxyd.jpg",
     category_id: catId('nature'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 67,
     created_at: new Date().toISOString(),
@@ -906,7 +905,7 @@ export const photos: Photo[] = [
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529952/28_uoxzao.jpg",
     category_id: catId('sports'),
     featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    featured_home: true, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 70,
     created_at: new Date().toISOString(),
@@ -1077,6 +1076,150 @@ export const photos: Photo[] = [
     featured_home: false, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 84,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-85',
+    title: "Chorégraphie du gala de danse Happy Dance 1",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529984/12_q09qvo.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 85,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-86',
+    title: "Chorégraphie du gala de danse Happy Dance 2",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529984/11_tp0rjx.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 86,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-87',
+    title: "Chorégraphie du gala de danse Happy Dance 3",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529954/10_vvva8u.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 87,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-88',
+    title: "Chorégraphie du gala de danse Happy Dance 4",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529904/9_aaefyg.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 88,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-89',
+    title: "Chorégraphie du gala de danse Happy Dance 5",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529940/8_q7teng.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 89,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-90',
+    title: "Chorégraphie du gala de danse ASLD 1",
+    description: "Danseuse qui est porté sur les hanches de sa partenaires",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529928/7_bubnyr.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 90,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-91',
+    title: "Chorégraphie du gala de danse ASLD 2",
+    description: "Daseuse de la chorégraphie Marthin Luther King",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529932/6_vkrykj.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 91,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-92',
+    title: "Chorégraphie du gala de danse ASLD 3",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529928/5_pvlmcl.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 92,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-93',
+    title: "Chorégraphie du gala de danse ASLD 4",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529923/4_ufxlgb.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 93,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-94',
+    title: "Chorégraphie du gala de danse ASLD 5",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529937/3_kluinf.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 94,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-95',
+    title: "Chorégraphie du gala de danse ASLD 6",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529911/2_dkundw.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 95,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'photo-96',
+    title: "Chorégraphie du gala de danse ASLD 7",
+    description: "",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529906/1_xeeid3.jpg",
+    category_id: catId('sports'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 96,
     created_at: new Date().toISOString(),
   },
 ];

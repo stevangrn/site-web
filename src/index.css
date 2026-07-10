@@ -41,6 +41,21 @@
     background-color: rgba(245, 158, 11, 0.3);
     color: var(--text-primary);
   }
+
+  /* Protection anti-copie des images : empêche le glisser-déposer,
+     la sélection et le menu contextuel natif sur toutes les photos. */
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    pointer-events: auto;
+  }
 }
 
 @layer utilities {

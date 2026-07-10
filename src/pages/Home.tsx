@@ -38,6 +38,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
           <img
             src={heroImage}
             alt="Background"
+            draggable={false}
             className="w-full h-full object-cover"
           />
         </div>
@@ -105,6 +106,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                   <img
                     src={photo.image_url}
                     alt={photo.title}
+                    draggable={false}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -141,12 +143,14 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                   <img
                     src={aboutPreviewPhoto.image_url}
                     alt="About"
+                    draggable={false}
                     className="w-full h-full object-cover"
                   />
                 ) : featuredPhotos[1] ? (
                   <img
                     src={featuredPhotos[1].image_url}
                     alt="About"
+                    draggable={false}
                     className="w-full h-full object-cover"
                   />
                 ) : (

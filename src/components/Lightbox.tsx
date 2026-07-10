@@ -24,6 +24,7 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
         <img
           src={photo.image_url}
           alt={photo.title}
+          draggable={false}
           className="max-w-full max-h-[85vh] object-contain rounded-lg"
         />
         <div className="text-center mt-4">

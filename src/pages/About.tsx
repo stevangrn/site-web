@@ -34,6 +34,7 @@ export function About({ aboutPhoto }: AboutProps) {
                   <img
                     src={aboutPhoto.image_url}
                     alt="About"
+                    draggable={false}
                     className="w-full h-full object-cover"
                   />
                 ) : (

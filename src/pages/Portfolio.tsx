@@ -98,6 +98,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                   <img
                     src={photo.image_url}
                     alt={photo.title}
+                    draggable={false}
                     className="w-full transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 transition-colors duration-500" />

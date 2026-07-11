@@ -1,4 +1,6 @@
 import { ArrowRight, ChevronDown } from 'lucide-react';
+import { navigate as goTo } from '../lib/router';
+import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Profile, Photo } from '../lib/supabase';
 
 interface HomeProps {
@@ -23,9 +25,9 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
     }
   };
 
-  // Ouvre une page du site en modifiant l’URL
+  // Ouvre une page du site en modifiant la vraie URL (plus de "#")
   const navigate = (path: string) => {
-    window.location.hash = path;
+    goTo(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -36,8 +38,12 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src={heroImage}
-            alt="Background"
+            src={optimizeCloudinaryUrl(heroImage)}
+            alt={
+              heroPhoto
+                ? buildPhotoAlt(heroPhoto.title)
+                : 'Stevan Garon, photographe et télépilote de drone en Vendée'
+            }
             draggable={false}
             className="w-full h-full object-cover"
           />
@@ -104,8 +110,8 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <img
-                    src={photo.image_url}
-                    alt={photo.title}
+                    src={optimizeCloudinaryUrl(photo.image_url)}
+                    alt={buildPhotoAlt(photo.title, photo.categories?.name)}
                     draggable={false}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -141,15 +147,15 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               <div className="aspect-[3/4] rounded-2xl overflow-hidden">
                 {aboutPreviewPhoto ? (
                   <img
-                    src={aboutPreviewPhoto.image_url}
-                    alt="About"
+                    src={optimizeCloudinaryUrl(aboutPreviewPhoto.image_url)}
+                    alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
                     className="w-full h-full object-cover"
                   />
                 ) : featuredPhotos[1] ? (
                   <img
-                    src={featuredPhotos[1].image_url}
-                    alt="About"
+                    src={optimizeCloudinaryUrl(featuredPhotos[1].image_url)}
+                    alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
                     className="w-full h-full object-cover"
                   />

@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Photo } from '../lib/supabase';
 
 interface LightboxProps {
@@ -22,8 +23,8 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
       </button>
       <div className="max-w-5xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
         <img
-          src={photo.image_url}
-          alt={photo.title}
+          src={optimizeCloudinaryUrl(photo.image_url)}
+          alt={buildPhotoAlt(photo.title, photo.categories?.name)}
           draggable={false}
           className="max-w-full max-h-[85vh] object-contain rounded-lg"
         />

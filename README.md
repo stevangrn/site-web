@@ -89,7 +89,7 @@ Après modification, sauvegarde le fichier : le site se met à jour automatiquem
 
 1. L'application démarre dans src/App.tsx.
 2. Elle récupère les données avec useData(), qui lit src/data/content.ts.
-3. Elle choisit la page à afficher selon l'URL (avec le hash).
+3. Elle choisit la page à afficher selon la vraie URL (/, /portfolio, /about, /contact).
 4. Le layout global affiche la navbar, le contenu et le footer.
 
 ## 8. Modifier le thème
@@ -108,6 +108,31 @@ npm run build
 ```
 
 Si la commande réussit, le site est prêt à être publié (le résultat est dans le dossier `dist/`).
+
+### Déploiement : URLs réelles (/portfolio, /about, /contact)
+
+Le site utilise maintenant de vraies URLs par page (plus de `#`), ce qui est
+important pour le référencement. Ça veut dire que le serveur qui héberge le
+site doit répondre avec `index.html` pour **toutes** les routes, sinon
+recharger la page sur `/portfolio` (ou y accéder directement) donnera une
+erreur 404. C'est déjà réglé pour les cas les plus courants :
+
+- **Netlify** : fichier `public/_redirects` (copié dans `dist/` au build).
+- **Vercel** : fichier `vercel.json` à la racine du projet.
+- **Hébergement Apache classique (OVH, o2switch...)** : fichier
+  `public/.htaccess` (copié dans `dist/` au build).
+- **GitHub Pages** : ne supporte pas nativement ce genre de redirection. La
+  solution la plus simple est de dupliquer `index.html` en `404.html` après
+  le build, pour que GitHub Pages serve le site sur n'importe quelle route :
+  ```bash
+  npm run build
+  cp dist/index.html dist/404.html
+  ```
+- **Autre hébergeur** : chercher une option "SPA fallback" ou "rewrite all
+  routes to index.html" dans sa configuration.
+
+En développement (`npm run dev`) et avec `npm run preview`, Vite gère déjà
+ça automatiquement, aucune configuration n'est nécessaire.
 
 ## 10. Conseils pour un étudiant débutant
 

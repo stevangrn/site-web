@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Camera, Moon, Sun } from 'lucide-react';
+import { navigate as goTo, getCurrentRoute, subscribeToRoute, type Route } from '../lib/router';
 import type { Profile } from '../lib/supabase';
 
 interface NavbarProps {
@@ -8,14 +9,12 @@ interface NavbarProps {
   onToggleTheme: () => void;
 }
 
-type Route = '/' | '/portfolio' | '/about' | '/contact';
-
 export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
   // État du menu mobile ouvert ou fermé
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Page active pour mettre en surbrillance le bon lien
-  const [currentRoute, setCurrentRoute] = useState<Route>('/');
+  const [currentRoute, setCurrentRoute] = useState<Route>(() => getCurrentRoute());
 
   // Liste des liens affichés dans la barre de navigation
   const navLinks = [
@@ -36,19 +35,12 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
 
   // Met à jour la page active quand l’URL change
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1) || '/';
-      setCurrentRoute(hash as Route);
-    };
-
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return subscribeToRoute(setCurrentRoute);
   }, []);
 
-  // Change la page en modifiant l’ancre de l’URL
+  // Change la page en modifiant la vraie URL (plus de "#")
   const navigate = (path: Route) => {
-    window.location.hash = path;
+    goTo(path);
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

@@ -6,19 +6,17 @@ import { Home } from './pages/Home';
 import { Portfolio } from './pages/Portfolio';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
+import { applyPageSeo } from './lib/seo';
+import { getCurrentRoute, subscribeToRoute, type Route } from './lib/router';
 
-type Route = '/' | '/portfolio' | '/about' | '/contact';
 type Theme = 'dark' | 'light';
-
-// Liste des pages autorisées du site
-const validRoutes: Route[] = ['/', '/portfolio', '/about', '/contact'];
 
 function App() {
   // Récupère les données du profil, des photos et des catégories depuis la base
   const { profile, categories, photos, loading } = useData();
 
-  // Gère la page actuellement affichée selon l’ancre dans l’URL
-  const [route, setRoute] = useState<Route>('/');
+  // Gère la page actuellement affichée selon la vraie URL (/, /portfolio, /about, /contact)
+  const [route, setRoute] = useState<Route>(() => getCurrentRoute());
 
   // Gère le thème clair/sombre du site
   const [theme, setTheme] = useState<Theme>('dark');
@@ -43,19 +41,17 @@ function App() {
     window.localStorage.setItem('portfolio-theme', theme);
   }, [theme]);
 
-  // Écoute les changements de page quand l’URL change
+  // Écoute les changements de page quand l’URL change (navigation interne
+  // ou boutons précédent/suivant du navigateur)
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1) || '/';
-      if (validRoutes.includes(hash as Route)) {
-        setRoute(hash as Route);
-      }
-    };
-
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return subscribeToRoute(setRoute);
   }, []);
+
+  // Met à jour le <title> et la <meta description> selon la page affichée
+  // (plan SEO, point 1.2). Voir src/lib/seo.ts pour le détail et les limites.
+  useEffect(() => {
+    applyPageSeo(route);
+  }, [route]);
 
   // Pendant le chargement, on affiche l’écran de chargement
   if (loading) {

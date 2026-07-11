@@ -1,4 +1,6 @@
 import { ArrowRight, Camera } from 'lucide-react';
+import { navigate as goTo } from '../lib/router';
+import { optimizeCloudinaryUrl } from '../lib/seo';
 import type { Profile, Photo } from '../lib/supabase';
 
 interface AboutProps {
@@ -32,8 +34,8 @@ export function About({ aboutPhoto }: AboutProps) {
               <div className="aspect-[3/4] rounded-2xl overflow-hidden">
                 {aboutPhoto ? (
                   <img
-                    src={aboutPhoto.image_url}
-                    alt="About"
+                    src={optimizeCloudinaryUrl(aboutPhoto.image_url)}
+                    alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
                     className="w-full h-full object-cover"
                   />
@@ -116,7 +118,7 @@ export function About({ aboutPhoto }: AboutProps) {
           </p>
           <button
             onClick={() => {
-              window.location.hash = '/contact';
+              goTo('/contact');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="inline-flex items-center gap-3 bg-amber-500/10 backdrop-blur-sm border border-amber-500/50 px-8 py-4 rounded-full text-amber-500 hover:bg-amber-500 hover:text-neutral-950 transition-all duration-500"

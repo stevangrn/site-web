@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Aperture } from 'lucide-react';
 import { Lightbox } from '../components/Lightbox';
+import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Category, Photo } from '../lib/supabase';
 
 interface PortfolioProps {
@@ -35,6 +36,10 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
   const filteredPhotos = selectedCategory
     ? sortedPhotos.filter((p) => p.category_id === selectedCategory)
     : sortedPhotos;
+
+  // Associe chaque photo à son nom de catégorie (pour enrichir le alt SEO),
+  // les photos de content.ts ne portant que le category_id.
+  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
 
   return (
     <>
@@ -96,8 +101,8 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <img
-                    src={photo.image_url}
-                    alt={photo.title}
+                    src={optimizeCloudinaryUrl(photo.image_url)}
+                    alt={buildPhotoAlt(photo.title, categoryNameById.get(photo.category_id ?? ''))}
                     draggable={false}
                     className="w-full transition-transform duration-500 group-hover:scale-105"
                   />

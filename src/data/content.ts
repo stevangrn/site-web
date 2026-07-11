@@ -1042,6 +1042,18 @@ export const photos: Photo[] = [
     created_at: new Date().toISOString(),
   },
   {
+    id: 'photo-82',
+    title: "Première danse du mariage d'Elodie et Emeric",
+    description: "Photo lors de la première danse du mariage d'Elodie et Emeric",
+    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530021/15_oy4szh.jpg",
+    category_id: catId('evenements'),
+    featured: false, //en vedette sur la page d'acceuil
+    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
+    hero: false, // true = cette photo sera affichée en héros
+    display_order: 82,
+    created_at: new Date().toISOString(),
+  },
+  {
     id: 'photo-83',
     title: "Photo de groupe Karting",
     description: "Photo d'un groupe participant à une activité karting  organisé par AIR RT",

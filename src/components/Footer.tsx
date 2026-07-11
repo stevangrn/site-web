@@ -1,11 +1,10 @@
 import { Camera, Instagram, Facebook, Mail } from 'lucide-react';
+import { navigate as goTo, type Route } from '../lib/router';
 import type { Profile } from '../lib/supabase';
 
 interface FooterProps {
   profile: Profile | null;
 }
-
-type Route = '/' | '/portfolio' | '/about' | '/contact';
 
 export function Footer({ profile }: FooterProps) {
   // Liens du footer vers les pages du site
@@ -18,7 +17,7 @@ export function Footer({ profile }: FooterProps) {
 
   // Permet de changer de page en cliquant sur un lien du footer
   const navigate = (path: Route) => {
-    window.location.hash = path;
+    goTo(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

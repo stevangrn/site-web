@@ -4,7 +4,7 @@
 // Pas besoin de base de données : tout le contenu du site est ici.
 // Après avoir modifié ce fichier, sauvegarde et le site se met à jour
 // automatiquement (en développement) ou après un nouveau "npm run build"
-// (une fois publié).
+// (une fois publié)
 // ============================================================================
 
 import type { Profile, Category, Photo } from '../lib/supabase';

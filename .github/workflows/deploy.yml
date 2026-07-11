@@ -36,9 +36,23 @@ jobs:
         run: npm run build
 
       - name: Dupliquer index.html en 404.html
-        # Indispensable pour une SPA sur GitHub Pages : sans ça, accéder
-        # directement à /portfolio, /about ou /contact renvoie une erreur 404.
+        # Filet de sécurité pour les URLs non prévues (ex: /portfolio?photo=xxx) :
+        # sans ça, ces liens précis renverraient une vraie page d'erreur.
         run: cp dist/index.html dist/404.html
+
+      - name: Créer un vrai index.html par page (/portfolio, /about, /contact)
+        # Indispensable pour le SEO : sans ça, GitHub Pages répond avec un
+        # code HTTP 404 sur ces URLs (même si le 404.html ci-dessus affiche
+        # la bonne page à l'écran), et Google refuse d'indexer une page qui
+        # renvoie un 404, quel que soit son contenu visuel.
+        # Ici, chaque route a son propre fichier réel : le serveur répond
+        # alors avec un vrai code 200. Le contenu est identique (c'est une
+        # SPA), seul le code HTTP change.
+        run: |
+          mkdir -p dist/portfolio dist/about dist/contact
+          cp dist/index.html dist/portfolio/index.html
+          cp dist/index.html dist/about/index.html
+          cp dist/index.html dist/contact/index.html
 
       - name: Préparer le déploiement GitHub Pages
         uses: actions/configure-pages@v5

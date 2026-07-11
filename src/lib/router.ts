@@ -22,11 +22,15 @@ export type Route = '/' | '/portfolio' | '/about' | '/contact';
 export const validRoutes: Route[] = ['/', '/portfolio', '/about', '/contact'];
 
 // Lit la route actuelle depuis l'URL réelle (plus depuis le hash).
-// Les paramètres de requête (ex: ?photo=photo-3) ne font pas partie de la
-// route elle-même : ils restent lisibles via window.location.search.
+// GitHub Pages redirige automatiquement /portfolio vers /portfolio/ (avec un
+// "/" final) pour les vrais fichiers déployés par page : on l'ignore donc
+// pour reconnaître la route. Les paramètres de requête (ex: ?photo=photo-3)
+// ne font pas partie de la route elle-même : ils restent lisibles via
+// window.location.search.
 export function getCurrentRoute(): Route {
   const path = window.location.pathname;
-  return (validRoutes as string[]).includes(path) ? (path as Route) : '/';
+  const normalizedPath = path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path;
+  return (validRoutes as string[]).includes(normalizedPath) ? (normalizedPath as Route) : '/';
 }
 
 // Change de page sans recharger, en mettant à jour l'URL affichée dans la

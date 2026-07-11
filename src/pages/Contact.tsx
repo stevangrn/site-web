@@ -94,10 +94,10 @@ export function Contact({ profile }: ContactProps) {
     return () => obs.disconnect();
   }, []);
 
-  // Détermination dynamique de la couleur du texte selon l'état actuel du thème
+  // Détermination de la couleur du texte selon le thème actif (Clair = Noir / Sombre = Blanc)
   const textColor = theme === 'light' ? 'text-neutral-950' : 'text-white';
   
-  // Classe commune pour les champs de saisie (input, select, textarea)
+  // Classe globale pour harmoniser tous les champs de saisie
   const inputClasses = `w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${textColor} placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`;
 
   return (
@@ -113,7 +113,9 @@ export function Contact({ profile }: ContactProps) {
           <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
             Contact
           </p>
-          <h1 className="text-4xl md:text-5xl font-light mb-4 text-white">Travaillons Ensemble</h1>
+          <h1 className={`text-4xl md:text-5xl font-light mb-4 ${textColor}`}>
+            Travaillons Ensemble
+          </h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
             Disponible pour vos projets photographiques. N'hésitez pas à me
             contacter pour discuter de vos besoins.
@@ -128,7 +130,7 @@ export function Contact({ profile }: ContactProps) {
             {/* Contact Info */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-light mb-4 text-white">
+                <h2 className={`text-2xl font-light mb-4 ${textColor}`}>
                   Parlons de votre projet
                 </h2>
                 <p className="text-neutral-400 leading-relaxed">
@@ -148,7 +150,7 @@ export function Contact({ profile }: ContactProps) {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm">Email</p>
-                    <p className="text-theme-primary text-white">{profile?.email || 'stevan.garon@gmail.com'}</p>
+                    <p className={`text-theme-primary ${textColor}`}>{profile?.email || 'stevan.garon@gmail.com'}</p>
                   </div>
                 </a>
 
@@ -162,7 +164,7 @@ export function Contact({ profile }: ContactProps) {
                     </div>
                     <div>
                       <p className="text-neutral-500 text-sm">Téléphone</p>
-                      <p className="text-theme-primary text-white">{profile.phone}</p>
+                      <p className={`text-theme-primary ${textColor}`}>{profile.phone}</p>
                     </div>
                   </a>
                 )}
@@ -173,7 +175,7 @@ export function Contact({ profile }: ContactProps) {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm">Localisation</p>
-                    <p className="text-theme-primary text-white">{profile?.location || 'La Chaize-le-Vicomte'}</p>
+                    <p className={`text-theme-primary ${textColor}`}>{profile?.location || 'La Chaize-le-Vicomte'}</p>
                   </div>
                 </div>
               </div>
@@ -195,7 +197,7 @@ export function Contact({ profile }: ContactProps) {
               {submitted ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-                  <h3 className="text-2xl font-light text-white mb-2">
+                  <h3 className={`text-2xl font-light mb-2 ${textColor}`}>
                     Message envoyé !
                   </h3>
                   <p className="text-neutral-400">
@@ -204,7 +206,7 @@ export function Contact({ profile }: ContactProps) {
                 </div>
               ) : (
                 <>
-                  <h3 className="text-2xl font-light mb-6 text-white">
+                  <h3 className={`text-2xl font-light mb-6 ${textColor}`}>
                     Envoyez un message
                   </h3>
                   <form onSubmit={handleSubmit} className="space-y-5">

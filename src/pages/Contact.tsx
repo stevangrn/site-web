@@ -94,20 +94,26 @@ export function Contact({ profile }: ContactProps) {
     return () => obs.disconnect();
   }, []);
 
+  // Détermination dynamique de la couleur du texte selon l'état actuel du thème
+  const textColor = theme === 'light' ? 'text-neutral-950' : 'text-white';
+  
+  // Classe commune pour les champs de saisie (input, select, textarea)
+  const inputClasses = `w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${textColor} placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`;
+
   return (
     <>
       <style>{`
-        :root[data-theme="dark"] select.contact-select option { color: #000 !important; background: #fff !important; }
-        :root[data-theme="dark"] select.contact-select option:checked { color: #fff !important; background: #111 !important; }
-        :root[data-theme="light"] select.contact-select, :root[data-theme="light"] select.contact-select option { color: #000 !important; }
+        :root[data-theme="dark"] select.contact-select option { color: #fff !important; background: #1a1a1a !important; }
+        :root[data-theme="light"] select.contact-select option { color: #000 !important; background: #fff !important; }
       `}</style>
+      
       {/* Header */}
       <section className="pt-20 pb-12 px-6 bg-neutral-950">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
             Contact
           </p>
-          <h1 className="text-4xl md:text-5xl font-light mb-4">Travaillons Ensemble</h1>
+          <h1 className="text-4xl md:text-5xl font-light mb-4 text-white">Travaillons Ensemble</h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
             Disponible pour vos projets photographiques. N'hésitez pas à me
             contacter pour discuter de vos besoins.
@@ -122,7 +128,7 @@ export function Contact({ profile }: ContactProps) {
             {/* Contact Info */}
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-light mb-4">
+                <h2 className="text-2xl font-light mb-4 text-white">
                   Parlons de votre projet
                 </h2>
                 <p className="text-neutral-400 leading-relaxed">
@@ -142,7 +148,7 @@ export function Contact({ profile }: ContactProps) {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm">Email</p>
-                    <p className="text-theme-primary">{profile?.email || 'stevan.garon@gmail.com'}</p>
+                    <p className="text-theme-primary text-white">{profile?.email || 'stevan.garon@gmail.com'}</p>
                   </div>
                 </a>
 
@@ -156,7 +162,7 @@ export function Contact({ profile }: ContactProps) {
                     </div>
                     <div>
                       <p className="text-neutral-500 text-sm">Téléphone</p>
-                      <p className="text-theme-primary">{profile.phone}</p>
+                      <p className="text-theme-primary text-white">{profile.phone}</p>
                     </div>
                   </a>
                 )}
@@ -167,7 +173,7 @@ export function Contact({ profile }: ContactProps) {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm">Localisation</p>
-                    <p className="text-theme-primary">{profile?.location || 'La Chaize-le-Vicomte'}</p>
+                    <p className="text-theme-primary text-white">{profile?.location || 'La Chaize-le-Vicomte'}</p>
                   </div>
                 </div>
               </div>
@@ -198,7 +204,7 @@ export function Contact({ profile }: ContactProps) {
                 </div>
               ) : (
                 <>
-                  <h3 className="text-2xl font-light mb-6">
+                  <h3 className="text-2xl font-light mb-6 text-white">
                     Envoyez un message
                   </h3>
                   <form onSubmit={handleSubmit} className="space-y-5">
@@ -211,7 +217,7 @@ export function Contact({ profile }: ContactProps) {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors"
+                        className={inputClasses}
                         placeholder="Jean Dupont"
                         required
                       />
@@ -225,7 +231,7 @@ export function Contact({ profile }: ContactProps) {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors"
+                        className={inputClasses}
                         placeholder="jean@example.com"
                         required
                       />
@@ -239,7 +245,7 @@ export function Contact({ profile }: ContactProps) {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors"
+                        className={inputClasses}
                         placeholder="06 12 34 56 78"
                       />
                     </div>
@@ -251,7 +257,7 @@ export function Contact({ profile }: ContactProps) {
                         name="projectType"
                         value={formData.projectType}
                         onChange={handleChange}
-                        className={`contact-select w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${theme === 'dark' ? (formData.projectType === '' ? 'text-white' : 'text-black') : 'text-black'} focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`}
+                        className={`contact-select ${inputClasses}`}
                       >
                         <option value="">Sélectionnez un type</option>
                         <option value="portrait">Portrait</option>
@@ -269,7 +275,7 @@ export function Contact({ profile }: ContactProps) {
                         rows={5}
                         value={formData.message}
                         onChange={handleChange}
-                        className="w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors resize-none"
+                        className={`${inputClasses} resize-none`}
                         placeholder="Décrivez votre projet..."
                         required
                       />

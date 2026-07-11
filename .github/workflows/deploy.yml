@@ -1,0 +1,53 @@
+name: Déployer le site sur GitHub Pages
+
+# Se déclenche automatiquement à chaque fois que du code est poussé sur main.
+# Peut aussi être lancé manuellement depuis l'onglet "Actions" du dépôt GitHub.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Construire le site
+        run: npm run build
+
+      - name: Dupliquer index.html en 404.html
+        # Indispensable pour une SPA sur GitHub Pages : sans ça, accéder
+        # directement à /portfolio, /about ou /contact renvoie une erreur 404.
+        run: cp dist/index.html dist/404.html
+
+      - name: Préparer le déploiement GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Empaqueter le dossier dist/
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Déployer sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

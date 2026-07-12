@@ -27,10 +27,9 @@ export function Contact({ profile }: ContactProps) {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
-  // Champ "honeypot" : invisible pour un humain, mais souvent rempli
-  // automatiquement par les robots spammeurs. S'il contient quoi que ce
-  // soit, on considère que c'est un bot et on n'envoie rien.
   const [honeypot, setHoneypot] = useState('');
+  
+  // Utilisation active de la variable 'theme'
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
     const stored = window.localStorage.getItem('portfolio-theme');
@@ -49,8 +48,6 @@ export function Contact({ profile }: ContactProps) {
     e.preventDefault();
     setError(null);
 
-    // Si le champ piège a été rempli, c'est très probablement un robot :
-    // on ne fait rien, comme si l'envoi avait réussi, sans le prévenir.
     if (honeypot.trim() !== '') {
       setSubmitted(true);
       setFormData(initialFormData);
@@ -111,19 +108,23 @@ export function Contact({ profile }: ContactProps) {
     return () => obs.disconnect();
   }, []);
 
-  // Champs du formulaire : blancs en mode sombre, et inversement (fond
-  // sombre) en mode clair.
-  const fieldClassName =
-    theme === 'dark'
-      ? 'w-full bg-white border border-neutral-300 rounded-lg px-4 py-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors'
-      : 'w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors';
+  // Classes dynamiques basées sur l'état du thème (Modifié)
+  const isDark = theme === 'dark';
+  const fieldClassName = `w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors ${
+    isDark 
+      ? 'bg-neutral-800/50 border-neutral-700 text-white placeholder:text-neutral-500' 
+      : 'bg-white border-neutral-300 text-black placeholder:text-neutral-400'
+  }`;
 
   return (
     <>
       <style>{`
-        :root[data-theme="dark"] select.contact-select option { color: #171717 !important; background: #ffffff !important; }
-        :root[data-theme="light"] select.contact-select option { color: #ffffff !important; background: #171717 !important; }
+        select.contact-select option { 
+          color: ${isDark ? '#fff' : '#000'} !important; 
+          background: ${isDark ? '#262626' : '#fff'} !important; 
+        }
       `}</style>
+      
       {/* Header */}
       <section className="pt-20 pb-12 px-6 bg-neutral-950">
         <div className="max-w-7xl mx-auto text-center">
@@ -225,11 +226,6 @@ export function Contact({ profile }: ContactProps) {
                     Envoyez un message
                   </h3>
                   <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Champ piège anti-spam : invisible et inaccessible pour
-                        un humain (masqué visuellement, ignoré au clavier et
-                        par les lecteurs d'écran), mais souvent rempli par
-                        les robots qui remplissent tous les champs qu'ils
-                        trouvent. Ne pas retirer ni rendre visible. */}
                     <div
                       aria-hidden="true"
                       style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}

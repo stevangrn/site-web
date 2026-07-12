@@ -28,7 +28,9 @@ export function Contact({ profile }: ContactProps) {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
   const [honeypot, setHoneypot] = useState('');
-  const [, setTheme] = useState<'dark' | 'light'>(() => {
+  
+  // Utilisation active de la variable 'theme'
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
     const stored = window.localStorage.getItem('portfolio-theme');
     if (stored === 'dark' || stored === 'light') return stored;
@@ -106,14 +108,21 @@ export function Contact({ profile }: ContactProps) {
     return () => obs.disconnect();
   }, []);
 
-  const fieldClassName =
-    'w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors';
+  // Classes dynamiques basées sur l'état du thème (Modifié)
+  const isDark = theme === 'dark';
+  const fieldClassName = `w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors ${
+    isDark 
+      ? 'bg-neutral-800/50 border-neutral-700 text-white placeholder:text-neutral-500' 
+      : 'bg-white border-neutral-300 text-black placeholder:text-neutral-400'
+  }`;
 
   return (
     <>
       <style>{`
-        select.contact-select option { color: #000 !important; background: #fff !important; }
-        select.contact-select option:checked { color: #fff !important; background: #111 !important; }
+        select.contact-select option { 
+          color: ${isDark ? '#fff' : '#000'} !important; 
+          background: ${isDark ? '#262626' : '#fff'} !important; 
+        }
       `}</style>
       
       {/* Header */}
@@ -281,7 +290,7 @@ export function Contact({ profile }: ContactProps) {
                         name="projectType"
                         value={formData.projectType}
                         onChange={handleChange}
-                        className={`contact-select w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${formData.projectType === '' ? 'text-white' : 'text-black'} focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`}
+                        className={`contact-select ${fieldClassName}`}
                       >
                         <option value="">Sélectionnez un type</option>
                         <option value="portrait">Portrait</option>

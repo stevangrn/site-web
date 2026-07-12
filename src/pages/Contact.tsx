@@ -31,7 +31,7 @@ export function Contact({ profile }: ContactProps) {
   // automatiquement par les robots spammeurs. S'il contient quoi que ce
   // soit, on considère que c'est un bot et on n'envoie rien.
   const [honeypot, setHoneypot] = useState('');
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+  const [, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
     const stored = window.localStorage.getItem('portfolio-theme');
     if (stored === 'dark' || stored === 'light') return stored;
@@ -111,18 +111,14 @@ export function Contact({ profile }: ContactProps) {
     return () => obs.disconnect();
   }, []);
 
-  // Champs du formulaire : blancs en mode sombre, et inversement (fond
-  // sombre) en mode clair.
   const fieldClassName =
-    theme === 'dark'
-      ? 'w-full bg-white border border-neutral-300 rounded-lg px-4 py-3 text-neutral-900 placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors'
-      : 'w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors';
+    'w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder:text-neutral-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors';
 
   return (
     <>
       <style>{`
-        :root[data-theme="dark"] select.contact-select option { color: #171717 !important; background: #ffffff !important; }
-        :root[data-theme="light"] select.contact-select option { color: #ffffff !important; background: #171717 !important; }
+        select.contact-select option { color: #000 !important; background: #fff !important; }
+        select.contact-select option:checked { color: #fff !important; background: #111 !important; }
       `}</style>
       {/* Header */}
       <section className="pt-20 pb-12 px-6 bg-neutral-950">
@@ -294,7 +290,7 @@ export function Contact({ profile }: ContactProps) {
                         name="projectType"
                         value={formData.projectType}
                         onChange={handleChange}
-                        className={`contact-select ${fieldClassName}`}
+                        className={`contact-select w-full bg-neutral-800/50 border border-neutral-700 rounded-lg px-4 py-3 ${formData.projectType === '' ? 'text-white' : 'text-black'} focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors`}
                       >
                         <option value="">Sélectionnez un type</option>
                         <option value="portrait">Portrait</option>

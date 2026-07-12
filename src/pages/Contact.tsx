@@ -27,6 +27,10 @@ export function Contact({ profile }: ContactProps) {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
+  // Champ "honeypot" : invisible pour un humain, mais souvent rempli
+  // automatiquement par les robots spammeurs. S'il contient quoi que ce
+  // soit, on considère que c'est un bot et on n'envoie rien.
+  const [honeypot, setHoneypot] = useState('');
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
     const stored = window.localStorage.getItem('portfolio-theme');
@@ -44,6 +48,17 @@ export function Contact({ profile }: ContactProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Si le champ piège a été rempli, c'est très probablement un robot :
+    // on ne fait rien, comme si l'envoi avait réussi, sans le prévenir.
+    if (honeypot.trim() !== '') {
+      setSubmitted(true);
+      setFormData(initialFormData);
+      setHoneypot('');
+      setTimeout(() => setSubmitted(false), 5000);
+      return;
+    }
+
     setIsSending(true);
 
     try {
@@ -65,6 +80,7 @@ export function Contact({ profile }: ContactProps) {
           _subject: `Nouveau message depuis le site - ${formData.name}`,
           _captcha: 'false',
           _template: 'table',
+          _honeypot: honeypot,
         }),
       });
 
@@ -74,6 +90,7 @@ export function Contact({ profile }: ContactProps) {
 
       setSubmitted(true);
       setFormData(initialFormData);
+      setHoneypot('');
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       console.error('Contact form error:', err);
@@ -208,6 +225,26 @@ export function Contact({ profile }: ContactProps) {
                     Envoyez un message
                   </h3>
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Champ piège anti-spam : invisible et inaccessible pour
+                        un humain (masqué visuellement, ignoré au clavier et
+                        par les lecteurs d'écran), mais souvent rempli par
+                        les robots qui remplissent tous les champs qu'ils
+                        trouvent. Ne pas retirer ni rendre visible. */}
+                    <div
+                      aria-hidden="true"
+                      style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+                    >
+                      <label htmlFor="website">Ne pas remplir ce champ</label>
+                      <input
+                        type="text"
+                        id="website"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </div>
                     <div>
                       <label className="block text-sm text-neutral-400 mb-2">
                         Votre nom

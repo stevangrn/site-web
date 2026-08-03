@@ -17,9 +17,9 @@
 // ajouté dans public/, et le README pour GitHub Pages.
 // ============================================================================
 
-export type Route = '/' | '/portfolio' | '/about' | '/contact';
+export type Route = '/' | '/portfolio' | '/about' | '/contact' | '/mentions-legales';
 
-export const validRoutes: Route[] = ['/', '/portfolio', '/about', '/contact'];
+export const validRoutes: Route[] = ['/', '/portfolio', '/about', '/contact', '/mentions-legales'];
 
 // Lit la route actuelle depuis l'URL réelle (plus depuis le hash).
 // GitHub Pages redirige automatiquement /portfolio vers /portfolio/ (avec un

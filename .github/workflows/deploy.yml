@@ -49,10 +49,11 @@ jobs:
         # alors avec un vrai code 200. Le contenu est identique (c'est une
         # SPA), seul le code HTTP change.
         run: |
-          mkdir -p dist/portfolio dist/about dist/contact
+          mkdir -p dist/portfolio dist/about dist/contact dist/mentions-legales
           cp dist/index.html dist/portfolio/index.html
           cp dist/index.html dist/about/index.html
           cp dist/index.html dist/contact/index.html
+          cp dist/index.html dist/mentions-legales/index.html
 
       - name: Préparer le déploiement GitHub Pages
         uses: actions/configure-pages@v5

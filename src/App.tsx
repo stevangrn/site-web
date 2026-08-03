@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { Portfolio } from './pages/Portfolio';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
+import { MentionsLegales } from './pages/MentionsLegales';
 import { applyPageSeo } from './lib/seo';
 import { getCurrentRoute, subscribeToRoute, type Route } from './lib/router';
 
@@ -70,6 +71,8 @@ function App() {
       <About profile={profile} aboutPhoto={aboutPhoto} />
     ) : route === '/contact' ? (
       <Contact profile={profile} />
+    ) : route === '/mentions-legales' ? (
+      <MentionsLegales profile={profile} />
     ) : (
       <Home profile={profile} featuredPhotos={featuredPhotos} heroPhoto={heroPhoto} aboutPreviewPhoto={aboutPhoto} />
     );

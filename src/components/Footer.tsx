@@ -76,10 +76,16 @@ export function Footer({ profile }: FooterProps) {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-[var(--border-color)] text-center">
+        <div className="mt-8 pt-8 border-t border-[var(--border-color)] text-center space-y-2">
           <p className="text-[var(--text-muted)] text-sm">
             © {new Date().getFullYear()} {profile?.name || 'Photographe'}. Tous droits réservés.
           </p>
+          <button
+            onClick={() => navigate('/mentions-legales')}
+            className="text-[var(--text-muted)] hover:text-amber-500 text-xs transition-colors"
+          >
+            Mentions légales
+          </button>
         </div>
       </div>
     </footer>

@@ -22,6 +22,9 @@ function App() {
   // Gère le thème clair/sombre du site
   const [theme, setTheme] = useState<Theme>('dark');
 
+  // Consentement RGPD / cookies : affiché tant qu'il n'a pas été accepté
+  const [showConsentBanner, setShowConsentBanner] = useState(false);
+
   // Au chargement, on récupère le thème sauvegardé ou celui du système
   useEffect(() => {
     const savedTheme = window.localStorage.getItem('portfolio-theme');
@@ -32,6 +35,8 @@ function App() {
         ? 'light'
         : 'dark';
 
+    const consentAccepted = window.localStorage.getItem('portfolio-consent') === 'accepted';
+    setShowConsentBanner(!consentAccepted);
     setTheme(initialTheme);
   }, []);
 
@@ -81,10 +86,35 @@ function App() {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   };
 
+  const acceptConsent = () => {
+    window.localStorage.setItem('portfolio-consent', 'accepted');
+    setShowConsentBanner(false);
+  };
+
   return (
-    <Layout profile={profile} theme={theme} onToggleTheme={toggleTheme}>
-      {pageContent}
-    </Layout>
+    <>
+      <Layout profile={profile} theme={theme} onToggleTheme={toggleTheme}>
+        {pageContent}
+      </Layout>
+
+      {showConsentBanner && (
+        <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur-md px-4 py-4 shadow-lg">
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <p className="text-sm text-[var(--text-secondary)]">
+              Ce site utilise des cookies de navigation et un stockage local pour mémoriser votre préférence de thème.
+              En continuant à naviguer, vous acceptez cette utilisation.
+            </p>
+            <button
+              type="button"
+              onClick={acceptConsent}
+              className="rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400"
+            >
+              J’ai compris
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

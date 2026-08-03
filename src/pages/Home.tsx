@@ -45,6 +45,8 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                 : 'Stevan Garon, photographe et télépilote de drone en Vendée'
             }
             draggable={false}
+            loading="eager"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         </div>
@@ -113,7 +115,9 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                     src={optimizeCloudinaryUrl(photo.image_url)}
                     alt={buildPhotoAlt(photo.title, photo.categories?.name)}
                     draggable={false}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
@@ -150,6 +154,8 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                     src={optimizeCloudinaryUrl(aboutPreviewPhoto.image_url)}
                     alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                 ) : featuredPhotos[1] ? (
@@ -157,6 +163,8 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                     src={optimizeCloudinaryUrl(featuredPhotos[1].image_url)}
                     alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                 ) : (

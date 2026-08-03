@@ -8,7 +8,7 @@ import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { MentionsLegales } from './pages/MentionsLegales';
 import { applyPageSeo } from './lib/seo';
-import { getCurrentRoute, navigate, subscribeToRoute, type Route } from './lib/router';
+import { getCurrentRoute, navigate as goTo, subscribeToRoute, type Route } from './lib/router';
 
 type Theme = 'dark' | 'light';
 

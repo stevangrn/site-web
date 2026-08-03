@@ -11,8 +11,6 @@ interface ContactFormData {
   email: string;
   phone: string;
   projectType: string;
-  eventDate: string;
-  budget: string;
   message: string;
 }
 
@@ -21,8 +19,6 @@ const initialFormData: ContactFormData = {
   email: '',
   phone: '',
   projectType: '',
-  eventDate: '',
-  budget: '',
   message: '',
 };
 
@@ -75,8 +71,6 @@ export function Contact({ profile }: ContactProps) {
           email: formData.email,
           phone: formData.phone,
           projectType: formData.projectType,
-          eventDate: formData.eventDate,
-          budget: formData.budget,
           message: formData.message,
           recipientEmail,
           source: 'site-web',
@@ -305,34 +299,6 @@ export function Contact({ profile }: ContactProps) {
                         <option value="autre">Autre</option>
                       </select>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm text-neutral-400 mb-2">
-                          Date de l’événement
-                        </label>
-                        <input
-                          type="text"
-                          name="eventDate"
-                          value={formData.eventDate}
-                          onChange={handleChange}
-                          className={fieldClassName}
-                          placeholder="Ex : juin 2026"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm text-neutral-400 mb-2">
-                          Budget approximatif
-                        </label>
-                        <input
-                          type="text"
-                          name="budget"
-                          value={formData.budget}
-                          onChange={handleChange}
-                          className={fieldClassName}
-                          placeholder="Ex : 500 € à 1 000 €"
-                        />
-                      </div>
-                    </div>
                     <div>
                       <label className="block text-sm text-neutral-400 mb-2">
                         Votre message
@@ -343,7 +309,7 @@ export function Contact({ profile }: ContactProps) {
                         value={formData.message}
                         onChange={handleChange}
                         className={`${fieldClassName} resize-none`}
-                        placeholder="Décrivez votre projet, votre vision, vos attentes..."
+                        placeholder="Décrivez votre projet..."
                         required
                       />
                     </div>

@@ -1,18 +1,20 @@
 import { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Photo } from '../lib/supabase';
 
 interface LightboxProps {
   photo: Photo | null;
+  photos: Photo[];
   onClose: () => void;
+  onNavigate: (photo: Photo) => void;
 }
 
 // Sélecteur standard des éléments focusables, pour le piège de focus.
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
-export function Lightbox({ photo, onClose }: LightboxProps) {
+export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -20,13 +22,16 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
   // pour lui rendre le focus à la fermeture au lieu de le perdre.
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
-  // Ouverture/fermeture : focus, verrouillage du scroll de fond, restauration du focus.
+  const isOpen = photo !== null;
+
+  // Ouverture/fermeture : focus, verrouillage du scroll de fond, restauration
+  // du focus. Ne dépend que de isOpen (et non de photo) pour ne pas se
+  // redéclencher à chaque navigation précédent/suivant sur la même ouverture.
   useEffect(() => {
-    if (!photo) return;
+    if (!isOpen) return;
 
     previouslyFocusedElement.current = document.activeElement as HTMLElement | null;
 
-    // On bloque le scroll de la page derrière la lightbox.
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
@@ -40,16 +45,42 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
       // et l'utilisateur clavier perd sa position dans la page.
       previouslyFocusedElement.current?.focus();
     };
-  }, [photo]);
+  }, [isOpen]);
 
-  // Fermeture avec Échap + piège de focus (Tab reste à l'intérieur de la boîte).
+  // Position de la photo actuelle dans la liste, pour savoir si on peut
+  // aller précédent/suivant et pour l'indicateur "3 / 42".
+  const currentIndex = photo ? photos.findIndex((p) => p.id === photo.id) : -1;
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex >= 0 && currentIndex < photos.length - 1;
+
+  const goToPrev = () => {
+    if (hasPrev) onNavigate(photos[currentIndex - 1]);
+  };
+  const goToNext = () => {
+    if (hasNext) onNavigate(photos[currentIndex + 1]);
+  };
+
+  // Raccourcis clavier : Échap pour fermer, flèches pour naviguer, Tab piégé
+  // dans la boîte de dialogue tant qu'elle est ouverte.
   useEffect(() => {
-    if (!photo) return;
+    if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         onClose();
+        return;
+      }
+
+      if (event.key === 'ArrowLeft' && hasPrev) {
+        event.preventDefault();
+        goToPrev();
+        return;
+      }
+
+      if (event.key === 'ArrowRight' && hasNext) {
+        event.preventDefault();
+        goToNext();
         return;
       }
 
@@ -74,7 +105,8 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [photo, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, photo, hasPrev, hasNext]);
 
   if (!photo) return null;
 
@@ -95,10 +127,39 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
           type="button"
           onClick={onClose}
           aria-label="Fermer l'aperçu de la photo"
-          className="absolute top-6 right-6 text-white hover:text-amber-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-full p-1"
+          className="absolute top-6 right-6 text-white hover:text-amber-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-full p-1 z-10"
         >
           <X className="w-8 h-8" />
         </button>
+
+        {hasPrev && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPrev();
+            }}
+            aria-label="Photo précédente"
+            className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 text-white hover:text-amber-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-full p-2 z-10"
+          >
+            <ChevronLeft className="w-8 h-8 md:w-10 md:h-10" />
+          </button>
+        )}
+
+        {hasNext && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToNext();
+            }}
+            aria-label="Photo suivante"
+            className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 text-white hover:text-amber-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-full p-2 z-10"
+          >
+            <ChevronRight className="w-8 h-8 md:w-10 md:h-10" />
+          </button>
+        )}
+
         <div className="max-w-5xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
           <img
             src={optimizeCloudinaryUrl(photo.image_url)}
@@ -115,6 +176,11 @@ export function Lightbox({ photo, onClose }: LightboxProps) {
             </h3>
             {photo.description && (
               <p className="text-neutral-400 text-sm mt-2">{photo.description}</p>
+            )}
+            {currentIndex >= 0 && photos.length > 1 && (
+              <p className="text-neutral-500 text-xs mt-3">
+                {currentIndex + 1} / {photos.length}
+              </p>
             )}
           </div>
         </div>

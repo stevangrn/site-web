@@ -180,7 +180,7 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
             {currentIndex >= 0 && photos.length > 1 && (
               <p className="text-neutral-500 text-xs mt-3">
                 {currentIndex + 1} / {photos.length}
-              </p>
+              </p>//aff
             )}
           </div>
         </div>

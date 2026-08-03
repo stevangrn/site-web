@@ -9,6 +9,10 @@ interface PortfolioProps {
   photos: Photo[];
 }
 
+// Nombre de photos affichées au départ, puis ajoutées à chaque clic sur
+// "Charger plus". 18 = multiple de 2 et 3 colonnes (bonne coupe en grille).
+const PAGE_SIZE = 18;
+
 export function Portfolio({ categories, photos }: PortfolioProps) {
   // Filtre les photos selon la catégorie choisie
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -16,15 +20,8 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
   // Stocke la photo ouverte dans la lumière/agrandissement
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
 
-  // Si l’URL contient une photo, on l’ouvre automatiquement dans la lightbox
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const photoId = params.get('photo');
-    if (photoId) {
-      const photo = photos.find((p) => p.id === photoId);
-      if (photo) setLightboxPhoto(photo);
-    }
-  }, [photos]);
+  // Nombre de photos actuellement affichées dans la grille (pagination)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   // Affiche toutes les photos ou seulement celles d’une catégorie,
   // en inversant l’ordre d’affichage par rapport au fichier de contenu.
@@ -36,6 +33,41 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
   const filteredPhotos = selectedCategory
     ? sortedPhotos.filter((p) => p.category_id === selectedCategory)
     : sortedPhotos;
+
+  // Revient à la première page de résultats à chaque changement de catégorie,
+  // pour ne pas garder un "visibleCount" hérité d'un autre filtre.
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [selectedCategory]);
+
+  // Si l’URL contient une photo, on l’ouvre automatiquement dans la lightbox,
+  // et on affiche assez de photos pour qu'elle soit présente dans la grille
+  // (utile pour les liens directs venant de la page d'accueil).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const photoId = params.get('photo');
+    if (!photoId) return;
+
+    const photo = photos.find((p) => p.id === photoId);
+    if (!photo) return;
+
+    setLightboxPhoto(photo);
+
+    const index = sortedPhotos.findIndex((p) => p.id === photoId);
+    if (index >= 0) {
+      const requiredCount = Math.ceil((index + 1) / PAGE_SIZE) * PAGE_SIZE;
+      setVisibleCount((current) => Math.max(current, requiredCount));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photos]);
+
+  // Photos réellement affichées à l'écran, et s'il en reste à charger
+  const visiblePhotos = filteredPhotos.slice(0, visibleCount);
+  const hasMore = filteredPhotos.length > visibleCount;
+
+  const handleLoadMore = () => {
+    setVisibleCount((current) => current + PAGE_SIZE);
+  };
 
   // Associe chaque photo à son nom de catégorie (pour enrichir le alt SEO),
   // les photos de content.ts ne portant que le category_id.
@@ -91,34 +123,53 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
       {/* Gallery Grid */}
       <section className="py-12 px-6 bg-neutral-900 min-h-[60vh]">
         <div className="max-w-7xl mx-auto">
-          {filteredPhotos.length > 0 ? (
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-              {filteredPhotos.map((photo, index) => (
-                <div
-                  key={photo.id}
-                  onClick={() => setLightboxPhoto(photo)}
-                  className="break-inside-avoid group relative rounded-xl overflow-hidden cursor-pointer"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <img
-                    src={optimizeCloudinaryUrl(photo.image_url)}
-                    alt={buildPhotoAlt(photo.title, categoryNameById.get(photo.category_id ?? ''))}
-                    draggable={false}
-                    className="w-full transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 transition-colors duration-500" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <ExternalLink className="w-8 h-8 text-white" />
+          {visiblePhotos.length > 0 ? (
+            <>
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+                {visiblePhotos.map((photo, index) => (
+                  <div
+                    key={photo.id}
+                    onClick={() => setLightboxPhoto(photo)}
+                    className="break-inside-avoid group relative rounded-xl overflow-hidden cursor-pointer"
+                    style={{ animationDelay: `${(index % PAGE_SIZE) * 50}ms` }}
+                  >
+                    <img
+                      src={optimizeCloudinaryUrl(photo.image_url)}
+                      alt={buildPhotoAlt(photo.title, categoryNameById.get(photo.category_id ?? ''))}
+                      draggable={false}
+                      loading={index < 6 ? 'eager' : 'lazy'}
+                      className="w-full transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 transition-colors duration-500" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <ExternalLink className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <p className="text-amber-500 text-xs tracking-widest uppercase mb-1">
+                        {photo.categories?.name || 'Photographie'}
+                      </p>
+                      <h3 className="text-lg font-light text-white">{photo.title}</h3>
+                    </div>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <p className="text-amber-500 text-xs tracking-widest uppercase mb-1">
-                      {photo.categories?.name || 'Photographie'}
-                    </p>
-                    <h3 className="text-lg font-light text-white">{photo.title}</h3>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {/* Pagination : affiche le compteur et un bouton pour charger la suite */}
+              <div className="flex flex-col items-center gap-4 mt-12">
+                <p className="text-sm text-neutral-500">
+                  {visiblePhotos.length} / {filteredPhotos.length} photos affichées
+                </p>
+                {hasMore && (
+                  <button
+                    type="button"
+                    onClick={handleLoadMore}
+                    className="px-8 py-3 rounded-full text-sm tracking-wide uppercase bg-neutral-800 text-neutral-200 hover:bg-amber-500 hover:text-neutral-950 transition-colors"
+                  >
+                    Charger plus
+                  </button>
+                )}
+              </div>
+            </>
           ) : (
             <div className="text-center py-16 text-neutral-500">
               <Aperture className="w-12 h-12 mx-auto mb-4 opacity-50" />

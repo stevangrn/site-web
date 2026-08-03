@@ -21,7 +21,7 @@ const PAGE_SEO: Record<Route, { title: string; description: string }> = {
   '/': {
     title: 'Stevan Garon — Photographe & Télépilote de drone en Vendée',
     description:
-      'Photographe professionnel à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone.',
+      'Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone.',
   },
   '/portfolio': {
     title: 'Portfolio photo — Portraits, Événements, Sports, Nature | Stevan Garon',

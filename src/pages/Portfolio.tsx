@@ -163,7 +163,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                   <button
                     type="button"
                     onClick={handleLoadMore}
-                    className="px-8 py-3 rounded-full text-sm tracking-wide uppercase bg-neutral-800 text-neutral-200 hover:bg-amber-500 hover:text-neutral-950 transition-colors"
+                    className="px-8 py-3 rounded-full text-sm tracking-wide uppercase bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition-all"
                   >
                     Charger plus
                   </button>

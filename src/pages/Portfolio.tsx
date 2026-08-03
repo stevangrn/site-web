@@ -132,7 +132,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                     type="button"
                     onClick={() => setLightboxPhoto(photo)}
                     aria-label={`Agrandir la photo : ${photo.title}`}
-                    className="group relative aspect-[4/5] overflow-hidden rounded-xl text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
+                    className="group relative overflow-hidden rounded-xl text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
                     style={{ animationDelay: `${(index % PAGE_SIZE) * 50}ms` }}
                   >
                     <img
@@ -141,7 +141,8 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                       draggable={false}
                       loading={index < 6 ? 'eager' : 'lazy'}
                       decoding="async"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      style={{ aspectRatio: '4 / 5' }}
                     />
                     <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 group-focus-visible:bg-neutral-950/40 transition-colors duration-500" />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-500">

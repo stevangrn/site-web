@@ -139,6 +139,52 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
         </section>
       )}
 
+      {/* Testimonials */}
+      <section className="py-24 px-6 bg-neutral-900">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
+              Ils m’ont fait confiance
+            </p>
+            <h2 className="text-3xl md:text-4xl font-light">Ce qu’ils disent de mes prestations</h2>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {[
+              {
+                quote:
+                  "Un rendu à la fois naturel et immersif. Stevan a su capter l’énergie du moment avec une vraie sensibilité artistique.",
+                name: 'Claire & Mathieu',
+                role: 'Mariage',
+              },
+              {
+                quote:
+                  "Professionnalisme, réactivité et un regard très juste sur les mouvements. Un vrai plaisir de travailler avec lui.",
+                name: 'Léa B.',
+                role: 'Portraits / Sport',
+              },
+              {
+                quote:
+                  "Des images sobres, élégantes et parfaitement adaptées à notre événement. Très satisfait du résultat.",
+                name: 'Sophie D.',
+                role: 'Événement',
+              },
+            ].map((testimonial) => (
+              <div
+                key={testimonial.name}
+                className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-primary)]/70 p-8 shadow-sm"
+              >
+                <p className="text-neutral-300 leading-relaxed">“{testimonial.quote}”</p>
+                <div className="mt-6">
+                  <p className="text-white font-medium">{testimonial.name}</p>
+                  <p className="text-sm text-amber-500">{testimonial.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* About Preview */}
       <section className="py-24 px-6 bg-neutral-900">
         <div className="max-w-7xl mx-auto">

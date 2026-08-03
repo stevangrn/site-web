@@ -95,20 +95,20 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
 
       {/* Featured Photos */}
       {featuredPhotos.length > 0 && (
-        <section id="featured" className="py-24 px-6 bg-neutral-950">
+        <section id="featured" className="py-20 px-6 bg-neutral-950">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
+            <div className="text-center mb-12 md:mb-14">
+              <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-3">
                 Sélection
               </p>
               <h2 className="text-3xl md:text-4xl font-light">Travaux en Vedette</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredPhotos.slice(0, 6).map((photo, index) => (
                 <button
                   key={photo.id}
                   onClick={() => navigate(`/portfolio?photo=${photo.id}`)}
-                  className="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer text-left"
+                  className="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer text-left border border-white/10 bg-neutral-900/60 shadow-sm"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <img
@@ -130,7 +130,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               ))}
             </div>
 
-            <div className="text-center mt-12">
+            <div className="text-center mt-12 md:mt-14">
               <button
                 onClick={() => navigate('/portfolio')}
                 className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 transition-colors"
@@ -144,11 +144,11 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
       )}
 
       {/* About Preview */}
-      <section className="py-24 px-6 bg-neutral-900">
+      <section className="py-20 px-6 bg-neutral-900">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="relative order-2 lg:order-1">
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden">
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-sm">
                 {aboutPreviewPhoto ? (
                   <img
                     src={optimizeCloudinaryUrl(aboutPreviewPhoto.image_url)}
@@ -180,7 +180,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
                 À Propos
               </p>
-              <h2 className="text-3xl md:text-4xl font-light mb-8">Mon Histoire</h2>
+              <h2 className="text-3xl md:text-4xl font-light mb-6">Mon Histoire</h2>
               <div className="space-y-6 text-neutral-400 leading-relaxed">
                 <p>
                   Je m'appelle Stevan Garon. Passionné de photo depuis l'enfance, j'ai commencé par capturer le monde pour mes proches avant de décider de lancer officiellement mon activité de photographe indépendant.
@@ -193,7 +193,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-6 mt-12">
+              <div className="grid grid-cols-3 gap-4 md:gap-6 mt-10">
                 <div className="text-center">
                   <p className="text-4xl font-light text-amber-500">3+</p>
                   <p className="text-sm text-neutral-500 mt-1">Années</p>

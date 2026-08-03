@@ -141,8 +141,8 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                       draggable={false}
                       loading={index < 6 ? 'eager' : 'lazy'}
                       decoding="async"
-                      className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      style={{ aspectRatio: '4 / 5' }}
+                      className="w-full transition-transform duration-500 group-hover:scale-105"
+                      style={{ objectFit: 'contain' }}
                     />
                     <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 group-focus-visible:bg-neutral-950/40 transition-colors duration-500" />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-500">

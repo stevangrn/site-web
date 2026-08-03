@@ -113,19 +113,63 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
             </p>
           </div>
 
-          {/* Données personnelles */}
+          {/* Politique de confidentialité */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">Données personnelles</h2>
+            <h2 className="text-2xl font-light text-white mb-4">Politique de confidentialité</h2>
             <p>
-              Le formulaire de contact de ce site collecte les informations que vous y
-              renseignez (nom, email, téléphone facultatif, message) dans le seul but de
-              répondre à votre demande. Ces données ne sont ni cédées, ni vendues à des tiers.
+              Cette politique décrit les informations personnelles collectées sur le site
+              <span className="text-neutral-300"> stevangaron.fr</span> et la manière dont
+              elles sont utilisées.
             </p>
-            <p className="mt-3">
-              Une politique de confidentialité détaillée, précisant vos droits d'accès, de
-              rectification et de suppression de vos données, sera prochainement disponible
-              sur cette page.
-            </p>
+            <div className="mt-4 space-y-3 text-sm">
+              <p>
+                <span className="font-medium text-neutral-200">Données collectées :</span>{' '}
+                lorsque vous utilisez le formulaire de contact, je peux recueillir votre nom,
+                votre adresse e-mail, votre numéro de téléphone (si vous le renseignez), le
+                type de projet ainsi que votre message. Ces informations sont uniquement
+                utilisées pour répondre à votre demande.
+              </p>
+              <p>
+                <span className="font-medium text-neutral-200">Finalités :</span>{' '}
+                les données sont traitées pour permettre la prise de contact, la préparation
+                d’une réponse personnalisée et, si nécessaire, la mise en place d’un projet
+                photographique.
+              </p>
+              <p>
+                <span className="font-medium text-neutral-200">Prestataires et services tiers :</span>{' '}
+                le formulaire peut transmettre vos données à un service externe de gestion
+                d’e-mails afin d’assurer l’envoi du message. Aucune donnée personnelle n’est
+                vendue ou cédée à des fins commerciales.
+              </p>
+              <p>
+                <span className="font-medium text-neutral-200">Cookies et stockage local :</span>{' '}
+                ce site n’utilise pas de cookies de suivi publicitaires. Un stockage local de
+                votre navigateur peut toutefois être utilisé pour mémoriser votre préférence de
+                thème (clair ou sombre).
+              </p>
+              <p>
+                <span className="font-medium text-neutral-200">Conservation :</span>{' '}
+                les données sont conservées le temps strictement nécessaire au traitement de
+                votre demande, puis supprimées ou anonymisées, sauf obligation légale ou besoin
+                de conservation pour la preuve d’une relation commerciale.
+              </p>
+              <p>
+                <span className="font-medium text-neutral-200">Vos droits :</span>{' '}
+                vous pouvez à tout moment demander l’accès, la correction, la suppression ou la
+                limitation du traitement de vos données personnelles. Vous pouvez également
+                retirer votre consentement ou introduire une réclamation auprès de la CNIL si
+                vous estimez que vos droits ne sont pas respectés.
+              </p>
+              <p>
+                <span className="font-medium text-neutral-200">Contact :</span>{' '}
+                pour exercer vos droits ou pour toute question relative à cette politique,
+                vous pouvez me contacter à{' '}
+                <a href={`mailto:${email}`} className="text-amber-500 hover:text-amber-400 transition-colors">
+                  {email}
+                </a>
+                .
+              </p>
+            </div>
           </div>
 
           {/* Crédits */}

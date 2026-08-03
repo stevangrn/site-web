@@ -84,14 +84,14 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
           <button
             type="button"
             onClick={onToggleTheme}
-            className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] p-2 text-[var(--text-secondary)] transition-colors hover:text-amber-500"
+            className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] p-2 text-[var(--text-secondary)] transition-colors hover:text-amber-500 touch-manipulation active:scale-[0.96]"
             aria-label="Basculer le thème"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
           <button
-            className="text-[var(--text-primary)] p-2"
+            className="text-[var(--text-primary)] p-2 touch-manipulation active:scale-[0.96]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -99,8 +99,10 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-[var(--bg-primary)] border-t border-[var(--border-color)]">
+      <div
+        className={`md:hidden overflow-hidden border-t border-[var(--border-color)] bg-[var(--bg-primary)] transition-all duration-300 ease-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
+      >
+        <div className="flex flex-col">
           {navLinks.map((link) => (
             <button
               key={link.path}
@@ -111,7 +113,7 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             </button>
           ))}
         </div>
-      )}
+      </div>
     </nav>
   );
 }

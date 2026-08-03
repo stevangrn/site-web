@@ -34,7 +34,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
   return (
     <>
       {/* Hero Section */}
-      <section className="min-h-[calc(100vh-4rem)] flex items-center justify-center relative overflow-hidden">
+      <section className="min-h-[100svh] flex items-center justify-center relative overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
@@ -69,14 +69,14 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-400">
             <button
               onClick={() => navigate('/portfolio')}
-              className="group inline-flex items-center gap-3 bg-amber-500/10 backdrop-blur-sm border border-amber-500/50 px-8 py-4 rounded-full text-white hover:bg-amber-500 hover:text-neutral-950 transition-all duration-500"
+              className="group inline-flex items-center gap-3 bg-amber-500/10 backdrop-blur-sm border border-amber-500/50 px-8 py-4 rounded-full text-white hover:bg-amber-500 hover:text-neutral-950 transition-all duration-500 touch-manipulation active:scale-[0.98]"
             >
               <span className="text-sm tracking-wider uppercase">Voir Portfolio</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={() => navigate('/contact')}
-              className="inline-flex items-center gap-3 border border-white/20 px-8 py-4 rounded-full text-white hover:border-amber-500 hover:text-amber-500 transition-all duration-500"
+              className="inline-flex items-center gap-3 border border-white/20 px-8 py-4 rounded-full text-white hover:border-amber-500 hover:text-amber-500 transition-all duration-500 touch-manipulation active:scale-[0.98]"
             >
               <span className="text-sm tracking-wider uppercase">Me Contacter</span>
             </button>

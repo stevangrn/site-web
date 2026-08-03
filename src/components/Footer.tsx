@@ -80,12 +80,20 @@ export function Footer({ profile }: FooterProps) {
           <p className="text-[var(--text-muted)] text-sm">
             © {new Date().getFullYear()} {profile?.name || 'Photographe'}. Tous droits réservés.
           </p>
-          <button
-            onClick={() => navigate('/mentions-legales')}
-            className="text-[var(--text-muted)] hover:text-amber-500 text-xs transition-colors"
-          >
-            Mentions légales
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+            <button
+              onClick={() => navigate('/mentions-legales')}
+              className="text-[var(--text-muted)] hover:text-amber-500 transition-colors"
+            >
+              Mentions légales
+            </button>
+            <button
+              onClick={() => navigate('/mentions-legales')}
+              className="text-[var(--text-muted)] hover:text-amber-500 transition-colors"
+            >
+              Politique de confidentialité
+            </button>
+          </div>
         </div>
       </div>
     </footer>

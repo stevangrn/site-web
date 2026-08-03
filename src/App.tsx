@@ -8,7 +8,7 @@ import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { MentionsLegales } from './pages/MentionsLegales';
 import { applyPageSeo } from './lib/seo';
-import { getCurrentRoute, subscribeToRoute, type Route } from './lib/router';
+import { getCurrentRoute, navigate, subscribeToRoute, type Route } from './lib/router';
 
 type Theme = 'dark' | 'light';
 
@@ -91,6 +91,11 @@ function App() {
     setShowConsentBanner(false);
   };
 
+  const declineConsent = () => {
+    window.localStorage.setItem('portfolio-consent', 'declined');
+    setShowConsentBanner(false);
+  };
+
   return (
     <>
       <Layout profile={profile} theme={theme} onToggleTheme={toggleTheme}>
@@ -98,19 +103,44 @@ function App() {
       </Layout>
 
       {showConsentBanner && (
-        <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur-md px-4 py-4 shadow-lg">
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <p className="text-sm text-[var(--text-secondary)]">
-              Ce site utilise des cookies de navigation et un stockage local pour mémoriser votre préférence de thème.
-              En continuant à naviguer, vous acceptez cette utilisation.
-            </p>
-            <button
-              type="button"
-              onClick={acceptConsent}
-              className="rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400"
-            >
-              J’ai compris
-            </button>
+        <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur-md px-4 py-4 shadow-[0_-10px_30px_rgba(0,0,0,0.25)]">
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/90 p-4 md:flex-row md:items-center md:justify-between md:px-6">
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium text-[var(--text-primary)]">
+                Nous respectons votre vie privée.
+              </p>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                Ce site utilise un stockage local pour mémoriser votre préférence de thème et améliorer votre expérience.
+                Vous pouvez accepter ou refuser cette utilisation.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={declineConsent}
+                className="rounded-full border border-[var(--border-color)] px-4 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
+              >
+                Refuser
+              </button>
+              <button
+                type="button"
+                onClick={acceptConsent}
+                className="rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400"
+              >
+                Accepter
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  window.localStorage.setItem('portfolio-consent', 'accepted');
+                  setShowConsentBanner(false);
+                  goTo('/mentions-legales');
+                }}
+                className="text-sm text-amber-500 transition-colors hover:text-amber-400"
+              >
+                Politique de confidentialité
+              </button>
+            </div>
           </div>
         </div>
       )}

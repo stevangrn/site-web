@@ -125,14 +125,14 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
         <div className="max-w-7xl mx-auto">
           {visiblePhotos.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
                 {visiblePhotos.map((photo, index) => (
                   <button
                     key={photo.id}
                     type="button"
                     onClick={() => setLightboxPhoto(photo)}
                     aria-label={`Agrandir la photo : ${photo.title}`}
-                    className="group relative overflow-hidden rounded-xl text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
+                    className="block w-full text-left break-inside-avoid group relative rounded-xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
                     style={{ animationDelay: `${(index % PAGE_SIZE) * 50}ms` }}
                   >
                     <img
@@ -140,9 +140,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                       alt={buildPhotoAlt(photo.title, categoryNameById.get(photo.category_id ?? ''))}
                       draggable={false}
                       loading={index < 6 ? 'eager' : 'lazy'}
-                      decoding="async"
                       className="w-full transition-transform duration-500 group-hover:scale-105"
-                      style={{ objectFit: 'contain' }}
                     />
                     <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 group-focus-visible:bg-neutral-950/40 transition-colors duration-500" />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-500">

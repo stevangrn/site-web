@@ -127,10 +127,12 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
             <>
               <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
                 {visiblePhotos.map((photo, index) => (
-                  <div
+                  <button
                     key={photo.id}
+                    type="button"
                     onClick={() => setLightboxPhoto(photo)}
-                    className="break-inside-avoid group relative rounded-xl overflow-hidden cursor-pointer"
+                    aria-label={`Agrandir la photo : ${photo.title}`}
+                    className="block w-full text-left break-inside-avoid group relative rounded-xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-900"
                     style={{ animationDelay: `${(index % PAGE_SIZE) * 50}ms` }}
                   >
                     <img
@@ -140,17 +142,17 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                       loading={index < 6 ? 'eager' : 'lazy'}
                       className="w-full transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 transition-colors duration-500" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 group-focus-visible:bg-neutral-950/40 transition-colors duration-500" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-500">
                       <ExternalLink className="w-8 h-8 text-white" />
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral-950 to-transparent opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-500">
                       <p className="text-amber-500 text-xs tracking-widest uppercase mb-1">
                         {photo.categories?.name || 'Photographie'}
                       </p>
                       <h3 className="text-lg font-light text-white">{photo.title}</h3>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
 

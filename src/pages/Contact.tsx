@@ -22,12 +22,23 @@ const initialFormData: ContactFormData = {
   message: '',
 };
 
+function generateCaptcha() {
+  const first = Math.floor(Math.random() * 9) + 1;
+  const second = Math.floor(Math.random() * 9) + 1;
+  return {
+    question: `Combien font ${first} + ${second} ?`,
+    answer: first + second,
+  };
+}
+
 export function Contact({ profile }: ContactProps) {
   const [submitted, setSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
   const [honeypot, setHoneypot] = useState('');
+  const [captcha, setCaptcha] = useState(() => generateCaptcha());
+  const [captchaInput, setCaptchaInput] = useState('');
   
   // Utilisation active de la variable 'theme'
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -82,6 +93,14 @@ export function Contact({ profile }: ContactProps) {
       return;
     }
 
+    const captchaAnswer = Number(captchaInput.trim());
+    if (!Number.isInteger(captchaAnswer) || captchaAnswer !== captcha.answer) {
+      setError('Le captcha est incorrect. Veuillez ressayer.');
+      setCaptchaInput('');
+      setCaptcha(generateCaptcha());
+      return;
+    }
+
     setIsSending(true);
 
     try {
@@ -114,6 +133,8 @@ export function Contact({ profile }: ContactProps) {
       setSubmitted(true);
       setFormData(initialFormData);
       setHoneypot('');
+      setCaptchaInput('');
+      setCaptcha(generateCaptcha());
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       console.error('Contact form error:', err);
@@ -346,6 +367,36 @@ export function Contact({ profile }: ContactProps) {
                         required
                         maxLength={2000}
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-neutral-400 mb-2" htmlFor="captcha">
+                        Vérification anti-spam
+                      </label>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <div className="rounded-lg border border-neutral-700/60 bg-neutral-800/40 px-4 py-3 text-sm text-neutral-200">
+                          {captcha.question}
+                        </div>
+                        <input
+                          id="captcha"
+                          type="number"
+                          inputMode="numeric"
+                          value={captchaInput}
+                          onChange={(event) => setCaptchaInput(event.target.value)}
+                          className={`${fieldClassName} sm:max-w-32`}
+                          placeholder="Réponse"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCaptcha(generateCaptcha());
+                            setCaptchaInput('');
+                          }}
+                          className="text-sm text-amber-500 hover:text-amber-400 transition-colors"
+                        >
+                          Changer
+                        </button>
+                      </div>
                     </div>
                     {error && (
                       <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">

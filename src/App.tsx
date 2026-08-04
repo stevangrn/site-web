@@ -57,6 +57,15 @@ function App() {
   // (plan SEO, point 1.2). Voir src/lib/seo.ts pour le détail et les limites.
   useEffect(() => {
     applyPageSeo(route);
+
+    if (typeof window !== 'undefined' && window.location.hostname === 'stevangaron.fr') {
+      const params = new URLSearchParams(window.location.search);
+      const isDebug = params.get('seo_debug') === '1';
+      if (isDebug) {
+        console.info('[SEO] route:', route);
+        console.info('[SEO] canonical:', document.querySelector('link[rel="canonical"]')?.getAttribute('href'));
+      }
+    }
   }, [route]);
 
   // Pendant le chargement, on affiche l’écran de chargement

@@ -56,6 +56,32 @@ export function Contact({ profile }: ContactProps) {
       return;
     }
 
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedPhone = formData.phone.trim();
+    const trimmedProjectType = formData.projectType.trim();
+    const trimmedMessage = formData.message.trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+      setError('Veuillez renseigner votre nom, votre email et votre message.');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('Veuillez saisir une adresse e-mail valide.');
+      return;
+    }
+
+    if (trimmedPhone && !/^[0-9\s+().-]{4,20}$/.test(trimmedPhone)) {
+      setError('Veuillez saisir un numéro de téléphone valide.');
+      return;
+    }
+
+    if (trimmedMessage.length > 2000) {
+      setError('Votre message est trop long. Veuillez limiter votre demande à 2000 caractères.');
+      return;
+    }
+
     setIsSending(true);
 
     try {
@@ -63,18 +89,18 @@ export function Contact({ profile }: ContactProps) {
       const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipientEmail)}`, {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          projectType: formData.projectType,
-          message: formData.message,
+          name: trimmedName,
+          email: trimmedEmail,
+          phone: trimmedPhone,
+          projectType: trimmedProjectType,
+          message: trimmedMessage,
           recipientEmail,
           source: 'site-web',
-          _subject: `Nouveau message depuis le site - ${formData.name}`,
+          _subject: `Nouveau message depuis le site - ${trimmedName}`,
           _captcha: 'false',
           _template: 'table',
           _honeypot: honeypot,
@@ -253,6 +279,8 @@ export function Contact({ profile }: ContactProps) {
                         className={fieldClassName}
                         placeholder="Jean Dupont"
                         required
+                        maxLength={100}
+                        autoComplete="name"
                       />
                     </div>
                     <div>
@@ -267,6 +295,8 @@ export function Contact({ profile }: ContactProps) {
                         className={fieldClassName}
                         placeholder="jean@example.com"
                         required
+                        maxLength={254}
+                        autoComplete="email"
                       />
                     </div>
                     <div>
@@ -280,6 +310,8 @@ export function Contact({ profile }: ContactProps) {
                         onChange={handleChange}
                         className={fieldClassName}
                         placeholder="06 12 34 56 78"
+                        maxLength={20}
+                        autoComplete="tel"
                       />
                     </div>
                     <div>
@@ -291,6 +323,7 @@ export function Contact({ profile }: ContactProps) {
                         value={formData.projectType}
                         onChange={handleChange}
                         className={`contact-select ${fieldClassName}`}
+                        aria-label="Type de projet"
                       >
                         <option value="">Sélectionnez un type</option>
                         <option value="portrait">Portrait</option>
@@ -311,6 +344,7 @@ export function Contact({ profile }: ContactProps) {
                         className={`${fieldClassName} resize-none`}
                         placeholder="Décrivez votre projet..."
                         required
+                        maxLength={2000}
                       />
                     </div>
                     {error && (

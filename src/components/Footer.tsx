@@ -34,13 +34,17 @@ export function Footer({ profile }: FooterProps) {
 
           <div className="flex items-center justify-center gap-6">
             {navLinks.map((link) => (
-              <button
+              <a
                 key={link.path}
-                onClick={() => navigate(link.path)}
+                href={link.path}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate(link.path);
+                }}
                 className="text-[var(--text-muted)] hover:text-amber-500 text-sm transition-colors"
               >
                 {link.name}
-              </button>
+              </a>
             ))}
           </div>
 
@@ -81,18 +85,26 @@ export function Footer({ profile }: FooterProps) {
             © {new Date().getFullYear()} {profile?.name || 'Photographe'}. Tous droits réservés.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
-            <button
-              onClick={() => navigate('/mentions-legales')}
+            <a
+              href="/mentions-legales"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate('/mentions-legales');
+              }}
               className="text-[var(--text-muted)] hover:text-amber-500 transition-colors"
             >
               Mentions légales
-            </button>
-            <button
-              onClick={() => navigate('/mentions-legales')}
+            </a>
+            <a
+              href="/mentions-legales"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate('/mentions-legales');
+              }}
               className="text-[var(--text-muted)] hover:text-amber-500 transition-colors"
             >
               Politique de confidentialité
-            </button>
+            </a>
           </div>
         </div>
       </div>

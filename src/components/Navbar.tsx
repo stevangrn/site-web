@@ -50,23 +50,31 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md border-b border-[var(--border-color)]">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
-        <button
-          onClick={() => navigate('/')}
+        <a
+          href="/"
+          onClick={(event) => {
+            event.preventDefault();
+            navigate('/');
+          }}
           className="flex items-center gap-2 text-[var(--text-primary)] font-light tracking-wider"
         >
           <Camera className="w-5 h-5 text-amber-500" />
           <span className="text-lg">{profile?.name?.split(' ')[0] || 'Portfolio'}</span>
-        </button>
+        </a>
 
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
-            <button
+            <a
               key={link.path}
-              onClick={() => navigate(link.path)}
+              href={link.path}
+              onClick={(event) => {
+                event.preventDefault();
+                navigate(link.path);
+              }}
               className={`text-sm tracking-wide transition-colors ${linkClassName(isActive(link.path))}`}
             >
               {link.name}
-            </button>
+            </a>
           ))}
 
           <button
@@ -106,13 +114,17 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
       >
         <div className="flex flex-col">
           {navLinks.map((link) => (
-            <button
+            <a
               key={link.path}
-              onClick={() => navigate(link.path)}
+              href={link.path}
+              onClick={(event) => {
+                event.preventDefault();
+                navigate(link.path);
+              }}
               className={`block w-full text-left px-6 py-4 transition-colors ${mobileLinkClassName(isActive(link.path))}`}
             >
               {link.name}
-            </button>
+            </a>
           ))}
         </div>
       </div>

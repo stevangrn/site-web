@@ -69,19 +69,27 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
           </h1>
           <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto mb-8 animate-fade-in animation-delay-200" />
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-400">
-            <button
-              onClick={() => navigate('/portfolio')}
+            <a
+              href="/portfolio"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate('/portfolio');
+              }}
               className="group inline-flex items-center gap-3 bg-amber-500/10 backdrop-blur-sm border border-amber-500/50 px-8 py-4 rounded-full text-white hover:bg-amber-500 hover:text-neutral-950 transition-all duration-500 touch-manipulation active:scale-[0.98]"
             >
               <span className="text-sm tracking-wider uppercase">Voir Portfolio</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => navigate('/contact')}
+            </a>
+            <a
+              href="/contact"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate('/contact');
+              }}
               className="inline-flex items-center gap-3 border border-white/20 px-8 py-4 rounded-full text-white hover:border-amber-500 hover:text-amber-500 transition-all duration-500 touch-manipulation active:scale-[0.98]"
             >
               <span className="text-sm tracking-wider uppercase">Me Contacter</span>
-            </button>
+            </a>
           </div>
         </div>
 
@@ -105,9 +113,13 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredPhotos.slice(0, 6).map((photo, index) => (
-                <button
+                <a
                   key={photo.id}
-                  onClick={() => navigate(`/portfolio?photo=${photo.id}`)}
+                  href={`/portfolio?photo=${photo.id}`}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    navigate(`/portfolio?photo=${photo.id}`);
+                  }}
                   className="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer text-left border border-white/10 bg-neutral-900/60 shadow-sm"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
@@ -126,18 +138,22 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                     </p>
                     <h3 className="text-xl font-light text-white">{photo.title}</h3>
                   </div>
-                </button>
+                </a>
               ))}
             </div>
 
             <div className="text-center mt-12 md:mt-14">
-              <button
-                onClick={() => navigate('/portfolio')}
+              <a
+                href="/portfolio"
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate('/portfolio');
+                }}
                 className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 transition-colors"
               >
                 <span className="text-sm tracking-wider uppercase">Voir tout le portfolio</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </a>
             </div>
           </div>
         </section>
@@ -209,13 +225,17 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               </div>
 
               <div className="mt-8">
-                <button
-                  onClick={() => navigate('/about')}
+                <a
+                  href="/about"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    navigate('/about');
+                  }}
                   className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 transition-colors"
                 >
                   <span className="text-sm tracking-wider uppercase">En savoir plus</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             </div>
           </div>

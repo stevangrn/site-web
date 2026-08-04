@@ -55,15 +55,27 @@ function setMetaTag(selector: string, attribute: string, value: string, content:
   tag.setAttribute('content', content);
 }
 
+function setCanonicalUrl(url: string) {
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', 'canonical');
+    document.head.appendChild(link);
+  }
+  link.setAttribute('href', url);
+}
+
 // Met à jour le titre de l'onglet et les balises meta selon la page affichée.
 // À appeler dans un useEffect, à chaque changement de route.
 export function applyPageSeo(route: Route) {
   const seo = PAGE_SEO[route] ?? PAGE_SEO['/'];
+  const canonicalUrl = new URL(route, window.location.origin || 'https://stevangaron.fr').toString();
 
   document.title = seo.title;
   setMetaTag('meta[name="description"]', 'name', 'description', seo.description);
   setMetaTag('meta[property="og:title"]', 'property', 'og:title', seo.title);
   setMetaTag('meta[property="og:description"]', 'property', 'og:description', seo.description);
+  setCanonicalUrl(canonicalUrl);
 }
 
 // ----------------------------------------------------------------------------

@@ -91,8 +91,10 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
           </button>
 
           <button
+            type="button"
             className="text-[var(--text-primary)] p-2 touch-manipulation active:scale-[0.96]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Fermer le menu mobile' : 'Ouvrir le menu mobile'}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>

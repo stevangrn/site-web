@@ -109,7 +109,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-3">
                 Sélection
               </p>
-              <h2 className="text-3xl md:text-4xl font-light">Travaux en Vedette</h2>
+              <h2 className="text-3xl md:text-4xl font-light">Portraits, événements et paysages en Vendée</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredPhotos.slice(0, 6).map((photo, index) => (
@@ -199,13 +199,13 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               <h2 className="text-3xl md:text-4xl font-light mb-6">Mon Histoire</h2>
               <div className="space-y-6 text-neutral-400 leading-relaxed">
                 <p>
-                  Je m'appelle Stevan Garon. Passionné de photo depuis l'enfance, j'ai commencé par capturer le monde pour mes proches avant de décider de lancer officiellement mon activité de photographe indépendant.
+                  Je m'appelle Stevan Garon, photographe et télépilote de drone basé en Vendée. Je travaille sur des portraits, des événements, des sports et des projets de paysage avec un regard à la fois documentaire et artistique.
                 </p>
                 <p>
-                  Mon terrain de jeu favori ? Le sport, où je prends un plaisir fou à figer le mouvement et l'adrénaline. J'immortalise également l'énergie de vos événements (concerts, théâtre), la magie de vos mariages, ainsi que vos portraits.
+                  Mon terrain de jeu favori ? Le sport, où je prends un plaisir fou à figer le mouvement et l'adrénaline. J'immortalise également l'énergie de vos événements (concerts, théâtre), la magie de vos mariages, ainsi que vos portraits en milieu naturel ou urbain.
                 </p>
                 <p>
-                  Mon objectif : mettre en valeur chaque instant avec authenticité, technique et sensibilité.
+                  Mon objectif : créer des images authentiques, sensibles et techniques, à la hauteur de vos projets, que ce soit à La Chaize-le-Vicomte, dans toute la Vendée ou au-delà.
                 </p>
               </div>
 

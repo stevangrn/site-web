@@ -83,8 +83,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
           </p>
           <h1 className="text-4xl md:text-5xl font-light mb-4">Mes Créations</h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
-            Découvrez une sélection de mes travaux photographiques, des portraits
-            aux paysages en passant par les événements sur la terre comme dans les aires.
+            Découvrez un portfolio photographique en Vendée : portraits, événements, sports, mariages et paysages capturés avec une approche naturelle, documentaire et artistique.
           </p>
         </div>
       </section>

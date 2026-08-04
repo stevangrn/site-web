@@ -173,7 +173,7 @@ export function applyPageSeo(route: Route) {
 export function buildPhotoAlt(title: string, categoryName?: string): string {
   const cleanTitle = title?.trim() || 'Photographie';
   const suffix = categoryName ? `${categoryName} en Vendée` : 'Photographe en Vendée';
-  return `${cleanTitle} — ${suffix}`;
+  return `${cleanTitle} — ${suffix} | Stevan Garon`;
 }
 
 // ----------------------------------------------------------------------------

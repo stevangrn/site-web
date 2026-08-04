@@ -65,6 +65,18 @@ function setCanonicalUrl(url: string) {
   link.setAttribute('href', url);
 }
 
+function setSocialImageMeta() {
+  const imageUrl = 'https://stevangaron.fr/static/logo.png';
+  setMetaTag('meta[property="og:image"]', 'property', 'og:image', imageUrl);
+  setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', imageUrl);
+  setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/png');
+  setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+  setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+  setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', 'Stevan Garon — photographe et télépilote de drone en Vendée');
+  setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', imageUrl);
+  setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', 'Stevan Garon — photographe et télépilote de drone en Vendée');
+}
+
 function setJsonLd(schema: Record<string, unknown>) {
   let script = document.querySelector('script[data-seo-schema="true"]');
   if (!script) {
@@ -161,7 +173,9 @@ export function applyPageSeo(route: Route) {
   setMetaTag('meta[name="description"]', 'name', 'description', seo.description);
   setMetaTag('meta[property="og:title"]', 'property', 'og:title', seo.title);
   setMetaTag('meta[property="og:description"]', 'property', 'og:description', seo.description);
+  setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Stevan Garon Photographe');
   setCanonicalUrl(canonicalUrl);
+  setSocialImageMeta();
   setJsonLd(buildStructuredData(route));
 }
 

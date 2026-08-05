@@ -101,7 +101,7 @@ export function Contact({ profile }: ContactProps) {
     e.preventDefault();
     setError(null);
 
-    if (honeypot.trim() !== '') {
+    if (!hasRecaptcha && honeypot.trim() !== '') {
       setSubmitted(true);
       setFormData(initialFormData);
       setHoneypot('');
@@ -183,7 +183,7 @@ export function Contact({ profile }: ContactProps) {
           _subject: `Nouveau message depuis le site - ${trimmedName}`,
           _captcha: 'false',
           _template: 'table',
-          _honeypot: honeypot,
+          ...(!hasRecaptcha ? { _honeypot: honeypot } : {}),
           ...(hasRecaptcha ? { recaptchaToken } : {}),
         }),
       });
@@ -335,21 +335,23 @@ export function Contact({ profile }: ContactProps) {
                     Envoyez un message
                   </h3>
                   <form onSubmit={handleSubmit} className="space-y-5">
-                    <div
-                      aria-hidden="true"
-                      style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
-                    >
-                      <label htmlFor="website">Ne pas remplir ce champ</label>
-                      <input
-                        type="text"
-                        id="website"
-                        name="website"
-                        tabIndex={-1}
-                        autoComplete="off"
-                        value={honeypot}
-                        onChange={(e) => setHoneypot(e.target.value)}
-                      />
-                    </div>
+                    {!hasRecaptcha && (
+                      <div
+                        aria-hidden="true"
+                        style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+                      >
+                        <label htmlFor="website">Ne pas remplir ce champ</label>
+                        <input
+                          type="text"
+                          id="website"
+                          name="website"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={honeypot}
+                          onChange={(e) => setHoneypot(e.target.value)}
+                        />
+                      </div>
+                    )}
                     <div>
                       <label className="block text-sm text-neutral-400 mb-2">
                         Votre nom

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { ExternalLink, Aperture } from 'lucide-react';
 import { Lightbox } from '../components/Lightbox';
 import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
-import { useTranslation } from '../lib/i18n';
 import type { Category, Photo } from '../lib/supabase';
 
 interface PortfolioProps {

@@ -1,7 +1,6 @@
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { navigate as goTo } from '../lib/router';
 import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
-import { useTranslation } from '../lib/i18n';
 import type { Profile, Photo } from '../lib/supabase';
 
 interface HomeProps {

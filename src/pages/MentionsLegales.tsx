@@ -1,5 +1,4 @@
 import { Mail, Phone, MapPin } from 'lucide-react';
-import { useTranslation } from '../lib/i18n';
 import type { Profile } from '../lib/supabase';
 
 interface MentionsLegalesProps {

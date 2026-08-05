@@ -39,6 +39,11 @@ export function Contact({ profile }: ContactProps) {
   const [honeypot, setHoneypot] = useState('');
   const [captcha, setCaptcha] = useState(() => generateCaptcha());
   const [captchaInput, setCaptchaInput] = useState('');
+
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
+  const hasRecaptcha = RECAPTCHA_SITE_KEY !== '';
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
   
   // Utilisation active de la variable 'theme'
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -53,6 +58,43 @@ export function Contact({ profile }: ContactProps) {
   ) => {
     const { name, value } = e.target;
     setFormData((current) => ({ ...current, [name]: value }));
+  };
+
+  useEffect(() => {
+    if (!hasRecaptcha || typeof window === 'undefined') return;
+
+    if ((window as any).grecaptcha) {
+      setIsRecaptchaReady(true);
+      return;
+    }
+
+    const scriptId = 'recaptcha-script';
+    if (document.getElementById(scriptId)) {
+      const existing = document.getElementById(scriptId) as HTMLScriptElement;
+      if (existing.complete || existing.readyState === 'complete') {
+        setIsRecaptchaReady(true);
+      } else {
+        existing.addEventListener('load', () => setIsRecaptchaReady(true), { once: true });
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(RECAPTCHA_SITE_KEY)}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setIsRecaptchaReady(true);
+    document.body.appendChild(script);
+  }, [hasRecaptcha, RECAPTCHA_SITE_KEY]);
+
+  const getRecaptchaToken = async () => {
+    if (!hasRecaptcha) return '';
+    if (!(window as any).grecaptcha) {
+      throw new Error('reCAPTCHA indisponible');
+    }
+
+    return await (window as any).grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'contact' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,12 +135,31 @@ export function Contact({ profile }: ContactProps) {
       return;
     }
 
-    const captchaAnswer = Number(captchaInput.trim());
-    if (!Number.isInteger(captchaAnswer) || captchaAnswer !== captcha.answer) {
-      setError('Le captcha est incorrect. Veuillez ressayer.');
-      setCaptchaInput('');
-      setCaptcha(generateCaptcha());
-      return;
+    if (hasRecaptcha) {
+      if (!isRecaptchaReady) {
+        setError('La vérification reCAPTCHA n’est pas encore prête. Veuillez patienter.');
+        return;
+      }
+
+      try {
+        const token = await getRecaptchaToken();
+        if (!token) {
+          throw new Error('Impossible de récupérer le token reCAPTCHA.');
+        }
+        setRecaptchaToken(token);
+      } catch (recaptchaErr) {
+        console.error('reCAPTCHA error:', recaptchaErr);
+        setError('La vérification anti-spam a échoué. Veuillez réessayer.');
+        return;
+      }
+    } else {
+      const captchaAnswer = Number(captchaInput.trim());
+      if (!Number.isInteger(captchaAnswer) || captchaAnswer !== captcha.answer) {
+        setError('Le captcha est incorrect. Veuillez ressayer.');
+        setCaptchaInput('');
+        setCaptcha(generateCaptcha());
+        return;
+      }
     }
 
     setIsSending(true);
@@ -123,6 +184,7 @@ export function Contact({ profile }: ContactProps) {
           _captcha: 'false',
           _template: 'table',
           _honeypot: honeypot,
+          ...(hasRecaptcha ? { recaptchaToken } : {}),
         }),
       });
 
@@ -372,31 +434,37 @@ export function Contact({ profile }: ContactProps) {
                       <label className="block text-sm text-neutral-400 mb-2" htmlFor="captcha">
                         Vérification anti-spam
                       </label>
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      {hasRecaptcha ? (
                         <div className="rounded-lg border border-neutral-700/60 bg-neutral-800/40 px-4 py-3 text-sm text-neutral-200">
-                          {captcha.question}
+                          reCAPTCHA est activé. La vérification se fait automatiquement lorsque vous envoyez le formulaire.
                         </div>
-                        <input
-                          id="captcha"
-                          type="number"
-                          inputMode="numeric"
-                          value={captchaInput}
-                          onChange={(event) => setCaptchaInput(event.target.value)}
-                          className={`${fieldClassName} sm:max-w-32`}
-                          placeholder="Réponse"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCaptcha(generateCaptcha());
-                            setCaptchaInput('');
-                          }}
-                          className="text-sm text-amber-500 hover:text-amber-400 transition-colors"
-                        >
-                          Changer
-                        </button>
-                      </div>
+                      ) : (
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                          <div className="rounded-lg border border-neutral-700/60 bg-neutral-800/40 px-4 py-3 text-sm text-neutral-200">
+                            {captcha.question}
+                          </div>
+                          <input
+                            id="captcha"
+                            type="number"
+                            inputMode="numeric"
+                            value={captchaInput}
+                            onChange={(event) => setCaptchaInput(event.target.value)}
+                            className={`${fieldClassName} sm:max-w-32`}
+                            placeholder="Réponse"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCaptcha(generateCaptcha());
+                              setCaptchaInput('');
+                            }}
+                            className="text-sm text-amber-500 hover:text-amber-400 transition-colors"
+                          >
+                            Changer
+                          </button>
+                        </div>
+                      )}
                     </div>
                     {error && (
                       <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">

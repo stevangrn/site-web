@@ -14,6 +14,19 @@ interface ContactFormData {
   message: string;
 }
 
+type Grecaptcha = {
+  execute: (siteKey: string, options: { action: string }) => Promise<string>;
+};
+
+interface RecaptchaWindow extends Window {
+  grecaptcha?: Grecaptcha;
+}
+
+interface ScriptElementWithReadyState extends HTMLScriptElement {
+  readyState?: string;
+  complete?: boolean;
+}
+
 const initialFormData: ContactFormData = {
   name: '',
   email: '',
@@ -22,23 +35,12 @@ const initialFormData: ContactFormData = {
   message: '',
 };
 
-function generateCaptcha() {
-  const first = Math.floor(Math.random() * 9) + 1;
-  const second = Math.floor(Math.random() * 9) + 1;
-  return {
-    question: `Combien font ${first} + ${second} ?`,
-    answer: first + second,
-  };
-}
-
 export function Contact({ profile }: ContactProps) {
   const [submitted, setSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
   const [honeypot, setHoneypot] = useState('');
-  const [captcha, setCaptcha] = useState(() => generateCaptcha());
-  const [captchaInput, setCaptchaInput] = useState('');
 
   const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
   const hasRecaptcha = RECAPTCHA_SITE_KEY !== '';
@@ -63,14 +65,16 @@ export function Contact({ profile }: ContactProps) {
   useEffect(() => {
     if (!hasRecaptcha || typeof window === 'undefined') return;
 
-    if ((window as any).grecaptcha) {
+    const recaptchaWindow = window as RecaptchaWindow;
+    if (recaptchaWindow.grecaptcha) {
       setIsRecaptchaReady(true);
       return;
     }
 
     const scriptId = 'recaptcha-script';
-    if (document.getElementById(scriptId)) {
-      const existing = document.getElementById(scriptId) as HTMLScriptElement;
+    const existingElement = document.getElementById(scriptId);
+    if (existingElement instanceof HTMLScriptElement) {
+      const existing = existingElement as ScriptElementWithReadyState;
       if (existing.complete || existing.readyState === 'complete') {
         setIsRecaptchaReady(true);
       } else {
@@ -90,11 +94,12 @@ export function Contact({ profile }: ContactProps) {
 
   const getRecaptchaToken = async () => {
     if (!hasRecaptcha) return '';
-    if (!(window as any).grecaptcha) {
+    const recaptchaWindow = window as RecaptchaWindow;
+    if (!recaptchaWindow.grecaptcha) {
       throw new Error('reCAPTCHA indisponible');
     }
 
-    return await (window as any).grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'contact' });
+    return await recaptchaWindow.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'contact' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,14 +157,6 @@ export function Contact({ profile }: ContactProps) {
         setError('La vérification anti-spam a échoué. Veuillez réessayer.');
         return;
       }
-    } else {
-      const captchaAnswer = Number(captchaInput.trim());
-      if (!Number.isInteger(captchaAnswer) || captchaAnswer !== captcha.answer) {
-        setError('Le captcha est incorrect. Veuillez ressayer.');
-        setCaptchaInput('');
-        setCaptcha(generateCaptcha());
-        return;
-      }
     }
 
     setIsSending(true);
@@ -195,8 +192,6 @@ export function Contact({ profile }: ContactProps) {
       setSubmitted(true);
       setFormData(initialFormData);
       setHoneypot('');
-      setCaptchaInput('');
-      setCaptcha(generateCaptcha());
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       console.error('Contact form error:', err);
@@ -432,42 +427,16 @@ export function Contact({ profile }: ContactProps) {
                         maxLength={2000}
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm text-neutral-400 mb-2" htmlFor="captcha">
-                        Vérification anti-spam
-                      </label>
-                      {hasRecaptcha ? (
+                    {hasRecaptcha && (
+                      <div>
+                        <label className="block text-sm text-neutral-400 mb-2" htmlFor="captcha">
+                          Vérification anti-spam
+                        </label>
                         <div className="rounded-lg border border-neutral-700/60 bg-neutral-800/40 px-4 py-3 text-sm text-neutral-200">
                           reCAPTCHA est activé. La vérification se fait automatiquement lorsque vous envoyez le formulaire.
                         </div>
-                      ) : (
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                          <div className="rounded-lg border border-neutral-700/60 bg-neutral-800/40 px-4 py-3 text-sm text-neutral-200">
-                            {captcha.question}
-                          </div>
-                          <input
-                            id="captcha"
-                            type="number"
-                            inputMode="numeric"
-                            value={captchaInput}
-                            onChange={(event) => setCaptchaInput(event.target.value)}
-                            className={`${fieldClassName} sm:max-w-32`}
-                            placeholder="Réponse"
-                            required
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCaptcha(generateCaptcha());
-                              setCaptchaInput('');
-                            }}
-                            className="text-sm text-amber-500 hover:text-amber-400 transition-colors"
-                          >
-                            Changer
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                     {error && (
                       <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />

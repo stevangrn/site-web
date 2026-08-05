@@ -1,5 +1,6 @@
 import { Camera, Instagram, Facebook, Mail } from 'lucide-react';
 import { navigate as goTo, type Route } from '../lib/router';
+import { useTranslation } from '../lib/i18n';
 import type { Profile } from '../lib/supabase';
 
 interface FooterProps {
@@ -7,12 +8,14 @@ interface FooterProps {
 }
 
 export function Footer({ profile }: FooterProps) {
+  const t = useTranslation();
+
   // Liens du footer vers les pages du site
   const navLinks = [
-    { name: 'Accueil', path: '/' as Route },
-    { name: 'Portfolio', path: '/portfolio' as Route },
-    { name: 'À Propos', path: '/about' as Route },
-    { name: 'Contact', path: '/contact' as Route },
+    { name: t('nav.home'), path: '/' as Route },
+    { name: t('nav.portfolio'), path: '/portfolio' as Route },
+    { name: t('nav.about'), path: '/about' as Route },
+    { name: t('nav.contact'), path: '/contact' as Route },
   ];
 
   // Permet de changer de page en cliquant sur un lien du footer
@@ -62,7 +65,7 @@ export function Footer({ profile }: FooterProps) {
             <a
               href={`mailto:${profile?.email || 'contact@example.com'}`}
               className="w-10 h-10 rounded-full bg-[var(--surface)] flex items-center justify-center hover:bg-amber-500 hover:text-neutral-950 text-[var(--text-muted)] transition-all"
-              aria-label="Envoyer un email"
+              aria-label={t('footer.emailAria')}
             >
               <Mail className="w-5 h-5" />
             </a>
@@ -82,7 +85,7 @@ export function Footer({ profile }: FooterProps) {
 
         <div className="mt-8 pt-8 border-t border-[var(--border-color)] text-center space-y-2">
           <p className="text-[var(--text-muted)] text-sm">
-            © {new Date().getFullYear()} {profile?.name || 'Photographe'}. Tous droits réservés.
+            {t('footer.rights', { year: String(new Date().getFullYear()), name: profile?.name || 'Photographe' })}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
             <a
@@ -93,7 +96,7 @@ export function Footer({ profile }: FooterProps) {
               }}
               className="text-[var(--text-muted)] hover:text-amber-500 transition-colors"
             >
-              Mentions légales
+              {t('footer.legal')}
             </a>
             <a
               href="/mentions-legales"
@@ -103,7 +106,7 @@ export function Footer({ profile }: FooterProps) {
               }}
               className="text-[var(--text-muted)] hover:text-amber-500 transition-colors"
             >
-              Politique de confidentialité
+              {t('footer.privacy')}
             </a>
           </div>
         </div>

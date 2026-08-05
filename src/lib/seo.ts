@@ -8,6 +8,7 @@
 // ============================================================================
 
 import type { Route } from './router';
+import { getSeoTranslations } from './i18n';
 
 // ----------------------------------------------------------------------------
 // 1. Titre + description par page
@@ -165,8 +166,8 @@ function buildStructuredData(route: Route) {
 
 // Met à jour le titre de l'onglet et les balises meta selon la page affichée.
 // À appeler dans un useEffect, à chaque changement de route.
-export function applyPageSeo(route: Route) {
-  const seo = PAGE_SEO[route] ?? PAGE_SEO['/'];
+export function applyPageSeo(route: Route, locale: 'fr' | 'en') {
+  const seo = getSeoTranslations(locale)[route] ?? getSeoTranslations(locale)['/'];
   const canonicalUrl = new URL(route, window.location.origin || 'https://stevangaron.fr').toString();
 
   document.title = seo.title;

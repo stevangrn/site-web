@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTranslation } from '../lib/i18n';
 import type { Profile } from '../lib/supabase';
 
 interface ContactProps {

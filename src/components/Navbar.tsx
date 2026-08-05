@@ -1,29 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Camera, Moon, Sun } from 'lucide-react';
 import { navigate as goTo, getCurrentRoute, subscribeToRoute, type Route } from '../lib/router';
+import { useTranslation } from '../lib/i18n';
 import type { Profile } from '../lib/supabase';
 
 interface NavbarProps {
   profile: Profile | null;
   theme: 'dark' | 'light';
+  locale: 'fr' | 'en';
   onToggleTheme: () => void;
+  onToggleLocale: () => void;
 }
 
-export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
+export function Navbar({ profile, theme, locale, onToggleTheme, onToggleLocale }: NavbarProps) {
   // État du menu mobile ouvert ou fermé
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Page active pour mettre en surbrillance le bon lien
   const [currentRoute, setCurrentRoute] = useState<Route>(() => getCurrentRoute());
 
+  const t = useTranslation();
+
   // Liste des liens affichés dans la barre de navigation
   const navLinks = [
-    { name: 'Accueil', path: '/' as Route },
-    { name: 'Portfolio', path: '/portfolio' as Route },
-    { name: 'À Propos', path: '/about' as Route },
-    { name: 'Contact', path: '/contact' as Route },
+    { name: t('nav.home'), path: '/' as Route },
+    { name: t('nav.portfolio'), path: '/portfolio' as Route },
+    { name: t('nav.about'), path: '/about' as Route },
+    { name: t('nav.contact'), path: '/contact' as Route },
   ];
-  const themeLabel = theme === 'dark' ? 'Clair' : 'Sombre';
+  const themeLabel = theme === 'dark' ? t('theme.light') : t('theme.dark');
+  const localeLabel = locale === 'fr' ? t('locale.fr') : t('locale.en');
   const linkClassName = (active: boolean) =>
     active
       ? 'text-amber-500'
@@ -86,6 +92,14 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             <span>{themeLabel}</span>
           </button>
+          <button
+            type="button"
+            onClick={onToggleLocale}
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
+            aria-label="Basculer la langue"
+          >
+            <span>{localeLabel}</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -93,16 +107,24 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             type="button"
             onClick={onToggleTheme}
             className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] p-2 text-[var(--text-secondary)] transition-colors hover:text-amber-500 touch-manipulation active:scale-[0.96]"
-            aria-label="Basculer le thème"
+            aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={onToggleLocale}
+            className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500 touch-manipulation active:scale-[0.96]"
+            aria-label={t('locale.' + (locale === 'fr' ? 'en' : 'fr'))}
+          >
+            {locale === 'fr' ? 'FR' : 'EN'}
           </button>
 
           <button
             type="button"
             className="text-[var(--text-primary)] p-2 touch-manipulation active:scale-[0.96]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? 'Fermer le menu mobile' : 'Ouvrir le menu mobile'}
+            aria-label={mobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>

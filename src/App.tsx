@@ -9,10 +9,8 @@ import { Contact } from './pages/Contact';
 import { MentionsLegales } from './pages/MentionsLegales';
 import { applyPageSeo } from './lib/seo';
 import { getCurrentRoute, navigate as goTo, subscribeToRoute, type Route } from './lib/router';
-import { LocaleProvider, t } from './lib/i18n';
 
 type Theme = 'dark' | 'light';
-type Locale = 'fr' | 'en';
 
 function App() {
   // Récupère les données du profil, des photos et des catégories depuis la base
@@ -23,9 +21,6 @@ function App() {
 
   // Gère le thème clair/sombre du site
   const [theme, setTheme] = useState<Theme>('dark');
-
-  // Gère la langue du site
-  const [locale, setLocale] = useState<Locale>('fr');
 
   // Consentement RGPD / cookies : affiché tant qu'il n'a pas été accepté
   const [showConsentBanner, setShowConsentBanner] = useState(false);
@@ -41,16 +36,8 @@ function App() {
         : 'dark';
 
     const consentAccepted = window.localStorage.getItem('portfolio-consent') === 'accepted';
-    const savedLocale = window.localStorage.getItem('portfolio-locale');
-    const initialLocale = savedLocale === 'fr' || savedLocale === 'en'
-      ? savedLocale
-      : window.navigator.language.startsWith('en')
-        ? 'en'
-        : 'fr';
-
     setShowConsentBanner(!consentAccepted);
     setTheme(initialTheme);
-    setLocale(initialLocale);
   }, []);
 
   // À chaque changement de thème, on applique le style au site et on le sauvegarde
@@ -59,11 +46,6 @@ function App() {
     document.documentElement.style.colorScheme = theme;
     window.localStorage.setItem('portfolio-theme', theme);
   }, [theme]);
-
-  useEffect(() => {
-    document.documentElement.lang = locale;
-    window.localStorage.setItem('portfolio-locale', locale);
-  }, [locale]);
 
   // Écoute les changements de page quand l’URL change (navigation interne
   // ou boutons précédent/suivant du navigateur)
@@ -74,7 +56,7 @@ function App() {
   // Met à jour le <title> et la <meta description> selon la page affichée
   // (plan SEO, point 1.2). Voir src/lib/seo.ts pour le détail et les limites.
   useEffect(() => {
-    applyPageSeo(route, locale);
+    applyPageSeo(route);
 
     if (typeof window !== 'undefined' && window.location.hostname === 'stevangaron.fr') {
       const params = new URLSearchParams(window.location.search);
@@ -84,15 +66,11 @@ function App() {
         console.info('[SEO] canonical:', document.querySelector('link[rel="canonical"]')?.getAttribute('href'));
       }
     }
-  }, [route, locale]);
+  }, [route]);
 
   // Pendant le chargement, on affiche l’écran de chargement
   if (loading) {
-    return (
-      <LocaleProvider locale={locale}>
-        <Loading />
-      </LocaleProvider>
-    );
+    return <Loading />;
   }
 
   // On garde seulement les photos mises en avant pour la section
@@ -117,10 +95,6 @@ function App() {
     setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   };
 
-  const toggleLocale = () => {
-    setLocale((currentLocale) => (currentLocale === 'fr' ? 'en' : 'fr'));
-  };
-
   const acceptConsent = () => {
     window.localStorage.setItem('portfolio-consent', 'accepted');
     setShowConsentBanner(false);
@@ -132,14 +106,8 @@ function App() {
   };
 
   return (
-    <LocaleProvider locale={locale}>
-      <Layout
-        profile={profile}
-        theme={theme}
-        locale={locale}
-        onToggleTheme={toggleTheme}
-        onToggleLocale={toggleLocale}
-      >
+    <>
+      <Layout profile={profile} theme={theme} onToggleTheme={toggleTheme}>
         {pageContent}
       </Layout>
 
@@ -148,10 +116,11 @@ function App() {
           <div className="mx-auto flex max-w-6xl flex-col gap-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/90 p-4 md:flex-row md:items-center md:justify-between md:px-6">
             <div className="max-w-2xl">
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                {t(locale, 'consent.title')}
+                Nous respectons votre vie privée.
               </p>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                {t(locale, 'consent.text')}
+                Ce site utilise un stockage local pour mémoriser votre préférence de thème et améliorer votre expérience.
+                Vous pouvez accepter ou refuser cette utilisation.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -160,14 +129,14 @@ function App() {
                 onClick={declineConsent}
                 className="rounded-full border border-[var(--border-color)] px-4 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
               >
-                {t(locale, 'consent.decline')}
+                Refuser
               </button>
               <button
                 type="button"
                 onClick={acceptConsent}
                 className="rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400"
               >
-                {t(locale, 'consent.accept')}
+                Accepter
               </button>
               <button
                 type="button"
@@ -178,13 +147,13 @@ function App() {
                 }}
                 className="text-sm text-amber-500 transition-colors hover:text-amber-400"
               >
-                {t(locale, 'consent.privacy')}
+                Politique de confidentialité
               </button>
             </div>
           </div>
         </div>
       )}
-    </LocaleProvider>
+    </>
   );
 }
 

@@ -6,13 +6,11 @@ import type { Profile } from '../lib/supabase';
 interface LayoutProps {
   profile: Profile | null;
   theme: 'dark' | 'light';
-  locale: 'fr' | 'en';
   onToggleTheme: () => void;
-  onToggleLocale: () => void;
   children: ReactNode;
 }
 
-export function Layout({ profile, theme, locale, onToggleTheme, onToggleLocale, children }: LayoutProps) {
+export function Layout({ profile, theme, onToggleTheme, children }: LayoutProps) {
   // Protection anti-copie des images sur l'ensemble du site :
   // bloque le clic droit sur les images, le glisser-déposer,
   // et le raccourci Ctrl/Cmd+S. Rappel : rien n'empêche une
@@ -53,13 +51,7 @@ export function Layout({ profile, theme, locale, onToggleTheme, onToggleLocale, 
     // Cette structure entoure toutes les pages du site
     // Elle affiche toujours la barre de navigation, le contenu et le footer
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col transition-colors duration-300">
-      <Navbar
-        profile={profile}
-        theme={theme}
-        locale={locale}
-        onToggleTheme={onToggleTheme}
-        onToggleLocale={onToggleLocale}
-      />
+      <Navbar profile={profile} theme={theme} onToggleTheme={onToggleTheme} />
       <main className="flex-1 pt-16">
         {children}
       </main>

@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Aperture } from 'lucide-react';
 import { Lightbox } from '../components/Lightbox';
-import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
+import { buildCloudinarySrcSet, buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Category, Photo } from '../lib/supabase';
 
 interface PortfolioProps {
   categories: Category[];
   photos: Photo[];
 }
+
+// Largeurs pour les vignettes de la grille en mosaïque (1 à 3 colonnes selon
+// l'écran) : pas besoin d'envoyer une photo de 3000px de large pour une
+// vignette qui n'en affichera jamais plus de 700-800.
+const GRID_WIDTHS = [400, 600, 900, 1200];
 
 // Nombre de photos affichées au départ, puis ajoutées à chaque clic sur
 // "Charger plus". 18 = multiple de 2 et 3 colonnes (bonne coupe en grille).
@@ -91,9 +96,11 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
       {/* Category Filter */}
       <section className="py-8 px-6 bg-neutral-950 sticky top-16 z-40 border-b border-neutral-800/50">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3" role="group" aria-label="Filtrer les photos par catégorie">
             <button
+              type="button"
               onClick={() => setSelectedCategory(null)}
+              aria-pressed={selectedCategory === null}
               className={`px-5 py-2 rounded-full text-sm tracking-wide transition-all ${
                 selectedCategory === null
                   ? 'bg-amber-500 text-neutral-950'
@@ -105,7 +112,9 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
             {categories.map((category) => (
               <button
                 key={category.id}
+                type="button"
                 onClick={() => setSelectedCategory(category.id)}
+                aria-pressed={selectedCategory === category.id}
                 className={`px-5 py-2 rounded-full text-sm tracking-wide transition-all ${
                   selectedCategory === category.id
                     ? 'bg-amber-500 text-neutral-950'
@@ -135,10 +144,13 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                     style={{ animationDelay: `${(index % PAGE_SIZE) * 50}ms` }}
                   >
                     <img
-                      src={optimizeCloudinaryUrl(photo.image_url)}
+                      src={optimizeCloudinaryUrl(photo.image_url, 600)}
+                      srcSet={buildCloudinarySrcSet(photo.image_url, GRID_WIDTHS)}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       alt={buildPhotoAlt(photo.title, categoryNameById.get(photo.category_id ?? ''))}
                       draggable={false}
                       loading={index < 6 ? 'eager' : 'lazy'}
+                      decoding="async"
                       className="w-full transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-neutral-950/0 group-hover:bg-neutral-950/40 group-focus-visible:bg-neutral-950/40 transition-colors duration-500" />

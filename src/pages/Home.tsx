@@ -1,7 +1,15 @@
+import { useEffect } from 'react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { navigate as goTo } from '../lib/router';
-import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
+import { buildCloudinarySrcSet, buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Profile, Photo } from '../lib/supabase';
+
+// Largeurs générées pour l'image de fond du hero : c'est la plus grande image
+// du site (pleine largeur d'écran) et généralement le LCP (Largest Contentful
+// Paint), la métrique de performance la plus regardée par Google.
+const HERO_WIDTHS = [768, 1280, 1920, 2560];
+// Largeurs pour les vignettes de la grille "Sélection" (3 colonnes max).
+const FEATURED_WIDTHS = [400, 600, 900, 1200];
 
 interface HomeProps {
   profile: Profile | null;
@@ -31,6 +39,27 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Précharge l'image de fond du hero le plus tôt possible : le navigateur
+  // la découvre normalement seulement après avoir lu le HTML puis le JS de
+  // ce composant, ce qui la retarde. Un <link rel="preload"> injecté dans le
+  // <head> dit au navigateur "télécharge-la tout de suite, en parallèle",
+  // ce qui accélère nettement le premier affichage (LCP).
+  useEffect(() => {
+    const heroSrcSet = buildCloudinarySrcSet(heroImage, HERO_WIDTHS);
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = optimizeCloudinaryUrl(heroImage, 1920);
+    if (heroSrcSet) {
+      link.setAttribute('imagesrcset', heroSrcSet);
+      link.setAttribute('imagesizes', '100vw');
+    }
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, [heroImage]);
+
   return (
     <>
       {/* Hero Section */}
@@ -38,7 +67,9 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src={optimizeCloudinaryUrl(heroImage)}
+            src={optimizeCloudinaryUrl(heroImage, 1920)}
+            srcSet={buildCloudinarySrcSet(heroImage, HERO_WIDTHS)}
+            sizes="100vw"
             alt={
               heroPhoto
                 ? buildPhotoAlt(heroPhoto.title)
@@ -47,6 +78,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
             draggable={false}
             loading="eager"
             decoding="async"
+            fetchPriority="high"
             className="w-full h-full object-cover"
           />
         </div>
@@ -124,7 +156,9 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <img
-                    src={optimizeCloudinaryUrl(photo.image_url)}
+                    src={optimizeCloudinaryUrl(photo.image_url, 900)}
+                    srcSet={buildCloudinarySrcSet(photo.image_url, FEATURED_WIDTHS)}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     alt={buildPhotoAlt(photo.title, photo.categories?.name)}
                     draggable={false}
                     loading={index < 2 ? 'eager' : 'lazy'}
@@ -167,7 +201,9 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               <div className="aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-sm">
                 {aboutPreviewPhoto ? (
                   <img
-                    src={optimizeCloudinaryUrl(aboutPreviewPhoto.image_url)}
+                    src={optimizeCloudinaryUrl(aboutPreviewPhoto.image_url, 900)}
+                    srcSet={buildCloudinarySrcSet(aboutPreviewPhoto.image_url, FEATURED_WIDTHS)}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
                     loading="lazy"
@@ -176,7 +212,9 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                   />
                 ) : featuredPhotos[1] ? (
                   <img
-                    src={optimizeCloudinaryUrl(featuredPhotos[1].image_url)}
+                    src={optimizeCloudinaryUrl(featuredPhotos[1].image_url, 900)}
+                    srcSet={buildCloudinarySrcSet(featuredPhotos[1].image_url, FEATURED_WIDTHS)}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                     alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
                     loading="lazy"

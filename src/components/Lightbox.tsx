@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
+import { buildCloudinarySrcSet, buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Photo } from '../lib/supabase';
 
 interface LightboxProps {
@@ -13,6 +13,14 @@ interface LightboxProps {
 // Sélecteur standard des éléments focusables, pour le piège de focus.
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
+// La lightbox affiche l'image en grand (jusqu'à ~1024px de large, 90vh de
+// haut) : pas besoin d'aller chercher la version originale à 3000px+.
+const LIGHTBOX_WIDTHS = [640, 1024, 1600, 2000];
+
+// Distance minimale (en pixels) pour qu'un glissement tactile soit interprété
+// comme un balayage (swipe) plutôt qu'un simple tapotement imprécis.
+const SWIPE_THRESHOLD = 50;
 
 export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -58,6 +66,35 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
   };
   const goToNext = () => {
     if (hasNext) onNavigate(photos[currentIndex + 1]);
+  };
+
+  // Navigation tactile : glisser vers la gauche = photo suivante, vers la
+  // droite = photo précédente (comportement attendu sur mobile/tablette).
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    touchStartX.current = event.touches[0].clientX;
+    touchStartY.current = event.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = event.changedTouches[0].clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    // On ignore les glissements surtout verticaux (l'utilisateur essaie
+    // probablement de faire défiler ou de fermer, pas de naviguer).
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+    if (deltaX < 0) {
+      goToNext();
+    } else {
+      goToPrev();
+    }
   };
 
   // Raccourcis clavier : Échap pour fermer, flèches pour naviguer, Tab piégé
@@ -114,6 +151,8 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
     <div
       className="fixed inset-0 z-50 bg-neutral-950/95 flex items-center justify-center p-4"
       onClick={onClose}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       <div
         ref={dialogRef}
@@ -162,9 +201,12 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
 
         <div className="max-w-5xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
           <img
-            src={optimizeCloudinaryUrl(photo.image_url)}
+            src={optimizeCloudinaryUrl(photo.image_url, 1600)}
+            srcSet={buildCloudinarySrcSet(photo.image_url, LIGHTBOX_WIDTHS)}
+            sizes="(max-width: 1024px) 100vw, 1024px"
             alt={buildPhotoAlt(photo.title, photo.categories?.name)}
             draggable={false}
+            decoding="async"
             className="max-w-full max-h-[85vh] object-contain rounded-lg"
           />
           <div className="text-center mt-4">
@@ -180,7 +222,7 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
             {currentIndex >= 0 && photos.length > 1 && (
               <p className="text-neutral-500 text-xs mt-3">
                 {currentIndex + 1} / {photos.length}
-              </p>//aff
+              </p>
             )}
           </div>
         </div>

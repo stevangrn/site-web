@@ -196,12 +196,34 @@ export function buildPhotoAlt(title: string, categoryName?: string): string {
 // Insère les paramètres f_auto,q_auto (format + qualité automatiques) dans les
 // URLs Cloudinary pour servir des images plus légères, sans avoir à ré-uploader
 // ni à modifier les 96 URLs dans content.ts.
-export function optimizeCloudinaryUrl(url: string): string {
+//
+// Le paramètre `width` optionnel ajoute en plus c_limit,w_XXX : Cloudinary ne
+// renverra jamais une image plus large que ce qui est réellement affiché à
+// l'écran (au lieu d'envoyer la photo originale, souvent 3000px+ de large,
+// pour une vignette de 400px). C'est le gain de performance le plus important
+// du site : moins de données transférées = chargement plus rapide, surtout
+// sur mobile / 4G.
+export function optimizeCloudinaryUrl(url: string, width?: number): string {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) {
     return url;
   }
   if (url.includes('/upload/f_auto')) {
     return url; // déjà optimisée
   }
-  return url.replace('/upload/', '/upload/f_auto,q_auto/');
+  const sizePart = width ? `,c_limit,w_${Math.round(width)}` : '';
+  return url.replace('/upload/', `/upload/f_auto,q_auto${sizePart}/`);
+}
+
+// ----------------------------------------------------------------------------
+// 4. Attribut srcset pour les images Cloudinary
+// ----------------------------------------------------------------------------
+// Génère plusieurs variantes de la même image à différentes largeurs, pour
+// que le navigateur choisisse lui-même la plus petite qui reste nette selon
+// la taille d'écran et la densité de pixels (mobile, tablette, écran Retina...).
+// À utiliser avec l'attribut `sizes` sur la balise <img>.
+export function buildCloudinarySrcSet(url: string, widths: number[]): string | undefined {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/') || url.includes('/upload/f_auto')) {
+    return undefined;
+  }
+  return widths.map((width) => `${optimizeCloudinaryUrl(url, width)} ${width}w`).join(', ');
 }

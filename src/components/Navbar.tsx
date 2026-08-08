@@ -103,6 +103,8 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             className="text-[var(--text-primary)] p-2 touch-manipulation active:scale-[0.96]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Fermer le menu mobile' : 'Ouvrir le menu mobile'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -110,6 +112,7 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
       </div>
 
       <div
+        id="mobile-menu"
         className={`md:hidden overflow-hidden border-t border-[var(--border-color)] bg-[var(--bg-primary)] transition-all duration-300 ease-out ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
       >
         <div className="flex flex-col">

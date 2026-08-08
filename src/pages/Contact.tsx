@@ -315,8 +315,12 @@ export function Contact({ profile }: ContactProps) {
             {/* Contact Form */}
             <div className="bg-neutral-800/20 rounded-2xl p-8 border border-neutral-700/30">
               {submitted ? (
-                <div className="h-full flex flex-col items-center justify-center text-center">
-                  <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="h-full flex flex-col items-center justify-center text-center"
+                >
+                  <CheckCircle className="w-16 h-16 text-green-500 mb-4" aria-hidden="true" />
                   <h3 className="text-2xl font-light text-white mb-2">
                     Message envoyé !
                   </h3>
@@ -348,10 +352,11 @@ export function Contact({ profile }: ContactProps) {
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm text-neutral-400 mb-2">
+                      <label htmlFor="contact-name" className="block text-sm text-neutral-400 mb-2">
                         Votre nom
                       </label>
                       <input
+                        id="contact-name"
                         type="text"
                         name="name"
                         value={formData.name}
@@ -364,10 +369,11 @@ export function Contact({ profile }: ContactProps) {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-neutral-400 mb-2">
+                      <label htmlFor="contact-email" className="block text-sm text-neutral-400 mb-2">
                         Votre email
                       </label>
                       <input
+                        id="contact-email"
                         type="email"
                         name="email"
                         value={formData.email}
@@ -380,10 +386,11 @@ export function Contact({ profile }: ContactProps) {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-neutral-400 mb-2">
+                      <label htmlFor="contact-phone" className="block text-sm text-neutral-400 mb-2">
                         Votre téléphone (optionnel)
                       </label>
                       <input
+                        id="contact-phone"
                         type="tel"
                         name="phone"
                         value={formData.phone}
@@ -395,15 +402,15 @@ export function Contact({ profile }: ContactProps) {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-neutral-400 mb-2">
+                      <label htmlFor="contact-project-type" className="block text-sm text-neutral-400 mb-2">
                         Type de projet
                       </label>
                       <select
+                        id="contact-project-type"
                         name="projectType"
                         value={formData.projectType}
                         onChange={handleChange}
                         className={`contact-select ${fieldClassName}`}
-                        aria-label="Type de projet"
                       >
                         <option value="">Sélectionnez un type</option>
                         <option value="portrait">Portrait</option>
@@ -413,10 +420,11 @@ export function Contact({ profile }: ContactProps) {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-neutral-400 mb-2">
+                      <label htmlFor="contact-message" className="block text-sm text-neutral-400 mb-2">
                         Votre message
                       </label>
                       <textarea
+                        id="contact-message"
                         name="message"
                         rows={5}
                         value={formData.message}
@@ -438,8 +446,12 @@ export function Contact({ profile }: ContactProps) {
                       </div>
                     )}
                     {error && (
-                      <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                      <div
+                        role="alert"
+                        aria-live="assertive"
+                        className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+                      >
+                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                         <span>{error}</span>
                       </div>
                     )}

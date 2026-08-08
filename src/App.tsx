@@ -25,38 +25,27 @@ function App() {
   // Consentement RGPD / cookies : affiché tant qu'il n'a pas été accepté
   const [showConsentBanner, setShowConsentBanner] = useState(false);
 
-  // Reflète l'état réel du consentement (true seulement si "Accepter" a été cliqué).
-  // Tant que c'est false, on n'écrit rien dans localStorage.
-  const [consentGiven, setConsentGiven] = useState(false);
-
-  // Au chargement : le thème n'est lu depuis localStorage QUE si le consentement
-  // a déjà été donné lors d'une visite précédente. Sinon on ne lit ni n'écrit rien,
-  // on se base uniquement sur la préférence système (RGPD : pas de dépôt avant accord).
+  // Au chargement, on récupère le thème sauvegardé ou celui du système
   useEffect(() => {
-    const consentAccepted = window.localStorage.getItem('portfolio-consent') === 'accepted';
+    const savedTheme = window.localStorage.getItem('portfolio-theme');
     const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-
-    const savedTheme = consentAccepted ? window.localStorage.getItem('portfolio-theme') : null;
     const initialTheme = savedTheme === 'light' || savedTheme === 'dark'
       ? savedTheme
       : systemPrefersLight
         ? 'light'
         : 'dark';
 
-    setConsentGiven(consentAccepted);
+    const consentAccepted = window.localStorage.getItem('portfolio-consent') === 'accepted';
     setShowConsentBanner(!consentAccepted);
     setTheme(initialTheme);
   }, []);
 
-  // À chaque changement de thème, on applique le style au site.
-  // On ne PERSISTE en localStorage que si le consentement a été donné.
+  // À chaque changement de thème, on applique le style au site et on le sauvegarde
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.style.colorScheme = theme;
-    if (consentGiven) {
-      window.localStorage.setItem('portfolio-theme', theme);
-    }
-  }, [theme, consentGiven]);
+    window.localStorage.setItem('portfolio-theme', theme);
+  }, [theme]);
 
   // Écoute les changements de page quand l’URL change (navigation interne
   // ou boutons précédent/suivant du navigateur)
@@ -108,15 +97,11 @@ function App() {
 
   const acceptConsent = () => {
     window.localStorage.setItem('portfolio-consent', 'accepted');
-    setConsentGiven(true); // autorise désormais la persistance du thème
     setShowConsentBanner(false);
   };
 
   const declineConsent = () => {
-    // "declined" est le statut du bandeau lui-même (ne pas re-demander),
-    // ce n'est pas un consentement au dépôt d'autres données.
     window.localStorage.setItem('portfolio-consent', 'declined');
-    setConsentGiven(false);
     setShowConsentBanner(false);
   };
 
@@ -156,7 +141,8 @@ function App() {
               <button
                 type="button"
                 onClick={() => {
-                  acceptConsent();
+                  window.localStorage.setItem('portfolio-consent', 'accepted');
+                  setShowConsentBanner(false);
                   goTo('/mentions-legales');
                 }}
                 className="text-sm text-amber-500 transition-colors hover:text-amber-400"

@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://stevangaron.fr/sitemap.xml

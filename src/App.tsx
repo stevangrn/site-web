@@ -9,6 +9,7 @@ import { Contact } from './pages/Contact';
 import { MentionsLegales } from './pages/MentionsLegales';
 import { applyPageSeo } from './lib/seo';
 import { getCurrentRoute, navigate as goTo, subscribeToRoute, type Route } from './lib/router';
+import { loadGTM } from './lib/gtm';
 
 type Theme = 'dark' | 'light';
 
@@ -38,6 +39,13 @@ function App() {
     const consentAccepted = window.localStorage.getItem('portfolio-consent') === 'accepted';
     setShowConsentBanner(!consentAccepted);
     setTheme(initialTheme);
+
+    // Si la personne avait déjà accepté lors d'une visite précédente,
+    // on peut charger GTM tout de suite. Sinon, GTM reste bloqué tant
+    // qu'elle n'a pas cliqué sur "Accepter".
+    if (consentAccepted) {
+      loadGTM();
+    }
   }, []);
 
   // À chaque changement de thème, on applique le style au site et on le sauvegarde
@@ -98,6 +106,7 @@ function App() {
   const acceptConsent = () => {
     window.localStorage.setItem('portfolio-consent', 'accepted');
     setShowConsentBanner(false);
+    loadGTM();
   };
 
   const declineConsent = () => {
@@ -119,7 +128,8 @@ function App() {
                 Nous respectons votre vie privée.
               </p>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                Ce site utilise un stockage local pour mémoriser votre préférence de thème et améliorer votre expérience.
+                Ce site utilise un stockage local pour mémoriser votre préférence de thème, et souhaite utiliser
+                Google Tag Manager pour la mesure d'audience. Ce dernier n'est chargé qu'après votre accord.
                 Vous pouvez accepter ou refuser cette utilisation.
               </p>
             </div>
@@ -143,6 +153,7 @@ function App() {
                 onClick={() => {
                   window.localStorage.setItem('portfolio-consent', 'accepted');
                   setShowConsentBanner(false);
+                  loadGTM();
                   goTo('/mentions-legales');
                 }}
                 className="text-sm text-amber-500 transition-colors hover:text-amber-400"

@@ -24,13 +24,15 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
   return (
     <>
       {/* Header */}
-      <section className="pt-20 pb-12 px-6 bg-neutral-950">
+      <section className="pt-20 pb-12 px-6 bg-[var(--bg-primary)]">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
             Informations légales
           </p>
-          <h1 className="text-4xl md:text-5xl font-light mb-4">Mentions Légales</h1>
-          <p className="text-neutral-400 max-w-2xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-light mb-4 text-[var(--text-primary)]">
+            Mentions Légales
+          </h1>
+          <p className="text-[var(--text-secondary)] max-w-2xl mx-auto">
             Conformément à la loi n°2004-575 du 21 juin 2004 pour la confiance
             dans l'économie numérique.
           </p>
@@ -38,17 +40,19 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
       </section>
 
       {/* Content */}
-      <section className="py-16 px-6 bg-neutral-950">
-        <div className="max-w-3xl mx-auto space-y-12 text-neutral-400 leading-relaxed">
+      <section className="py-16 px-6 bg-[var(--bg-primary)]">
+        <div className="max-w-3xl mx-auto space-y-12 text-[var(--text-secondary)] leading-relaxed">
           {/* Éditeur du site */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">Éditeur du site</h2>
+            <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">
+              Éditeur du site
+            </h2>
             <p>
-              Le site <span className="text-neutral-300">stevangaron.fr</span> est édité à
-              titre individuel par :
+              Le site <span className="text-[var(--text-primary)]">stevangaron.fr</span> est
+              édité à titre individuel par :
             </p>
-            <div className="mt-4 space-y-3 bg-neutral-800/30 rounded-xl p-6 border border-neutral-700/30">
-              <p className="text-neutral-200">{name}</p>
+            <div className="mt-4 space-y-3 bg-[var(--surface)] rounded-xl p-6 border border-[var(--border-color)]">
+              <p className="text-[var(--text-primary)]">{name}</p>
               <div className="flex items-center gap-3">
                 <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>{location}</span>
@@ -66,7 +70,7 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
                 </a>
               </div>
             </div>
-            <p className="mt-4 text-sm text-neutral-500">
+            <p className="mt-4 text-sm text-[var(--text-muted)]">
               Cette activité de photographie est exercée à titre individuel et n'est, à ce
               jour, rattachée à aucune structure juridique immatriculée (pas de numéro SIRET,
               de numéro RCS, ni de numéro de TVA intracommunautaire).
@@ -75,7 +79,7 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
 
           {/* Directeur de la publication */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">
+            <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">
               Directeur de la publication
             </h2>
             <p>{name}, également éditeur du site (coordonnées ci-dessus).</p>
@@ -83,10 +87,10 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
 
           {/* Hébergement */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">Hébergement</h2>
+            <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">Hébergement</h2>
             <p>Le site est hébergé par :</p>
-            <div className="mt-4 space-y-1 bg-neutral-800/30 rounded-xl p-6 border border-neutral-700/30">
-              <p className="text-neutral-200">GitHub, Inc.</p>
+            <div className="mt-4 space-y-1 bg-[var(--surface)] rounded-xl p-6 border border-[var(--border-color)]">
+              <p className="text-[var(--text-primary)]">GitHub, Inc.</p>
               <p>88 Colin P Kelly Jr Street</p>
               <p>San Francisco, CA 94107</p>
               <p>États-Unis</p>
@@ -103,7 +107,9 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
 
           {/* Propriété intellectuelle */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">Propriété intellectuelle</h2>
+            <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">
+              Propriété intellectuelle
+            </h2>
             <p>
               L'ensemble des photographies, textes, logos et éléments graphiques présents sur
               ce site sont la propriété exclusive de {name}, sauf mention contraire. Toute
@@ -115,53 +121,55 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
 
           {/* Politique de confidentialité */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">Politique de confidentialité</h2>
+            <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">
+              Politique de confidentialité
+            </h2>
             <p>
               Cette politique décrit les informations personnelles collectées sur le site
-              <span className="text-neutral-300"> stevangaron.fr</span> et la manière dont
-              elles sont utilisées.
+              <span className="text-[var(--text-primary)]"> stevangaron.fr</span> et la manière
+              dont elles sont utilisées.
             </p>
             <div className="mt-4 space-y-3 text-sm">
               <p>
-                <span className="font-medium text-neutral-200">Données collectées :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Données collectées :</span>{' '}
                 lorsque vous utilisez le formulaire de contact, je peux recueillir votre nom,
                 votre adresse e-mail, votre numéro de téléphone (si vous le renseignez), le
                 type de projet ainsi que votre message. Ces informations sont uniquement
                 utilisées pour répondre à votre demande.
               </p>
               <p>
-                <span className="font-medium text-neutral-200">Finalités :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Finalités :</span>{' '}
                 les données sont traitées pour permettre la prise de contact, la préparation
                 d’une réponse personnalisée et, si nécessaire, la mise en place d’un projet
                 photographique.
               </p>
               <p>
-                <span className="font-medium text-neutral-200">Prestataires et services tiers :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Prestataires et services tiers :</span>{' '}
                 le formulaire peut transmettre vos données à un service externe de gestion
                 d’e-mails afin d’assurer l’envoi du message. Aucune donnée personnelle n’est
                 vendue ou cédée à des fins commerciales.
               </p>
               <p>
-                <span className="font-medium text-neutral-200">Cookies et stockage local :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Cookies et stockage local :</span>{' '}
                 ce site n’utilise pas de cookies de suivi publicitaires. Un stockage local de
                 votre navigateur peut toutefois être utilisé pour mémoriser votre préférence de
-                thème (clair ou sombre).
+                thème (clair ou sombre), et Google Tag Manager n’est chargé qu’après votre accord.
               </p>
               <p>
-                <span className="font-medium text-neutral-200">Conservation :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Conservation :</span>{' '}
                 les données sont conservées le temps strictement nécessaire au traitement de
                 votre demande, puis supprimées ou anonymisées, sauf obligation légale ou besoin
                 de conservation pour la preuve d’une relation commerciale.
               </p>
               <p>
-                <span className="font-medium text-neutral-200">Vos droits :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Vos droits :</span>{' '}
                 vous pouvez à tout moment demander l’accès, la correction, la suppression ou la
                 limitation du traitement de vos données personnelles. Vous pouvez également
                 retirer votre consentement ou introduire une réclamation auprès de la CNIL si
                 vous estimez que vos droits ne sont pas respectés.
               </p>
               <p>
-                <span className="font-medium text-neutral-200">Contact :</span>{' '}
+                <span className="font-medium text-[var(--text-primary)]">Contact :</span>{' '}
                 pour exercer vos droits ou pour toute question relative à cette politique,
                 vous pouvez me contacter à{' '}
                 <a href={`mailto:${email}`} className="text-amber-500 hover:text-amber-400 transition-colors">
@@ -174,7 +182,7 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
 
           {/* Crédits */}
           <div>
-            <h2 className="text-2xl font-light text-white mb-4">Crédits</h2>
+            <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">Crédits</h2>
             <p>Conception et développement du site : {name}.</p>
           </div>
         </div>

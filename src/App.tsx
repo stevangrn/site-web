@@ -1,15 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { useData } from './hooks/useData';
 import { Layout } from './components/Layout';
 import { Loading } from './components/Loading';
 import { Home } from './pages/Home';
-import { Portfolio } from './pages/Portfolio';
-import { About } from './pages/About';
-import { Contact } from './pages/Contact';
-import { MentionsLegales } from './pages/MentionsLegales';
 import { applyPageSeo } from './lib/seo';
 import { getCurrentRoute, navigate as goTo, subscribeToRoute, type Route } from './lib/router';
 import { loadGTM } from './lib/gtm';
+
+// Home reste chargée immédiatement : c'est la page d'atterrissage de la
+// grande majorité des visites. Les autres pages ne sont téléchargées par
+// le navigateur qu'au moment où l'utilisateur y accède réellement, ce qui
+// réduit le JS chargé au premier affichage (notamment Contact.tsx, qui
+// embarque le script reCAPTCHA).
+const Portfolio = lazy(() => import('./pages/Portfolio').then((m) => ({ default: m.Portfolio })));
+const About = lazy(() => import('./pages/About').then((m) => ({ default: m.About })));
+const Contact = lazy(() => import('./pages/Contact').then((m) => ({ default: m.Contact })));
+const MentionsLegales = lazy(() =>
+  import('./pages/MentionsLegales').then((m) => ({ default: m.MentionsLegales }))
+);
 
 type Theme = 'dark' | 'light';
 
@@ -117,7 +125,7 @@ function App() {
   return (
     <>
       <Layout profile={profile} theme={theme} onToggleTheme={toggleTheme}>
-        {pageContent}
+        <Suspense fallback={<Loading />}>{pageContent}</Suspense>
       </Layout>
 
       {showConsentBanner && (

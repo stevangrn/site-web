@@ -7,7 +7,7 @@
 // (une fois publié).
 // ============================================================================
 
-import type { Profile, Category, Photo } from '../lib/supabase';
+import type { Profile, Category, Photo } from '../lib/types';
 
 // ----------------------------------------------------------------------------
 // 1. PROFIL — tes informations personnelles
@@ -295,8 +295,8 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-18',
-    title: "Démonstration de judo de l'école Tenri",
-    description: "Projection spectaculaire lors d'une démonstration de judo par un judoka de Tenri, au Japon",
+    title: "Démonstration de judo de l'université de Tenri",
+    description: "Projection spectaculaire lors d'une démonstration de judo par un judoka de l'université de Tenri, au Japon",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529951/73_j3mejk.jpg",
     category_id: catId('sports'),
     featured: false, //en vedette sur la page d'acceuil
@@ -307,8 +307,8 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-20',
-    title: "Portrait d'un judoka de l'école de Tenri",
-    description: "Judoka de Tenri photographié de dos, son nom brodé en japonais sur son judogi",
+    title: "Portrait d'un judoka de l'université de Tenri",
+    description: "Judoka de l'université de Tenri photographié de dos, son nom brodé en japonais sur son judogi",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530009/73_2_k01jjk.jpg",
     category_id: catId('portraits'),
     featured: false, //en vedette sur la page d'acceuil
@@ -1048,18 +1048,6 @@ export const photos: Photo[] = [
     featured_home: false, // true = cette photo apparaît dans les travaux en vedette
     hero: false, // true = cette photo sera affichée en héros
     display_order: 81,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 'photo-82',
-    title: "Première danse du mariage d'Elodie et Emeric",
-    description: "Les mariés enlacés pendant leur première danse, en noir et blanc",
-    image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530021/15_oy4szh.jpg",
-    category_id: catId('evenements'),
-    featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
-    hero: false, // true = cette photo sera affichée en héros
-    display_order: 82,
     created_at: new Date().toISOString(),
   },
   {

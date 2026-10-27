@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { toTelHref } from '../lib/phone';
-import type { Profile } from '../lib/supabase';
+import type { Profile } from '../lib/types';
 
 interface MentionsLegalesProps {
   profile: Profile | null;

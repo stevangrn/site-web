@@ -1,4 +1,4 @@
-import type { Profile, Category, Photo } from '../lib/supabase';
+import type { Profile, Category, Photo } from '../lib/types';
 import { profile, categories, photos } from '../data/content';
 
 // Ce hook fournit les données du site (profil, catégories, photos).

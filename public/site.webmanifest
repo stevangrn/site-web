@@ -1,0 +1,15 @@
+{
+  "name": "Stevan Garon — Photographe & Télépilote de drone",
+  "short_name": "Stevan Garon",
+  "description": "Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "minimal-ui",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

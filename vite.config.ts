@@ -54,9 +54,16 @@ function heroImagePreload(): Plugin {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
+// "npm run build" lance deux constructions (voir package.json) : le site
+// normal, puis la version "serveur" (isSsrBuild) qui sert seulement à générer
+// le HTML des pages (scripts/prerender.mjs).
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react(), heroImagePreload()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-});
+  build: {
+    // Inutile de recopier public/ (images, sitemap...) dans dist-ssr/.
+    copyPublicDir: !isSsrBuild,
+  },
+}));

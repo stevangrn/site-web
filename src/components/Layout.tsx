@@ -1,17 +1,19 @@
 import { useEffect, type ReactNode } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import type { Profile } from '../lib/supabase';
+import type { Route } from '../lib/router';
+import type { Profile } from '../lib/types';
 
 interface LayoutProps {
   profile: Profile | null;
-  theme: 'dark' | 'light';
+  // Page affichée (pour mettre en surbrillance le bon lien du menu)
+  route: Route;
   onToggleTheme: () => void;
   onManageConsent: () => void;
   children: ReactNode;
 }
 
-export function Layout({ profile, theme, onToggleTheme, onManageConsent, children }: LayoutProps) {
+export function Layout({ profile, route, onToggleTheme, onManageConsent, children }: LayoutProps) {
   // Protection anti-copie des images sur l'ensemble du site :
   // bloque le clic droit sur les images, le glisser-déposer,
   // et le raccourci Ctrl/Cmd+S. Rappel : rien n'empêche une
@@ -62,7 +64,7 @@ export function Layout({ profile, theme, onToggleTheme, onManageConsent, childre
       >
         Aller au contenu principal
       </a>
-      <Navbar profile={profile} theme={theme} onToggleTheme={onToggleTheme} />
+      <Navbar profile={profile} route={route} onToggleTheme={onToggleTheme} />
       <main id="main-content" className="flex-1 pt-16">
         {children}
       </main>

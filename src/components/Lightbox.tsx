@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { buildCloudinarySrcSet, buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
-import type { Photo } from '../lib/supabase';
+import type { Photo } from '../lib/types';
 
 interface LightboxProps {
   photo: Photo | null;

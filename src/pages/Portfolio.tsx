@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Aperture, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Lightbox } from '../components/Lightbox';
-import { navigate as goTo, toHref } from '../lib/router';
+import { navigate as goTo, portfolioPath, toHref } from '../lib/router';
 import {
   buildCloudinaryCropSrcSet,
   buildCloudinarySrcSet,
   buildPhotoAlt,
   cropCloudinaryUrl,
+  fetchPriority,
   optimizeCloudinaryUrl,
 } from '../lib/seo';
-import type { Category, Photo } from '../lib/supabase';
+import type { Category, Photo } from '../lib/types';
 
 interface PortfolioProps {
   categories: Category[];
   photos: Photo[];
+  // Catégorie affichée, déduite de l'adresse (/portfolio/sports/ -> Sports).
+  // null = l'écran « Choisissez une catégorie » (/portfolio/).
+  category: Category | null;
 }
 
 // Largeurs pour les vignettes de la grille en mosaïque (1 à 3 colonnes selon
@@ -29,37 +33,7 @@ const COVER_WIDTHS = [320, 480, 640, 960];
 // "Charger plus". 18 = multiple de 2 et 3 colonnes (bonne coupe en grille).
 const PAGE_SIZE = 18;
 
-// Lit dans l'adresse la catégorie à afficher :
-//   /portfolio/?categorie=sports   -> les photos de la catégorie Sports
-//   /portfolio/?photo=photo-12     -> la catégorie de cette photo (liens de l'accueil)
-//   /portfolio/                    -> l'écran "Choisissez une catégorie"
-// L'adresse sert de référence : le bouton "retour" du navigateur ramène
-// donc d'une catégorie à l'écran de choix, et chaque catégorie a un lien
-// partageable.
-function readCategoryFromUrl(categories: Category[], photos: Photo[]): string | null {
-  const params = new URLSearchParams(window.location.search);
-
-  const slug = params.get('categorie');
-  if (slug) {
-    const category = categories.find((c) => c.slug === slug);
-    if (category) return category.id;
-  }
-
-  const photoId = params.get('photo');
-  if (photoId) {
-    const photo = photos.find((p) => p.id === photoId);
-    if (photo?.category_id) return photo.category_id;
-  }
-
-  return null;
-}
-
-export function Portfolio({ categories, photos }: PortfolioProps) {
-  // Catégorie affichée (null = écran de choix des catégories)
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(() =>
-    readCategoryFromUrl(categories, photos)
-  );
-
+export function Portfolio({ categories, photos, category }: PortfolioProps) {
   // Stocke la photo ouverte dans la lumière/agrandissement
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
 
@@ -75,47 +49,37 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
 
   // Catégories dans l'ordre choisi dans content.ts (display_order)
   const sortedCategories = [...categories].sort((a, b) => a.display_order - b.display_order);
-  const currentCategory = sortedCategories.find((category) => category.id === selectedCategory) ?? null;
+  const currentCategory = category;
+  const selectedCategory = category?.id ?? null;
 
   const filteredPhotos = selectedCategory
     ? sortedPhotos.filter((p) => p.category_id === selectedCategory)
     : [];
 
-  // Boutons précédent/suivant du navigateur : on relit la catégorie dans l'adresse.
-  useEffect(() => {
-    const handlePopState = () => setSelectedCategory(readCategoryFromUrl(categories, photos));
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [categories, photos]);
-
   // Revient à la première page de résultats à chaque changement de catégorie,
   // pour ne pas garder un "visibleCount" hérité d'un autre filtre.
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
+    setLightboxPhoto(null);
   }, [selectedCategory]);
 
-  // Si l’URL contient une photo, on l’ouvre automatiquement dans la lightbox,
-  // et on affiche assez de photos pour qu'elle soit présente dans la grille
-  // (utile pour les liens directs venant de la page d'accueil).
+  // Si l’URL contient une photo de cette catégorie (?photo=photo-12), on
+  // l'ouvre automatiquement dans la lightbox, et on affiche assez de photos
+  // pour qu'elle soit présente dans la grille (liens venant de l'accueil).
+  // Lu après l'affichage (et non pendant) : la page générée au build ne
+  // contient pas de photo ouverte.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const photoId = params.get('photo');
+    const photoId = new URLSearchParams(window.location.search).get('photo');
     if (!photoId) return;
 
-    const photo = photos.find((p) => p.id === photoId);
-    if (!photo) return;
+    const index = filteredPhotos.findIndex((p) => p.id === photoId);
+    if (index < 0) return;
 
-    setLightboxPhoto(photo);
-
-    const index = sortedPhotos
-      .filter((p) => p.category_id === photo.category_id)
-      .findIndex((p) => p.id === photoId);
-    if (index >= 0) {
-      const requiredCount = Math.ceil((index + 1) / PAGE_SIZE) * PAGE_SIZE;
-      setVisibleCount((current) => Math.max(current, requiredCount));
-    }
+    setLightboxPhoto(filteredPhotos[index]);
+    const requiredCount = Math.ceil((index + 1) / PAGE_SIZE) * PAGE_SIZE;
+    setVisibleCount((current) => Math.max(current, requiredCount));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photos]);
+  }, [selectedCategory]);
 
   // Photos réellement affichées à l'écran, et s'il en reste à charger
   const visiblePhotos = filteredPhotos.slice(0, visibleCount);
@@ -127,17 +91,18 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
 
   // Associe chaque photo à son nom de catégorie (pour enrichir le alt SEO),
   // les photos de content.ts ne portant que le category_id.
-  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
+  const categoryNameById = new Map(categories.map((c) => [c.id, c.name]));
 
   // Nombre de photos et photo de couverture de chaque catégorie
-  const photosOf = (category: Category) => sortedPhotos.filter((p) => p.category_id === category.id);
-  const coverOf = (category: Category) =>
-    photos.find((p) => p.id === category.cover_photo_id) ?? photosOf(category)[0] ?? null;
+  const photosOf = (c: Category) => sortedPhotos.filter((p) => p.category_id === c.id);
+  const coverOf = (c: Category) =>
+    photos.find((p) => p.id === c.cover_photo_id) ?? photosOf(c)[0] ?? null;
 
-  // Change de catégorie (ou revient à l'écran de choix avec null) en mettant
-  // à jour l'adresse ; l'écouteur "popstate" ci-dessus met l'affichage à jour.
-  const chooseCategory = (category: Category | null, scrollTargetId: string) => {
-    goTo(category ? `/portfolio?categorie=${category.slug}` : '/portfolio');
+  // Change de catégorie (ou revient à l'écran de choix avec null) : chaque
+  // catégorie a sa propre page (/portfolio/sports/), App.tsx affiche la bonne
+  // quand l'adresse change.
+  const chooseCategory = (target: Category | null, scrollTargetId: string) => {
+    goTo(portfolioPath(target?.slug));
     window.requestAnimationFrame(() => {
       document.getElementById(scrollTargetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -145,15 +110,21 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
 
   return (
     <>
-      {/* Header */}
+      {/* Header : sur une page de catégorie, le titre principal (H1) est le
+          nom de la catégorie, pour que chaque page ait son propre titre aux
+          yeux de Google. */}
       <section className="pt-20 pb-12 px-6 bg-neutral-950">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
             Portfolio
           </p>
-          <h1 className="text-4xl md:text-5xl font-light mb-4">Mes Créations</h1>
+          <h1 className="text-4xl md:text-5xl font-light mb-4">
+            {currentCategory ? currentCategory.name : 'Mes Créations'}
+          </h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
-            Découvrez un portfolio photographique en Vendée : portraits, événements, sports, mariages et paysages capturés avec une approche naturelle, documentaire et artistique.
+            {currentCategory?.description
+              ? `${currentCategory.description}.`
+              : 'Découvrez un portfolio photographique en Vendée : portraits, événements, sports, mariages et paysages capturés avec une approche naturelle, documentaire et artistique.'}
           </p>
         </div>
       </section>
@@ -170,7 +141,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                 return (
                   <a
                     key={category.id}
-                    href={toHref(`/portfolio?categorie=${category.slug}`)}
+                    href={toHref(portfolioPath(category.slug))}
                     onClick={(event) => {
                       event.preventDefault();
                       chooseCategory(category, 'portfolio-galerie');
@@ -187,7 +158,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
                         loading="eager"
                         // La première carte est souvent le plus grand élément
                         // visible (mobile) : on la télécharge en priorité.
-                        fetchPriority={index === 0 ? 'high' : 'auto'}
+                        {...fetchPriority(index === 0 ? 'high' : 'auto')}
                         decoding="async"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
@@ -255,7 +226,7 @@ export function Portfolio({ categories, photos }: PortfolioProps) {
             <div className="max-w-7xl mx-auto">
               {/* Titre invisible à l'écran mais lu par les lecteurs d'écran et
                   Google : il garde un ordre de titres logique (H1 > H2 > H3)
-                  entre "Mes Créations" et les titres des photos. */}
+                  entre le titre de la page et les titres des photos. */}
               <h2 className="sr-only">Photos : {currentCategory.name}</h2>
               {visiblePhotos.length > 0 ? (
                 <>

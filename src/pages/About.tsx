@@ -1,7 +1,11 @@
 import { ArrowRight, Camera } from 'lucide-react';
 import { navigate as goTo } from '../lib/router';
-import { optimizeCloudinaryUrl } from '../lib/seo';
-import type { Profile, Photo } from '../lib/supabase';
+import { buildCloudinaryCropSrcSet, cropCloudinaryUrl, fetchPriority } from '../lib/seo';
+import type { Profile, Photo } from '../lib/types';
+
+// Largeurs du portrait (format 3/4), recadré par Cloudinary : la photo
+// d'origine pesait 660 Ko, la version adaptée à l'écran 5 à 10 fois moins.
+const ABOUT_WIDTHS = [400, 600, 800, 1000];
 
 interface AboutProps {
   profile: Profile | null;
@@ -34,9 +38,14 @@ export function About({ aboutPhoto }: AboutProps) {
               <div className="aspect-[3/4] rounded-2xl overflow-hidden">
                 {aboutPhoto ? (
                   <img
-                    src={optimizeCloudinaryUrl(aboutPhoto.image_url)}
+                    src={cropCloudinaryUrl(aboutPhoto.image_url, 800, '3:4')}
+                    srcSet={buildCloudinaryCropSrcSet(aboutPhoto.image_url, ABOUT_WIDTHS, '3:4')}
+                    sizes="(max-width: 1024px) calc(100vw - 48px), 600px"
                     alt="Stevan Garon, photographe et télépilote de drone en Vendée"
                     draggable={false}
+                    loading="eager"
+                    decoding="async"
+                    {...fetchPriority('high')}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -53,7 +62,7 @@ export function About({ aboutPhoto }: AboutProps) {
             <div className="lg:pl-8">
               <div className="space-y-6 text-neutral-400 leading-relaxed">
                 <p className="italic text-neutral-300">
-                  Je m'appelle Stevan Garon et je capture le mouvement, l'émotion et l'énergie à travers mon objectif. Voyageant dans le monde de la photographie depuis mon enfance, c'est au cours des 3 dernières années que j'ai transformé cette passion en véritable vocation professionnelle en devenant photographe indépendant.
+                  Je m'appelle Stevan Garon et je capture le mouvement, l'émotion et l'énergie à travers mon objectif. La photographie m'accompagne depuis l'enfance ; depuis trois ans, elle est devenue bien plus qu'une passion : une véritable vocation.
                 </p>
                 <p>
                   Au départ, tout a commencé avec un petit appareil et une envie simple : montrer ma vision du monde aux autres. Encouragé par mes proches à partager mon regard, j'ai sauté le pas. Aujourd'hui, j'accompagne mes clients pour immortaliser leurs plus beaux moments.

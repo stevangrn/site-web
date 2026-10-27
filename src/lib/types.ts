@@ -1,5 +1,7 @@
-// Ce fichier ne contient plus que les types utilisés par le site.
-// Le site n'utilise plus Supabase : les données viennent de src/data/content.ts.
+// Types des données du site (profil, catégories, photos).
+// Les données elles-mêmes sont dans src/data/content.ts.
+// (Ce fichier s'appelait auparavant supabase.ts, du temps où le site
+// utilisait la base de données Supabase.)
 
 export type Profile = {
   id: string;

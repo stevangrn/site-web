@@ -32,28 +32,20 @@ jobs:
       - name: Installer les dépendances
         run: npm ci
 
-      - name: Construire le site
+      # Contrôles avant la mise en ligne : si l'un d'eux échoue, le workflow
+      # s'arrête ici et le site en ligne reste tel quel (rien de cassé n'est
+      # publié). Le détail de l'erreur s'affiche dans l'onglet "Actions".
+      - name: Vérifier les types (TypeScript)
+        run: npm run typecheck
+
+      - name: Vérifier le code (ESLint)
+        run: npm run lint
+
+      - name: Construire le site et générer les pages
+        # "npm run build" construit le site, puis génère une vraie page HTML
+        # par adresse (/, /portfolio/, /portfolio/sports/, /about/...), la
+        # page 404.html et le sitemap.xml (voir scripts/prerender.mjs).
         run: npm run build
-
-      - name: Dupliquer index.html en 404.html
-        # Filet de sécurité pour les URLs non prévues (ex: /portfolio?photo=xxx) :
-        # sans ça, ces liens précis renverraient une vraie page d'erreur.
-        run: cp dist/index.html dist/404.html
-
-      - name: Créer un vrai index.html par page (/portfolio, /about, /contact)
-        # Indispensable pour le SEO : sans ça, GitHub Pages répond avec un
-        # code HTTP 404 sur ces URLs (même si le 404.html ci-dessus affiche
-        # la bonne page à l'écran), et Google refuse d'indexer une page qui
-        # renvoie un 404, quel que soit son contenu visuel.
-        # Ici, chaque route a son propre fichier réel : le serveur répond
-        # alors avec un vrai code 200. Le contenu est identique (c'est une
-        # SPA), seul le code HTTP change.
-        run: |
-          mkdir -p dist/portfolio dist/about dist/contact dist/mentions-legales
-          cp dist/index.html dist/portfolio/index.html
-          cp dist/index.html dist/about/index.html
-          cp dist/index.html dist/contact/index.html
-          cp dist/index.html dist/mentions-legales/index.html
 
       - name: Préparer le déploiement GitHub Pages
         uses: actions/configure-pages@v5

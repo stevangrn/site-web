@@ -1,25 +1,34 @@
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { navigate as goTo, toHref } from '../lib/router';
+import { navigate as goTo, portfolioPath, toHref } from '../lib/router';
 import {
   buildCloudinarySrcSet,
   buildPhotoAlt,
+  fetchPriority,
   HERO_DEFAULT_WIDTH,
   HERO_WIDTHS,
   optimizeCloudinaryUrl,
 } from '../lib/seo';
-import type { Profile, Photo } from '../lib/supabase';
+import type { Category, Profile, Photo } from '../lib/types';
 
 // Largeurs pour les vignettes de la grille "Sélection" (3 colonnes max).
 const FEATURED_WIDTHS = [400, 600, 900, 1200];
 
 interface HomeProps {
   profile: Profile | null;
+  categories: Category[];
   featuredPhotos: Photo[];
   heroPhoto: Photo | null;
   aboutPreviewPhoto: Photo | null;
 }
 
-export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: HomeProps) {
+export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPreviewPhoto }: HomeProps) {
+  // Lien d'une photo de la sélection : sa page de catégorie, avec la photo
+  // ouverte en grand (ex: /portfolio/nature/?photo=photo-2).
+  const photoPath = (photo: Photo) => {
+    const slug = categories.find((category) => category.id === photo.category_id)?.slug;
+    return `${portfolioPath(slug)}?photo=${photo.id}`;
+  };
+
   // Image principale affichée en arrière-plan sur la page d’accueil
   const heroImage =
     heroPhoto?.image_url ||
@@ -62,7 +71,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
             draggable={false}
             loading="eager"
             decoding="async"
-            fetchPriority="high"
+            {...fetchPriority('high')}
             className="w-full h-full object-cover"
           />
         </div>
@@ -133,10 +142,10 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               {featuredPhotos.slice(0, 6).map((photo, index) => (
                 <a
                   key={photo.id}
-                  href={toHref(`/portfolio?photo=${photo.id}`)}
+                  href={toHref(photoPath(photo))}
                   onClick={(event) => {
                     event.preventDefault();
-                    navigate(`/portfolio?photo=${photo.id}`);
+                    navigate(photoPath(photo));
                   }}
                   className="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer text-left border border-white/10 bg-neutral-900/60 shadow-sm"
                   style={{ animationDelay: `${index * 100}ms` }}

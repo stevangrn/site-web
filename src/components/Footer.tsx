@@ -1,6 +1,6 @@
 import { Camera, Instagram, Facebook, Mail } from 'lucide-react';
 import { navigate as goTo, toHref, type Route } from '../lib/router';
-import type { Profile } from '../lib/supabase';
+import type { Profile } from '../lib/types';
 
 interface FooterProps {
   profile: Profile | null;
@@ -105,7 +105,10 @@ export function Footer({ profile, onManageConsent }: FooterProps) {
         </div>
 
         <div className="mt-8 pt-8 border-t border-[var(--border-color)] text-center space-y-2">
-          <p className="text-[var(--text-muted)] text-sm">
+          {/* suppressHydrationWarning : l'année est calculée au build puis dans
+              le navigateur ; si elles diffèrent (site construit en décembre,
+              visité en janvier), le navigateur affiche simplement la bonne. */}
+          <p className="text-[var(--text-muted)] text-sm" suppressHydrationWarning>
             © {new Date().getFullYear()} {profile?.name || 'Photographe'}. Tous droits réservés.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">

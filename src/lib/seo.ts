@@ -5,13 +5,23 @@
 //   - un <title> et une <meta description> différents par page (point 1.2)
 //   - des textes "alt" plus riches sur les photos, avec contexte local (point 1.5)
 //   - une optimisation automatique des images Cloudinary (point 1.6)
+//
+// Les informations de chaque page (titre, description, canonical...) sont
+// calculées une seule fois par getPageMeta(), puis utilisées à deux endroits :
+//   - au build, pour écrire les balises directement dans le HTML de chaque
+//     page (buildHeadTags, utilisé par scripts/prerender.mjs) : elles sont
+//     ainsi lues par Google, Bing et les aperçus de partage, même sans JavaScript ;
+//   - dans le navigateur, pour les mettre à jour quand on change de page sans
+//     recharger (applyPageSeo).
 // ============================================================================
 
-import { toHref, type Route } from './router';
+import { portfolioPath, toHref, type Route, type SiteLocation } from './router';
+import type { Category } from './types';
 
 // Adresse officielle du site, utilisée pour le canonical, og:url et les
 // données structurées (jamais l'adresse locale de développement).
-const SITE_URL = 'https://stevangaron.fr';
+export const SITE_URL = 'https://stevangaron.fr';
+const SITE_NAME = 'Stevan Garon Photographe';
 
 // Image affichée quand un lien du site est partagé (WhatsApp, Facebook,
 // LinkedIn...). Le fichier est dans public/og-image.png : il est copié tel
@@ -24,16 +34,11 @@ const INSTAGRAM_URL = 'https://www.instagram.com/stevan_raw/';
 // ----------------------------------------------------------------------------
 // 1. Titre + description par page
 // ----------------------------------------------------------------------------
-// Depuis le passage à de vraies URLs (src/lib/router.ts), chaque page a sa
-// propre adresse (/, /portfolio, /about, /contact). Ce mécanisme met à jour
-// le <title> et la <meta description> à chaque changement de route : comme
-// Google exécute le JavaScript de la page avant de l'indexer, il verra
-// désormais un titre et une description différents pour chaque URL.
 const PAGE_SEO: Record<Route, { title: string; description: string }> = {
   '/': {
     title: 'Stevan Garon — Photographe & Télépilote de drone en Vendée',
     description:
-      'Photographe professionnel à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone.',
+      'Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone.',
   },
   '/portfolio': {
     title: 'Portfolio photo — Portraits, Événements, Sports, Nature | Stevan Garon',
@@ -61,6 +66,139 @@ const PAGE_SEO: Record<Route, { title: string; description: string }> = {
   },
 };
 
+// Tout ce qu'il faut savoir sur une page pour remplir son <head>.
+export interface PageMeta {
+  title: string;
+  description: string;
+  // Adresse officielle de la page (null = page introuvable, sans canonical)
+  canonical: string | null;
+  robots: string;
+  // Données structurées propres à la page (null = aucune)
+  schema: Record<string, unknown> | null;
+}
+
+// Adresse officielle d'un chemin, avec le "/" final (ex: https://stevangaron.fr/portfolio/).
+function absoluteUrl(path: string): string {
+  return `${SITE_URL}${toHref(path)}`;
+}
+
+// Calcule les informations d'une page. `category` = la catégorie affichée
+// sur une page /portfolio/<categorie>/ (null sinon).
+//
+// Les données structurées décrivent la page affichée. L'activité elle-même
+// (ProfessionalService : nom, adresse, téléphone...) est décrite une seule
+// fois, dans le <script type="application/ld+json"> de index.html.
+export function getPageMeta(location: SiteLocation, category: Category | null): PageMeta {
+  const { route } = location;
+
+  if (route === '/404') {
+    return { ...PAGE_SEO['/404'], canonical: null, robots: 'noindex, follow', schema: null };
+  }
+
+  if (route === '/portfolio' && category) {
+    const url = absoluteUrl(portfolioPath(category.slug));
+    const description = `${category.description ? `${category.description}. ` : ''}Photos réalisées en Vendée et alentours par Stevan Garon, photographe et télépilote de drone.`;
+    return {
+      title: `${category.name} — Portfolio photo en Vendée | Stevan Garon`,
+      description,
+      canonical: url,
+      robots: 'index, follow',
+      schema: {
+        '@context': 'https://schema.org',
+        '@type': 'ImageGallery',
+        name: `${category.name} — Portfolio de Stevan Garon`,
+        url,
+        description,
+      },
+    };
+  }
+
+  const seo = PAGE_SEO[route];
+  const url = absoluteUrl(route);
+  let schema: Record<string, unknown>;
+
+  if (route === '/portfolio') {
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: seo.title,
+      url,
+      description: 'Portfolio photo de portraits, événements, sports et paysages en Vendée.',
+    };
+  } else if (route === '/about') {
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Stevan Garon',
+      url,
+      jobTitle: 'Photographe et télépilote de drone',
+      description:
+        'Photographe basé en Vendée, spécialisé dans les portraits, événements, sports et prises de vue aériennes.',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'La Chaize-le-Vicomte',
+        addressRegion: 'Vendée',
+        addressCountry: 'FR',
+      },
+      sameAs: [INSTAGRAM_URL],
+    };
+  } else if (route === '/contact') {
+    schema = { '@context': 'https://schema.org', '@type': 'ContactPage', name: seo.title, url };
+  } else if (route === '/mentions-legales') {
+    schema = { '@context': 'https://schema.org', '@type': 'WebPage', name: 'Mentions légales', url };
+  } else {
+    schema = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, url, inLanguage: 'fr-FR' };
+  }
+
+  return { ...seo, canonical: url, robots: 'index, follow', schema };
+}
+
+// ----------------------------------------------------------------------------
+// Écriture des balises dans le HTML (au build)
+// ----------------------------------------------------------------------------
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Renvoie les balises du <head> d'une page, à insérer dans son fichier HTML.
+export function buildHeadTags(meta: PageMeta): string {
+  const ogUrl = meta.canonical ?? `${SITE_URL}/`;
+  const tags = [
+    `<title>${escapeHtml(meta.title)}</title>`,
+    `<meta name="description" content="${escapeHtml(meta.description)}" />`,
+    `<meta name="robots" content="${meta.robots}" />`,
+    meta.canonical ? `<link rel="canonical" href="${escapeHtml(meta.canonical)}" />` : '',
+    `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
+    '<meta property="og:type" content="website" />',
+    '<meta property="og:locale" content="fr_FR" />',
+    `<meta property="og:url" content="${escapeHtml(ogUrl)}" />`,
+    `<meta property="og:site_name" content="${SITE_NAME}" />`,
+    `<meta property="og:image" content="${SOCIAL_IMAGE_URL}" />`,
+    `<meta property="og:image:secure_url" content="${SOCIAL_IMAGE_URL}" />`,
+    '<meta property="og:image:type" content="image/png" />',
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
+    `<meta property="og:image:alt" content="${escapeHtml(SOCIAL_IMAGE_ALT)}" />`,
+    '<meta name="twitter:card" content="summary_large_image" />',
+    `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
+    `<meta name="twitter:image" content="${SOCIAL_IMAGE_URL}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(SOCIAL_IMAGE_ALT)}" />`,
+    meta.schema
+      ? `<script type="application/ld+json" data-seo-schema="true">${JSON.stringify(meta.schema).replace(/</g, '\\u003c')}</script>`
+      : '',
+  ];
+  return tags.filter(Boolean).join('\n    ');
+}
+
+// ----------------------------------------------------------------------------
+// Mise à jour des balises dans le navigateur (changement de page)
+// ----------------------------------------------------------------------------
 function setMetaTag(selector: string, attribute: string, value: string, content: string) {
   let tag = document.querySelector(selector);
   if (!tag) {
@@ -87,19 +225,12 @@ function setCanonicalUrl(url: string | null) {
   link.setAttribute('href', url);
 }
 
-function setSocialImageMeta() {
-  setMetaTag('meta[property="og:image"]', 'property', 'og:image', SOCIAL_IMAGE_URL);
-  setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', SOCIAL_IMAGE_URL);
-  setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/png');
-  setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
-  setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
-  setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', SOCIAL_IMAGE_ALT);
-  setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', SOCIAL_IMAGE_URL);
-  setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', SOCIAL_IMAGE_ALT);
-}
-
-function setJsonLd(schema: Record<string, unknown>) {
+function setJsonLd(schema: Record<string, unknown> | null) {
   let script = document.querySelector('script[data-seo-schema="true"]');
+  if (!schema) {
+    script?.remove();
+    return;
+  }
   if (!script) {
     script = document.createElement('script');
     script.setAttribute('type', 'application/ld+json');
@@ -109,106 +240,20 @@ function setJsonLd(schema: Record<string, unknown>) {
   script.textContent = JSON.stringify(schema);
 }
 
-// Adresse officielle d'une page, avec le "/" final (ex: https://stevangaron.fr/portfolio/).
-function pageUrlFor(route: Route): string {
-  return `${SITE_URL}${toHref(route)}`;
-}
-
-// Données structurées propres à chaque page. L'activité elle-même
-// (ProfessionalService : nom, adresse, téléphone...) est décrite une seule
-// fois, dans le <script type="application/ld+json"> de index.html : ici, on
-// ajoute seulement ce qui décrit la page affichée, avec des propriétés que
-// chaque type Schema.org prévoit réellement.
-function buildStructuredData(route: Route): Record<string, unknown> | null {
-  const pageUrl = pageUrlFor(route);
-  const seo = PAGE_SEO[route];
-
-  if (route === '/portfolio') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'ImageGallery',
-      name: seo.title,
-      url: pageUrl,
-      description: 'Portfolio photo de portraits, événements, sports et paysages en Vendée.',
-    };
-  }
-
-  if (route === '/about') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'Person',
-      name: 'Stevan Garon',
-      url: pageUrl,
-      jobTitle: 'Photographe et télépilote de drone',
-      description:
-        'Photographe basé en Vendée, spécialisé dans les portraits, événements, sports et prises de vue aériennes.',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: 'La Chaize-le-Vicomte',
-        addressRegion: 'Vendée',
-        addressCountry: 'FR',
-      },
-      sameAs: [INSTAGRAM_URL],
-    };
-  }
-
-  if (route === '/contact') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'ContactPage',
-      name: seo.title,
-      url: pageUrl,
-    };
-  }
-
-  if (route === '/mentions-legales') {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      name: 'Mentions légales',
-      url: pageUrl,
-    };
-  }
-
-  if (route === '/404') {
-    return null;
-  }
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'Stevan Garon Photographe',
-    url: pageUrl,
-    inLanguage: 'fr-FR',
-  };
-}
-
 // Met à jour le titre de l'onglet et les balises meta selon la page affichée.
-// À appeler dans un useEffect, à chaque changement de route.
-export function applyPageSeo(route: Route) {
-  const seo = PAGE_SEO[route] ?? PAGE_SEO['/'];
-  const isNotFound = route === '/404';
-  const canonicalUrl = isNotFound ? null : pageUrlFor(route);
-
-  document.title = seo.title;
-  setMetaTag('meta[name="description"]', 'name', 'description', seo.description);
+// À appeler dans un useEffect, à chaque changement de page.
+export function applyPageSeo(meta: PageMeta) {
+  document.title = meta.title;
+  setMetaTag('meta[name="description"]', 'name', 'description', meta.description);
   // Une page introuvable ne doit pas apparaître dans Google.
-  setMetaTag('meta[name="robots"]', 'name', 'robots', isNotFound ? 'noindex, follow' : 'index, follow');
-  setMetaTag('meta[property="og:title"]', 'property', 'og:title', seo.title);
-  setMetaTag('meta[property="og:description"]', 'property', 'og:description', seo.description);
-  setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalUrl ?? SITE_URL + '/');
-  setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Stevan Garon Photographe');
-  setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', seo.title);
-  setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', seo.description);
-  setCanonicalUrl(canonicalUrl);
-  setSocialImageMeta();
-
-  const schema = buildStructuredData(route);
-  if (schema) {
-    setJsonLd(schema);
-  } else {
-    document.querySelector('script[data-seo-schema="true"]')?.remove();
-  }
+  setMetaTag('meta[name="robots"]', 'name', 'robots', meta.robots);
+  setMetaTag('meta[property="og:title"]', 'property', 'og:title', meta.title);
+  setMetaTag('meta[property="og:description"]', 'property', 'og:description', meta.description);
+  setMetaTag('meta[property="og:url"]', 'property', 'og:url', meta.canonical ?? `${SITE_URL}/`);
+  setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', meta.title);
+  setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', meta.description);
+  setCanonicalUrl(meta.canonical);
+  setJsonLd(meta.schema);
 }
 
 // ----------------------------------------------------------------------------
@@ -271,6 +316,15 @@ export function buildCloudinarySrcSet(url: string, widths: number[]): string | u
 // demander exactement les mêmes fichiers pour que le préchargement serve.
 export const HERO_WIDTHS = [768, 1280, 1920, 2560];
 export const HERO_DEFAULT_WIDTH = 1920;
+
+// Attribut HTML fetchpriority (priorité de téléchargement d'une image), à
+// placer sur une balise <img> avec {...fetchPriority('high')}. React 18 ne
+// connaît pas encore la forme "fetchPriority" et l'écrirait en signalant une
+// erreur pendant la génération des pages : on écrit donc directement
+// l'attribut HTML, en minuscules.
+export function fetchPriority(value: 'high' | 'low' | 'auto'): Record<string, string> {
+  return { fetchpriority: value };
+}
 
 // ----------------------------------------------------------------------------
 // 6. Images recadrées par Cloudinary (cartes de catégories du portfolio)

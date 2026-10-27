@@ -12,9 +12,18 @@
   --text-secondary: #d4d4d4;
   --text-muted: #a3a3a3;
   --border-color: rgba(255, 255, 255, 0.12);
+  /* Champs du formulaire de contact */
+  --field-bg: rgba(255, 255, 255, 0.12);
+  --field-border: rgba(255, 255, 255, 0.12);
+  --field-placeholder: #737373;
+  --field-option-bg: #262626;
 }
 
 [data-theme='light'] {
+  --field-bg: #ffffff;
+  --field-border: #d4d4d4;
+  --field-placeholder: #9ca3af;
+  --field-option-bg: #ffffff;
   --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f1f5f9;
@@ -220,4 +229,22 @@
 [data-theme='light'] .on-dark .text-neutral-400,
 [data-theme='light'] .on-dark .text-neutral-500 {
   color: #a3a3a3 !important;
+}
+
+/* ----------------------------------------------------------------------------
+   Éléments qui dépendent du thème, affichés par le CSS
+   ----------------------------------------------------------------------------
+   Le thème est porté par l'attribut data-theme de <html>, posé avant le
+   premier affichage par le script de index.html. Afficher la bonne version
+   par le CSS (plutôt que par React) évite tout décalage entre la page générée
+   au build et la page dans le navigateur. */
+[data-theme='light'] .only-dark-theme,
+:root:not([data-theme='light']) .only-light-theme {
+  display: none !important;
+}
+
+/* Liste déroulante du formulaire de contact : options lisibles dans les deux thèmes */
+select.contact-select option {
+  color: var(--text-primary);
+  background: var(--field-option-bg);
 }

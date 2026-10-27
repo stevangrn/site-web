@@ -31,7 +31,7 @@ tourner et à entretenir, sans compte externe ni clé à configurer.
 - src/pages/ : les différentes pages du site : accueil, portfolio, à propos, contact.
 - src/data/content.ts : **le fichier à modifier pour changer le contenu du site** (profil, catégories, photos).
 - src/hooks/useData.ts : fournit les données de src/data/content.ts aux pages.
-- src/lib/supabase.ts : ne contient plus que les types de données utilisées par le site.
+- src/lib/types.ts : les types des données utilisées par le site (profil, catégories, photos).
 - src/lib/photos.ts : choix de la photo d'accueil, de la photo À propos et de la sélection de l'accueil.
 - src/lib/seo.ts : titres, descriptions, canonical et images optimisées (Cloudinary).
 - src/lib/router.ts : navigation entre les pages par de vraies adresses.
@@ -43,7 +43,9 @@ tourner et à entretenir, sans compte externe ni clé à configurer.
 Le site est organisé en 4 pages principales :
 
 - Accueil : présente le photographe, son titre, une courte bio et deux boutons d'action pour voir le portfolio ou contacter.
-- Portfolio : s'ouvre sur le choix d'une catégorie (une carte par catégorie avec sa photo de couverture), puis affiche les photos de cette catégorie et permet d'en ouvrir une en grand dans une lightbox.
+- Portfolio (/portfolio/) : s'ouvre sur le choix d'une catégorie (une carte par catégorie avec sa photo de couverture). Chaque catégorie a sa propre page (/portfolio/sports/, /portfolio/nature/...), où l'on peut ouvrir une photo en grand dans une lightbox.
+
+Les icônes du site (onglet du navigateur, écran d'accueil des téléphones) sont dans `public/` : `favicon.ico`, `favicon-32x32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, et le manifeste `site.webmanifest`.
 - À propos : raconte l'histoire du photographe, ses services et son parcours.
 - Contact : propose un formulaire de contact, les coordonnées et une zone de confirmation après envoi.
 
@@ -98,9 +100,9 @@ Après modification, sauvegarde le fichier : le site se met à jour automatiquem
 
 ## 7. Comment comprendre le flux principal
 
-1. L'application démarre dans src/App.tsx.
+1. L'application démarre dans src/main.tsx, qui affiche src/App.tsx.
 2. Elle récupère les données avec useData(), qui lit src/data/content.ts.
-3. Elle choisit la page à afficher selon la vraie URL (/, /portfolio, /about, /contact).
+3. Elle choisit la page à afficher selon la vraie URL (/, /portfolio/, /portfolio/sports/, /about/, /contact/), décodée par src/lib/router.ts.
 4. Le layout global affiche la navbar, le contenu et le footer.
 
 ## 8. Modifier le thème
@@ -119,23 +121,48 @@ npm run build
 ```
 
 Si la commande réussit, le site est prêt à être publié (le résultat est dans le dossier `dist/`).
+Pour voir ce résultat dans le navigateur : `npm run preview`.
 
-On peut aussi lancer `npm run typecheck` (vérification des types) et
-`npm run lint` (vérification du code) avant de publier.
+Avant de publier, lancer aussi :
+```bash
+npm run check
+```
+qui vérifie les types (TypeScript) puis le code (ESLint). Ces mêmes
+vérifications sont faites automatiquement avant chaque mise en ligne.
+
+### Une vraie page HTML par adresse (pré-rendu)
+
+`npm run build` fait trois choses :
+1. construit le site normal dans `dist/` ;
+2. construit `src/entry-server.tsx` dans `dist-ssr/` (une version du site qui
+   tourne sans navigateur) ;
+3. lance `scripts/prerender.mjs`, qui écrit pour chaque adresse un fichier
+   HTML déjà rempli : `dist/index.html`, `dist/portfolio/index.html`,
+   `dist/portfolio/sports/index.html`, `dist/about/index.html`..., plus
+   `dist/404.html` et `dist/sitemap.xml`.
+
+Chaque page arrive donc avec son contenu, son titre, sa description et son
+image de partage, même sans JavaScript : c'est ce que lisent Google, Bing et
+les aperçus de partage (WhatsApp, Facebook, LinkedIn...). Une nouvelle
+catégorie ajoutée dans `src/data/content.ts` a automatiquement sa page
+(`/portfolio/<slug>/`) et sa place dans le sitemap.
+
+Point d'attention si tu modifies les composants : le premier affichage ne doit
+dépendre que de l'adresse de la page. Tout ce qui dépend du navigateur
+(`window`, `localStorage`, paramètres `?photo=`...) se lit dans un `useEffect`,
+sinon la page générée au build et celle du navigateur ne correspondent plus
+(voir le commentaire en haut de `src/App.tsx`).
 
 ### Déploiement sur GitHub Pages
 
 Le site est publié automatiquement sur GitHub Pages à chaque `git push` sur
-la branche `main`, par le workflow `.github/workflows/deploy.yml`.
+la branche `main`, par le workflow `.github/workflows/deploy.yml` : il installe
+les dépendances, lance les vérifications, construit le site (avec le
+pré-rendu) et publie le dossier `dist/`. Si une vérification échoue, rien
+n'est publié et le site en ligne reste tel quel.
 
-Le site utilise de vraies URLs par page (plus de `#`), ce qui est important
-pour le référencement. Pour que recharger la page sur `/portfolio` fonctionne,
-le workflow copie `index.html` dans un dossier par page (`portfolio/`,
-`about/`, `contact/`, `mentions-legales/`) et en `404.html` pour les adresses
-inconnues, qui affichent alors la page « Page introuvable ».
-
-En développement (`npm run dev`) et avec `npm run preview`, Vite gère déjà
-ça automatiquement, aucune configuration n'est nécessaire.
+En développement (`npm run dev`), Vite affiche le site sans pré-rendu, aucune
+configuration n'est nécessaire.
 
 ## 10. Conseils pour un étudiant débutant
 

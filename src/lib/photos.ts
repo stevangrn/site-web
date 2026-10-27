@@ -9,7 +9,7 @@
 //     dès le HTML, avant même que le JavaScript ne soit téléchargé.
 // ============================================================================
 
-import type { Photo } from './supabase';
+import type { Photo } from './types';
 
 // Image de fond de l'accueil : la photo marquée "hero: true" dans content.ts.
 export function pickHeroPhoto(photos: Photo[]): Photo | null {

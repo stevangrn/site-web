@@ -18,9 +18,14 @@
         document.documentElement.style.colorScheme = theme;
       } catch (e) {}
     </script>
-    <meta name="robots" content="index, follow" />
+    <!-- Balises propres à chaque page (titre, description, canonical, partage).
+         Le bloc ci-dessous contient celles de l'accueil ; au build,
+         scripts/prerender.mjs le remplace par celles de chaque page. Garder
+         les deux commentaires page-meta, qui délimitent le bloc. -->
+    <!--page-meta-->
     <title>Stevan Garon — Photographe & Télépilote de drone en Vendée</title>
     <meta name="description" content="Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone." />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://stevangaron.fr/" />
     <meta property="og:title" content="Stevan Garon — Photographe & Télépilote de drone en Vendée" />
     <meta property="og:description" content="Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone." />
@@ -28,8 +33,6 @@
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:url" content="https://stevangaron.fr/" />
     <meta property="og:site_name" content="Stevan Garon Photographe" />
-    <!-- Image de partage : public/og-image.png (1200 × 630), copiée telle
-         quelle à la racine du site au build, donc son adresse ne change pas. -->
     <meta property="og:image" content="https://stevangaron.fr/og-image.png" />
     <meta property="og:image:secure_url" content="https://stevangaron.fr/og-image.png" />
     <meta property="og:image:type" content="image/png" />
@@ -41,11 +44,17 @@
     <meta name="twitter:description" content="Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone." />
     <meta name="twitter:image" content="https://stevangaron.fr/og-image.png" />
     <meta name="twitter:image:alt" content="Logo Stevan Garon — photographe et télépilote de drone en Vendée" />
+    <!--/page-meta-->
     <!-- Police Inter : hébergée avec le site (voir src/main.tsx), plus de
          Google Fonts. L'image d'accueil est préchargée par un petit script
          ajouté automatiquement au build (voir vite.config.ts). -->
-    <link rel="icon" type="image/png" href="static/logo.png">
-    <link rel="apple-touch-icon" href="static/logo.png">
+    <!-- Icônes du site (onglet du navigateur, écran d'accueil des téléphones),
+         dans public/ : favicon.ico, favicon-32x32.png, apple-touch-icon.png,
+         icon-192.png, icon-512.png, et le manifeste site.webmanifest. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <!-- Données structurées Schema.org : aide Google à comprendre qu'il s'agit
          d'une activité locale (peut faire apparaître des infos enrichies dans
          les résultats de recherche). Voir plan SEO, point 2.3. -->

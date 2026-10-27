@@ -1,20 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Menu, X, Camera, Moon, Sun } from 'lucide-react';
-import { navigate as goTo, getCurrentRoute, subscribeToRoute, toHref, type Route } from '../lib/router';
-import type { Profile } from '../lib/supabase';
+import { navigate as goTo, toHref, type Route } from '../lib/router';
+import type { Profile } from '../lib/types';
 
 interface NavbarProps {
   profile: Profile | null;
-  theme: 'dark' | 'light';
+  // Page affichée, pour mettre en surbrillance le bon lien
+  route: Route;
   onToggleTheme: () => void;
 }
 
-export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
+export function Navbar({ profile, route, onToggleTheme }: NavbarProps) {
   // État du menu mobile ouvert ou fermé
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Page active pour mettre en surbrillance le bon lien
-  const [currentRoute, setCurrentRoute] = useState<Route>(() => getCurrentRoute());
 
   // Liste des liens affichés dans la barre de navigation
   const navLinks = [
@@ -23,10 +21,31 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
     { name: 'À Propos', path: '/about' as Route },
     { name: 'Contact', path: '/contact' as Route },
   ];
-  const themeLabel = theme === 'dark' ? 'Clair' : 'Sombre';
-  // Le nom lu par les lecteurs d'écran contient le mot affiché ("Clair" ou
-  // "Sombre"), comme le demandent les règles d'accessibilité (WCAG 2.5.3).
-  const themeAriaLabel = `Passer au thème ${themeLabel.toLowerCase()}`;
+
+  // Bouton de thème : les deux versions (soleil + « Clair » en mode sombre,
+  // lune + « Sombre » en mode clair) sont dans la page, et c'est le CSS qui
+  // affiche la bonne selon l'attribut data-theme de <html> (voir index.css).
+  // Ainsi le bouton est juste dès le premier affichage, même avant que le
+  // JavaScript ne soit chargé. Le nom lu par les lecteurs d'écran contient le
+  // mot affiché (règle d'accessibilité WCAG 2.5.3).
+  const themeButtonContent = (withText: boolean) => (
+    <>
+      <span className="only-dark-theme inline-flex items-center gap-2">
+        <Sun className="h-4 w-4" aria-hidden="true" />
+        <span className={withText ? '' : 'sr-only'}>
+          <span className="sr-only">Passer au thème </span>
+          {withText ? 'Clair' : 'clair'}
+        </span>
+      </span>
+      <span className="only-light-theme inline-flex items-center gap-2">
+        <Moon className="h-4 w-4" aria-hidden="true" />
+        <span className={withText ? '' : 'sr-only'}>
+          <span className="sr-only">Passer au thème </span>
+          {withText ? 'Sombre' : 'sombre'}
+        </span>
+      </span>
+    </>
+  );
   const linkClassName = (active: boolean) =>
     active
       ? 'text-amber-500'
@@ -36,11 +55,6 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
       ? 'bg-[var(--surface)] text-amber-500'
       : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-amber-500';
 
-  // Met à jour la page active quand l’URL change
-  useEffect(() => {
-    return subscribeToRoute(setCurrentRoute);
-  }, []);
-
   // Change la page en modifiant la vraie URL (plus de "#")
   const navigate = (path: Route) => {
     goTo(path);
@@ -48,7 +62,7 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const isActive = (path: string) => currentRoute === path;
+  const isActive = (path: string) => route === path;
 
   return (
     // Fond plein : l'ancienne classe "bg-[var(--bg-primary)]/95" n'était pas
@@ -87,10 +101,8 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             type="button"
             onClick={onToggleTheme}
             className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
-            aria-label={themeAriaLabel}
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
-            <span>{themeLabel}</span>
+            {themeButtonContent(true)}
           </button>
         </div>
 
@@ -99,9 +111,8 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             type="button"
             onClick={onToggleTheme}
             className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] p-2 text-[var(--text-secondary)] transition-colors hover:text-amber-500 touch-manipulation active:scale-[0.96]"
-            aria-label={themeAriaLabel}
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+            {themeButtonContent(false)}
           </button>
 
           <button

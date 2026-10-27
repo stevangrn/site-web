@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { toTelHref } from '../lib/phone';
-import type { Profile } from '../lib/supabase';
+import type { Profile } from '../lib/types';
 
 interface ContactProps {
   profile: Profile | null;
@@ -36,14 +36,6 @@ export function Contact({ profile }: ContactProps) {
   // protection anti-spam du formulaire (l'ancien code reCAPTCHA, jamais
   // activé, a été retiré).
   const [honeypot, setHoneypot] = useState('');
-
-  // Utilisation active de la variable 'theme'
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'dark';
-    const stored = window.localStorage.getItem('portfolio-theme');
-    if (stored === 'dark' || stored === 'light') return stored;
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -137,34 +129,14 @@ export function Contact({ profile }: ContactProps) {
     }
   };
 
-  useEffect(() => {
-    const applyTheme = () => {
-      const t = document.documentElement.getAttribute('data-theme');
-      if (t === 'dark' || t === 'light') setTheme(t);
-    };
-    applyTheme();
-    const obs = new MutationObserver(() => applyTheme());
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => obs.disconnect();
-  }, []);
-
-  // Classes dynamiques basées sur l'état du thème (Modifié)
-  const isDark = theme === 'dark';
-  const fieldClassName = `w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors ${
-    isDark 
-      ? 'bg-neutral-800/50 border-neutral-700 text-white placeholder:text-neutral-500' 
-      : 'bg-white border-neutral-300 text-black placeholder:text-neutral-400'
-  }`;
+  // Style des champs : les couleurs viennent des variables du thème
+  // (--field-bg, --field-border... dans index.css), qui changent toutes seules
+  // entre clair et sombre. Plus besoin de suivre le thème dans ce composant.
+  const fieldClassName =
+    'w-full border rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500/50 transition-colors bg-[var(--field-bg)] border-[var(--field-border)] text-[var(--text-primary)] placeholder:text-[var(--field-placeholder)]';
 
   return (
     <>
-      <style>{`
-        select.contact-select option { 
-          color: ${isDark ? '#fff' : '#000'} !important; 
-          background: ${isDark ? '#262626' : '#fff'} !important; 
-        }
-      `}</style>
-      
       {/* Header */}
       <section className="pt-20 pb-12 px-6 bg-neutral-950">
         <div className="max-w-7xl mx-auto text-center">

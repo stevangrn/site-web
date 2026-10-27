@@ -9,16 +9,18 @@
 // coller à l'esprit "facile à lire" du projet : on utilise directement les
 // APIs du navigateur (history.pushState + événement popstate).
 //
-// IMPORTANT côté hébergement : pour que ça fonctionne, le serveur doit
-// répondre avec index.html pour TOUTES les routes (/, /portfolio, /about,
-// /contact), sinon recharger la page sur /portfolio donnera une erreur 404.
-// Voir public/_redirects (Netlify) et vercel.json (Vercel) ajoutés au
-// projet ; pour un hébergement classique (Apache/OVH...), voir le .htaccess
-// ajouté dans public/, et le README pour GitHub Pages.
+// IMPORTANT côté hébergement : chaque page doit exister comme un vrai
+// fichier, sinon recharger la page sur /portfolio donnerait une erreur 404.
+// Sur GitHub Pages, c'est le workflow .github/workflows/deploy.yml qui s'en
+// charge : il copie index.html dans portfolio/, about/, contact/ et
+// mentions-legales/, et en 404.html pour les adresses inconnues.
 // ============================================================================
 
-export type Route = '/' | '/portfolio' | '/about' | '/contact' | '/mentions-legales';
+// '/404' n'est pas une vraie adresse : c'est la route interne utilisée pour
+// afficher la page "Page introuvable" quand l'URL ne correspond à aucune page.
+export type Route = '/' | '/portfolio' | '/about' | '/contact' | '/mentions-legales' | '/404';
 
+// Les vraies pages du site (celles qui ont une adresse et vont dans le sitemap).
 export const validRoutes: Route[] = ['/', '/portfolio', '/about', '/contact', '/mentions-legales'];
 
 // Lit la route actuelle depuis l'URL réelle (plus depuis le hash).
@@ -27,19 +29,41 @@ export const validRoutes: Route[] = ['/', '/portfolio', '/about', '/contact', '/
 // pour reconnaître la route. Les paramètres de requête (ex: ?photo=photo-3)
 // ne font pas partie de la route elle-même : ils restent lisibles via
 // window.location.search.
+// Une adresse inconnue (ex: /galerie) affiche la page "Page introuvable"
+// au lieu de l'accueil.
 export function getCurrentRoute(): Route {
   const path = window.location.pathname;
-  const normalizedPath = path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path;
-  return (validRoutes as string[]).includes(normalizedPath) ? (normalizedPath as Route) : '/';
+  if (path === '' || path === '/' || path === '/index.html') {
+    return '/';
+  }
+  const normalizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+  return (validRoutes as string[]).includes(normalizedPath) ? (normalizedPath as Route) : '/404';
+}
+
+// Transforme un chemin interne en adresse "officielle" du site, avec le "/"
+// final que GitHub Pages impose (ex: "/portfolio" -> "/portfolio/",
+// "/portfolio?photo=photo-3" -> "/portfolio/?photo=photo-3"). Ainsi les liens,
+// la barre d'adresse, le canonical et le sitemap utilisent tous la même forme,
+// et aucun lien ne passe par une redirection 301.
+export function toHref(path: string): string {
+  const match = path.match(/^([^?#]*)(.*)$/);
+  const pathname = match?.[1] ?? path;
+  const rest = match?.[2] ?? '';
+  if (pathname === '' || pathname === '/' || pathname.endsWith('/')) {
+    return `${pathname || '/'}${rest}`;
+  }
+  return `${pathname}/${rest}`;
 }
 
 // Change de page sans recharger, en mettant à jour l'URL affichée dans la
 // barre d'adresse (vraie URL, plus de "#"). Accepte une query string
-// (ex: "/portfolio?photo=photo-3") pour le lien direct vers une photo.
+// (ex: "/portfolio?photo=photo-3") pour le lien direct vers une photo, et une
+// ancre (ex: "/mentions-legales#confidentialite").
 export function navigate(path: string) {
-  const currentFullPath = window.location.pathname + window.location.search;
-  if (currentFullPath !== path) {
-    window.history.pushState({}, '', path);
+  const target = toHref(path);
+  const currentFullPath = window.location.pathname + window.location.search + window.location.hash;
+  if (currentFullPath !== target) {
+    window.history.pushState({}, '', target);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
 }

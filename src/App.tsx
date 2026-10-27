@@ -1,57 +1,76 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect } from 'react';
 import { useData } from './hooks/useData';
 import { Layout } from './components/Layout';
-import { Loading } from './components/Loading';
 import { Home } from './pages/Home';
+import { Portfolio } from './pages/Portfolio';
+import { About } from './pages/About';
+import { Contact } from './pages/Contact';
+import { MentionsLegales } from './pages/MentionsLegales';
+import { NotFound } from './pages/NotFound';
 import { applyPageSeo } from './lib/seo';
-import { getCurrentRoute, navigate as goTo, subscribeToRoute, type Route } from './lib/router';
+import { pickAboutPhoto, pickFeaturedPhotos, pickHeroPhoto } from './lib/photos';
+import { getCurrentRoute, navigate as goTo, subscribeToRoute, toHref, type Route } from './lib/router';
 import { loadGTM } from './lib/gtm';
 
-// Home reste chargée immédiatement : c'est la page d'atterrissage de la
-// grande majorité des visites. Les autres pages ne sont téléchargées par
-// le navigateur qu'au moment où l'utilisateur y accède réellement, ce qui
-// réduit le JS chargé au premier affichage (notamment Contact.tsx, qui
-// embarque le script reCAPTCHA).
-const Portfolio = lazy(() => import('./pages/Portfolio').then((m) => ({ default: m.Portfolio })));
-const About = lazy(() => import('./pages/About').then((m) => ({ default: m.About })));
-const Contact = lazy(() => import('./pages/Contact').then((m) => ({ default: m.Contact })));
-const MentionsLegales = lazy(() =>
-  import('./pages/MentionsLegales').then((m) => ({ default: m.MentionsLegales }))
-);
+// Toutes les pages sont incluses directement (plus de chargement à la
+// demande) : elles sont légères (une trentaine de Ko au total, une dizaine
+// une fois compressées), et cela supprime l'écran "Chargement" qui
+// s'affichait en changeant de page.
 
 type Theme = 'dark' | 'light';
 
+// Clé du choix cookies dans le navigateur : 'accepted' ou 'declined'.
+const CONSENT_KEY = 'portfolio-consent';
+
+// Supprime les cookies de mesure d'audience Google (_ga, _gid...) déjà
+// déposés, quand la personne retire son accord.
+function removeAnalyticsCookies() {
+  const hostname = window.location.hostname;
+  const domains = [hostname, `.${hostname.replace(/^www\./, '')}`];
+  document.cookie.split(';').forEach((cookie) => {
+    const name = cookie.split('=')[0].trim();
+    if (name.startsWith('_ga') || name === '_gid' || name.startsWith('_gat')) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+      domains.forEach((domain) => {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${domain}`;
+      });
+    }
+  });
+}
+
+// Thème au premier affichage : celui choisi lors d'une visite précédente, sinon
+// celui du système. Lu tout de suite (et non après un premier affichage en
+// sombre) pour éviter un "flash" de thème au chargement.
+function getInitialTheme(): Theme {
+  const savedTheme = window.localStorage.getItem('portfolio-theme');
+  if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
 function App() {
-  // Récupère les données du profil, des photos et des catégories depuis la base
-  const { profile, categories, photos, loading } = useData();
+  // Données du site (profil, photos, catégories), lues dans src/data/content.ts
+  const { profile, categories, photos } = useData();
 
   // Gère la page actuellement affichée selon la vraie URL (/, /portfolio, /about, /contact)
   const [route, setRoute] = useState<Route>(() => getCurrentRoute());
 
   // Gère le thème clair/sombre du site
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
-  // Consentement RGPD / cookies : affiché tant qu'il n'a pas été accepté
-  const [showConsentBanner, setShowConsentBanner] = useState(false);
+  // Consentement RGPD / cookies : affiché tant que la personne n'a fait
+  // aucun choix (ni accepté, ni refusé), ou quand elle clique sur
+  // "Gérer les cookies" en bas de page. Un refus est mémorisé comme une
+  // acceptation : on ne redemande pas à chaque visite (recommandation CNIL).
+  const [showConsentBanner, setShowConsentBanner] = useState(() => {
+    const consentChoice = window.localStorage.getItem(CONSENT_KEY);
+    return consentChoice !== 'accepted' && consentChoice !== 'declined';
+  });
 
-  // Au chargement, on récupère le thème sauvegardé ou celui du système
+  // Si la personne avait déjà accepté lors d'une visite précédente, on peut
+  // charger GTM tout de suite. Sinon, GTM reste bloqué tant qu'elle n'a pas
+  // cliqué sur "Accepter".
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem('portfolio-theme');
-    const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-    const initialTheme = savedTheme === 'light' || savedTheme === 'dark'
-      ? savedTheme
-      : systemPrefersLight
-        ? 'light'
-        : 'dark';
-
-    const consentAccepted = window.localStorage.getItem('portfolio-consent') === 'accepted';
-    setShowConsentBanner(!consentAccepted);
-    setTheme(initialTheme);
-
-    // Si la personne avait déjà accepté lors d'une visite précédente,
-    // on peut charger GTM tout de suite. Sinon, GTM reste bloqué tant
-    // qu'elle n'a pas cliqué sur "Accepter".
-    if (consentAccepted) {
+    if (window.localStorage.getItem(CONSENT_KEY) === 'accepted') {
       loadGTM();
     }
   }, []);
@@ -84,16 +103,12 @@ function App() {
     }
   }, [route]);
 
-  // Pendant le chargement, on affiche l’écran de chargement
-  if (loading) {
-    return <Loading />;
-  }
-
-  // On garde seulement les photos mises en avant pour la section
-  // Travaux en Vedette de l’accueil, en excluant la photo réservée à À Propos.
-  const featuredPhotos = photos.filter((photo) => (photo.featured_home ?? photo.featured) && !photo.about);
-  const heroPhoto = photos.find((photo) => photo.hero) ?? photos.find((photo) => photo.featured) ?? null;
-  const aboutPhoto = photos.find((photo) => photo.about) ?? photos.find((photo) => photo.featured) ?? null;
+  // Photos mises en avant : sélection de l'accueil (sans la photo réservée à
+  // À Propos), image de fond de l'accueil et photo de la page À Propos.
+  // Les règles sont dans src/lib/photos.ts.
+  const featuredPhotos = pickFeaturedPhotos(photos);
+  const heroPhoto = pickHeroPhoto(photos);
+  const aboutPhoto = pickAboutPhoto(photos);
   const pageContent =
     route === '/portfolio' ? (
       <Portfolio categories={categories} photos={photos} />
@@ -103,6 +118,8 @@ function App() {
       <Contact profile={profile} />
     ) : route === '/mentions-legales' ? (
       <MentionsLegales profile={profile} />
+    ) : route === '/404' ? (
+      <NotFound />
     ) : (
       <Home profile={profile} featuredPhotos={featuredPhotos} heroPhoto={heroPhoto} aboutPreviewPhoto={aboutPhoto} />
     );
@@ -112,61 +129,90 @@ function App() {
   };
 
   const acceptConsent = () => {
-    window.localStorage.setItem('portfolio-consent', 'accepted');
+    window.localStorage.setItem(CONSENT_KEY, 'accepted');
     setShowConsentBanner(false);
     loadGTM();
   };
 
   const declineConsent = () => {
-    window.localStorage.setItem('portfolio-consent', 'declined');
+    const previousChoice = window.localStorage.getItem(CONSENT_KEY);
+    window.localStorage.setItem(CONSENT_KEY, 'declined');
     setShowConsentBanner(false);
+
+    // Retrait d'un accord donné auparavant : GTM est peut-être déjà chargé
+    // dans cette page. On efface ses cookies et on recharge la page pour
+    // qu'il ne tourne plus.
+    if (previousChoice === 'accepted') {
+      removeAnalyticsCookies();
+      window.location.reload();
+    }
+  };
+
+  // Ouvre la politique de confidentialité SANS valider le bandeau : la
+  // personne doit pouvoir la lire avant de choisir.
+  const openPrivacyPolicy = () => {
+    goTo('/mentions-legales#confidentialite');
+    window.requestAnimationFrame(() => {
+      document.getElementById('confidentialite')?.scrollIntoView({ behavior: 'smooth' });
+    });
   };
 
   return (
     <>
-      <Layout profile={profile} theme={theme} onToggleTheme={toggleTheme}>
-        <Suspense fallback={<Loading />}>{pageContent}</Suspense>
+      <Layout
+        profile={profile}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onManageConsent={() => setShowConsentBanner(true)}
+      >
+        {pageContent}
       </Layout>
 
+      {/* Bandeau cookies. Fond plein (l'ancien fond semi-transparent n'était
+          pas généré par Tailwind, le texte se retrouvait illisible sur les
+          photos) et boutons "Refuser" / "Accepter" identiques : la CNIL
+          demande que refuser soit aussi simple et visible qu'accepter. */}
       {showConsentBanner && (
-        <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--border-color)] bg-[var(--bg-primary)]/95 backdrop-blur-md px-4 py-4 shadow-[0_-10px_30px_rgba(0,0,0,0.25)]">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/90 p-4 md:flex-row md:items-center md:justify-between md:px-6">
+        <div
+          role="region"
+          aria-label="Gestion des cookies"
+          className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.25)] md:py-4"
+        >
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-8">
             <div className="max-w-2xl">
               <p className="text-sm font-medium text-[var(--text-primary)]">
                 Nous respectons votre vie privée.
               </p>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                Ce site utilise un stockage local pour mémoriser votre préférence de thème, et souhaite utiliser
-                Google Tag Manager pour la mesure d'audience. Ce dernier n'est chargé qu'après votre accord.
-                Vous pouvez accepter ou refuser cette utilisation.
+                Avec votre accord, ce site utilise Google Tag Manager pour mesurer son audience. Votre
+                choix de thème est mémorisé dans votre navigateur. Vous pourrez changer d'avis à tout
+                moment via «&nbsp;Gérer les cookies&nbsp;» en bas de page.{' '}
+                <a
+                  href={toHref('/mentions-legales#confidentialite')}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    openPrivacyPolicy();
+                  }}
+                  className="text-amber-500 underline underline-offset-2 hover:text-amber-400"
+                >
+                  Politique de confidentialité
+                </a>
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
                 onClick={declineConsent}
-                className="rounded-full border border-[var(--border-color)] px-4 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
+                className="flex-1 rounded-full bg-amber-500 px-6 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400 md:flex-none"
               >
                 Refuser
               </button>
               <button
                 type="button"
                 onClick={acceptConsent}
-                className="rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400"
+                className="flex-1 rounded-full bg-amber-500 px-6 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-amber-400 md:flex-none"
               >
                 Accepter
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  window.localStorage.setItem('portfolio-consent', 'accepted');
-                  setShowConsentBanner(false);
-                  loadGTM();
-                  goTo('/mentions-legales');
-                }}
-                className="text-sm text-amber-500 transition-colors hover:text-amber-400"
-              >
-                Politique de confidentialité
               </button>
             </div>
           </div>

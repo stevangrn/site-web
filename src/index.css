@@ -22,7 +22,9 @@
   --surface-strong: rgba(15, 23, 42, 0.09);
   --text-primary: #111827;
   --text-secondary: #374151;
-  --text-muted: #6b7280;
+  /* #4b5563 au lieu de #6b7280 : contraste ≥ 4,5:1 sur les fonds clairs
+     et sur les cartes grisées (libellés du formulaire, compteurs...). */
+  --text-muted: #4b5563;
   --border-color: rgba(15, 23, 42, 0.12);
 }
 
@@ -187,4 +189,35 @@
   .border-neutral-700\/50 {
     border-color: var(--border-color) !important;
   }
+}
+
+/* ----------------------------------------------------------------------------
+   Orange lisible en mode clair
+   ----------------------------------------------------------------------------
+   L'orange de la charte (#f59e0b) n'a qu'un contraste de 2:1 sur fond blanc :
+   les petits textes orange (sur-titres, liens, chiffres) sont difficiles à
+   lire. En mode clair, les TEXTES orange passent donc à un orange plus foncé
+   (#a54b08 : contraste ≥ 5:1 sur le fond de page et sur les cartes grisées).
+   Les boutons orange pleins, les bordures et le mode sombre ne changent pas.
+   ------------------------------------------------------------------------- */
+[data-theme='light'] .text-amber-500,
+[data-theme='light'] .hover\:text-amber-500:hover {
+  color: #a54b08;
+}
+
+[data-theme='light'] .hover\:text-amber-400:hover {
+  color: #92400e;
+}
+
+/* Zones qui restent sombres même en mode clair (légendes au survol des
+   photos, visionneuse plein écran) : on y garde l'orange et les gris
+   d'origine, faits pour un fond sombre. */
+[data-theme='light'] .on-dark .text-amber-500,
+[data-theme='light'] .on-dark .hover\:text-amber-500:hover {
+  color: #f59e0b;
+}
+
+[data-theme='light'] .on-dark .text-neutral-400,
+[data-theme='light'] .on-dark .text-neutral-500 {
+  color: #a3a3a3 !important;
 }

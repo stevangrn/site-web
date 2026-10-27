@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Camera, Moon, Sun } from 'lucide-react';
-import { navigate as goTo, getCurrentRoute, subscribeToRoute, type Route } from '../lib/router';
+import { navigate as goTo, getCurrentRoute, subscribeToRoute, toHref, type Route } from '../lib/router';
 import type { Profile } from '../lib/supabase';
 
 interface NavbarProps {
@@ -24,6 +24,9 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
     { name: 'Contact', path: '/contact' as Route },
   ];
   const themeLabel = theme === 'dark' ? 'Clair' : 'Sombre';
+  // Le nom lu par les lecteurs d'écran contient le mot affiché ("Clair" ou
+  // "Sombre"), comme le demandent les règles d'accessibilité (WCAG 2.5.3).
+  const themeAriaLabel = `Passer au thème ${themeLabel.toLowerCase()}`;
   const linkClassName = (active: boolean) =>
     active
       ? 'text-amber-500'
@@ -48,7 +51,10 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
   const isActive = (path: string) => currentRoute === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md border-b border-[var(--border-color)]">
+    // Fond plein : l'ancienne classe "bg-[var(--bg-primary)]/95" n'était pas
+    // générée par Tailwind (pas d'opacité possible sur une variable CSS), la
+    // barre était donc transparente et laissait voir la page en dessous.
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
         <a
           href="/"
@@ -66,7 +72,7 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
           {navLinks.map((link) => (
             <a
               key={link.path}
-              href={link.path}
+              href={toHref(link.path)}
               onClick={(event) => {
                 event.preventDefault();
                 navigate(link.path);
@@ -81,9 +87,9 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             type="button"
             onClick={onToggleTheme}
             className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-amber-500"
-            aria-label="Basculer le thème"
+            aria-label={themeAriaLabel}
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === 'dark' ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
             <span>{themeLabel}</span>
           </button>
         </div>
@@ -93,9 +99,9 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
             type="button"
             onClick={onToggleTheme}
             className="rounded-full border border-[var(--border-color)] bg-[var(--surface)] p-2 text-[var(--text-secondary)] transition-colors hover:text-amber-500 touch-manipulation active:scale-[0.96]"
-            aria-label="Basculer le thème"
+            aria-label={themeAriaLabel}
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === 'dark' ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
           </button>
 
           <button
@@ -119,7 +125,7 @@ export function Navbar({ profile, theme, onToggleTheme }: NavbarProps) {
           {navLinks.map((link) => (
             <a
               key={link.path}
-              href={link.path}
+              href={toHref(link.path)}
               onClick={(event) => {
                 event.preventDefault();
                 navigate(link.path);

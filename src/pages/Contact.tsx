@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { toTelHref } from '../lib/phone';
 import type { Profile } from '../lib/supabase';
 
 interface ContactProps {
@@ -11,20 +12,9 @@ interface ContactFormData {
   email: string;
   phone: string;
   projectType: string;
+  eventDate: string;
+  eventLocation: string;
   message: string;
-}
-
-type Grecaptcha = {
-  execute: (siteKey: string, options: { action: string }) => Promise<string>;
-};
-
-interface RecaptchaWindow extends Window {
-  grecaptcha?: Grecaptcha;
-}
-
-interface ScriptElementWithReadyState extends HTMLScriptElement {
-  readyState?: string;
-  complete?: boolean;
 }
 
 const initialFormData: ContactFormData = {
@@ -32,6 +22,8 @@ const initialFormData: ContactFormData = {
   email: '',
   phone: '',
   projectType: '',
+  eventDate: '',
+  eventLocation: '',
   message: '',
 };
 
@@ -40,13 +32,11 @@ export function Contact({ profile }: ContactProps) {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
+  // Champ piège invisible : seuls les robots de spam le remplissent. C'est la
+  // protection anti-spam du formulaire (l'ancien code reCAPTCHA, jamais
+  // activé, a été retiré).
   const [honeypot, setHoneypot] = useState('');
 
-  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
-  const hasRecaptcha = RECAPTCHA_SITE_KEY !== '';
-  const [recaptchaToken, setRecaptchaToken] = useState('');
-  const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
-  
   // Utilisation active de la variable 'theme'
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
@@ -62,51 +52,13 @@ export function Contact({ profile }: ContactProps) {
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
-  useEffect(() => {
-    if (!hasRecaptcha || typeof window === 'undefined') return;
-
-    const recaptchaWindow = window as RecaptchaWindow;
-    if (recaptchaWindow.grecaptcha) {
-      setIsRecaptchaReady(true);
-      return;
-    }
-
-    const scriptId = 'recaptcha-script';
-    const existingElement = document.getElementById(scriptId);
-    if (existingElement instanceof HTMLScriptElement) {
-      const existing = existingElement as ScriptElementWithReadyState;
-      if (existing.complete || existing.readyState === 'complete') {
-        setIsRecaptchaReady(true);
-      } else {
-        existing.addEventListener('load', () => setIsRecaptchaReady(true), { once: true });
-      }
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(RECAPTCHA_SITE_KEY)}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setIsRecaptchaReady(true);
-    document.body.appendChild(script);
-  }, [hasRecaptcha, RECAPTCHA_SITE_KEY]);
-
-  const getRecaptchaToken = async () => {
-    if (!hasRecaptcha) return '';
-    const recaptchaWindow = window as RecaptchaWindow;
-    if (!recaptchaWindow.grecaptcha) {
-      throw new Error('reCAPTCHA indisponible');
-    }
-
-    return await recaptchaWindow.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'contact' });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!hasRecaptcha && honeypot.trim() !== '') {
+    // Champ piège rempli = robot : on fait comme si l'envoi avait réussi,
+    // sans rien envoyer.
+    if (honeypot.trim() !== '') {
       setSubmitted(true);
       setFormData(initialFormData);
       setHoneypot('');
@@ -118,6 +70,8 @@ export function Contact({ profile }: ContactProps) {
     const trimmedEmail = formData.email.trim();
     const trimmedPhone = formData.phone.trim();
     const trimmedProjectType = formData.projectType.trim();
+    const trimmedEventDate = formData.eventDate.trim();
+    const trimmedEventLocation = formData.eventLocation.trim();
     const trimmedMessage = formData.message.trim();
 
     if (!trimmedName || !trimmedEmail || !trimmedMessage) {
@@ -140,25 +94,6 @@ export function Contact({ profile }: ContactProps) {
       return;
     }
 
-    if (hasRecaptcha) {
-      if (!isRecaptchaReady) {
-        setError('La vérification reCAPTCHA n’est pas encore prête. Veuillez patienter.');
-        return;
-      }
-
-      try {
-        const token = await getRecaptchaToken();
-        if (!token) {
-          throw new Error('Impossible de récupérer le token reCAPTCHA.');
-        }
-        setRecaptchaToken(token);
-      } catch (recaptchaErr) {
-        console.error('reCAPTCHA error:', recaptchaErr);
-        setError('La vérification anti-spam a échoué. Veuillez réessayer.');
-        return;
-      }
-    }
-
     setIsSending(true);
 
     try {
@@ -174,14 +109,15 @@ export function Contact({ profile }: ContactProps) {
           email: trimmedEmail,
           phone: trimmedPhone,
           projectType: trimmedProjectType,
+          eventDate: trimmedEventDate,
+          eventLocation: trimmedEventLocation,
           message: trimmedMessage,
           recipientEmail,
           source: 'site-web',
           _subject: `Nouveau message depuis le site - ${trimmedName}`,
           _captcha: 'false',
           _template: 'table',
-          ...(!hasRecaptcha ? { _honeypot: honeypot } : {}),
-          ...(hasRecaptcha ? { recaptchaToken } : {}),
+          _honeypot: honeypot,
         }),
       });
 
@@ -262,7 +198,7 @@ export function Contact({ profile }: ContactProps) {
 
               <div className="space-y-4">
                 <a
-                  href={`mailto:${profile?.email || 'contact@example.com'}`}
+                  href={`mailto:${profile?.email || 'stevan.garon@gmail.com'}`}
                   className="flex items-center gap-4 p-5 bg-neutral-800/30 rounded-xl hover:bg-neutral-800/50 transition-colors group border border-neutral-700/30"
                 >
                   <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500 transition-colors">
@@ -276,7 +212,7 @@ export function Contact({ profile }: ContactProps) {
 
                 {profile?.phone && (
                   <a
-                    href={`tel:${profile.phone}`}
+                    href={toTelHref(profile.phone)}
                     className="flex items-center gap-4 p-5 bg-neutral-800/30 rounded-xl hover:bg-neutral-800/50 transition-colors group border border-neutral-700/30"
                   >
                     <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500 transition-colors">
@@ -300,15 +236,25 @@ export function Contact({ profile }: ContactProps) {
                 </div>
               </div>
 
-              {/* Map */}
-              <div className="aspect-video rounded-xl overflow-hidden border border-neutral-700/30">
-                <iframe
-                  title="Carte de La Chaize-le-Vicomte"
-                  src="https://www.google.com/maps?q=La+Chaize-le+Vicomte,+France&z=9&output=embed"
-                  className="w-full h-full"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+              {/* Zone d'intervention : remplace l'ancienne carte Google Maps
+                  intégrée, qui se chargeait avant tout consentement (et
+                  transmettait l'adresse IP des visiteurs à Google). Un simple
+                  lien ouvre Google Maps seulement si la personne le souhaite. */}
+              <div className="p-5 bg-neutral-800/30 rounded-xl border border-neutral-700/30">
+                <p className="text-neutral-500 text-sm mb-1">Zone d'intervention</p>
+                <p className="text-theme-primary leading-relaxed">
+                  La Chaize-le-Vicomte, La Roche-sur-Yon, Fontenay-le-Comte et toute la Vendée.
+                  Déplacements possibles au-delà sur demande.
+                </p>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=La+Chaize-le-Vicomte%2C+Vend%C3%A9e"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm text-amber-500 hover:text-amber-400 transition-colors"
+                >
+                  Voir sur Google Maps
+                  <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                </a>
               </div>
             </div>
 
@@ -321,7 +267,9 @@ export function Contact({ profile }: ContactProps) {
                   className="h-full flex flex-col items-center justify-center text-center"
                 >
                   <CheckCircle className="w-16 h-16 text-green-500 mb-4" aria-hidden="true" />
-                  <h3 className="text-2xl font-light text-white mb-2">
+                  {/* text-theme-primary au lieu de text-white : en mode clair,
+                      le titre blanc était invisible sur le fond clair. */}
+                  <h3 className="text-2xl font-light text-theme-primary mb-2">
                     Message envoyé !
                   </h3>
                   <p className="text-neutral-400">
@@ -334,23 +282,21 @@ export function Contact({ profile }: ContactProps) {
                     Envoyez un message
                   </h3>
                   <form onSubmit={handleSubmit} className="space-y-5">
-                    {!hasRecaptcha && (
-                      <div
-                        aria-hidden="true"
-                        style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
-                      >
-                        <label htmlFor="website">Ne pas remplir ce champ</label>
-                        <input
-                          type="text"
-                          id="website"
-                          name="website"
-                          tabIndex={-1}
-                          autoComplete="off"
-                          value={honeypot}
-                          onChange={(e) => setHoneypot(e.target.value)}
-                        />
-                      </div>
-                    )}
+                    <div
+                      aria-hidden="true"
+                      style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}
+                    >
+                      <label htmlFor="website">Ne pas remplir ce champ</label>
+                      <input
+                        type="text"
+                        id="website"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </div>
                     <div>
                       <label htmlFor="contact-name" className="block text-sm text-neutral-400 mb-2">
                         Votre nom
@@ -413,11 +359,45 @@ export function Contact({ profile }: ContactProps) {
                         className={`contact-select ${fieldClassName}`}
                       >
                         <option value="">Sélectionnez un type</option>
+                        <option value="mariage">Mariage</option>
+                        <option value="sport">Sport</option>
+                        <option value="evenement">Événement (concert, gala, fête…)</option>
                         <option value="portrait">Portrait</option>
+                        <option value="drone">Drone / prise de vue aérienne</option>
                         <option value="paysage">Paysage</option>
-                        <option value="evenement">Événement</option>
                         <option value="autre">Autre</option>
                       </select>
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <div>
+                        <label htmlFor="contact-event-date" className="block text-sm text-neutral-400 mb-2">
+                          Date (optionnel)
+                        </label>
+                        <input
+                          id="contact-event-date"
+                          type="date"
+                          name="eventDate"
+                          value={formData.eventDate}
+                          onChange={handleChange}
+                          className={fieldClassName}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="contact-event-location" className="block text-sm text-neutral-400 mb-2">
+                          Lieu (optionnel)
+                        </label>
+                        <input
+                          id="contact-event-location"
+                          type="text"
+                          name="eventLocation"
+                          value={formData.eventLocation}
+                          onChange={handleChange}
+                          className={fieldClassName}
+                          placeholder="La Roche-sur-Yon"
+                          maxLength={120}
+                          autoComplete="address-level2"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label htmlFor="contact-message" className="block text-sm text-neutral-400 mb-2">
@@ -435,16 +415,6 @@ export function Contact({ profile }: ContactProps) {
                         maxLength={2000}
                       />
                     </div>
-                    {hasRecaptcha && (
-                      <div>
-                        <label className="block text-sm text-neutral-400 mb-2" htmlFor="captcha">
-                          Vérification anti-spam
-                        </label>
-                        <div className="rounded-lg border border-neutral-700/60 bg-neutral-800/40 px-4 py-3 text-sm text-neutral-200">
-                          reCAPTCHA est activé. La vérification se fait automatiquement lorsque vous envoyez le formulaire.
-                        </div>
-                      </div>
-                    )}
                     {error && (
                       <div
                         role="alert"

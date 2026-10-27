@@ -147,9 +147,11 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
 
   if (!photo) return null;
 
+  // "on-dark" : la visionneuse reste sombre en mode clair, on y garde donc
+  // l'orange et les gris prévus pour un fond sombre (voir index.css).
   return (
     <div
-      className="fixed inset-0 z-50 bg-neutral-950/95 flex items-center justify-center p-4"
+      className="on-dark fixed inset-0 z-50 bg-neutral-950/95 flex items-center justify-center p-4"
       onClick={onClose}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}

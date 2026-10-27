@@ -90,24 +90,39 @@ async function main() {
     const nextPhotoNumber = (photoMatches.length > 0 ? Math.max(...photoMatches) : 0) + 1;
     const nextDisplayOrder = (orderMatches.length > 0 ? Math.max(...orderMatches) : 0) + 1;
 
-    const newEntry = `  {
-    id: 'photo-${nextPhotoNumber}',
-    title: ${toTsString(title)},
-    description: ${toTsString(description)},
-    image_url: ${toTsString(imageUrl)},
-    category_id: catId('${category}'),
-    featured: false, //en vedette sur la page d'acceuil
-    featured_home: false, // true = cette photo apparaît dans les travaux en vedette
-    hero: false, // true = cette photo sera affichée en héros
-    display_order: ${nextDisplayOrder},
-    created_at: new Date().toISOString(),
-  },`;
+    // Fins de ligne du fichier (Windows "\r\n" ou Unix "\n"), pour ne pas
+    // mélanger les deux en ajoutant la photo.
+    const eol = content.includes('\r\n') ? '\r\n' : '\n';
 
-    const updatedContent = content.replace(/\n\];/, `\n${newEntry}\n];`);
+    const newEntry = [
+      '  {',
+      `    id: 'photo-${nextPhotoNumber}',`,
+      `    title: ${toTsString(title)},`,
+      `    description: ${toTsString(description)},`,
+      `    image_url: ${toTsString(imageUrl)},`,
+      `    category_id: catId('${category}'),`,
+      "    featured: false, //en vedette sur la page d'acceuil",
+      '    featured_home: false, // true = cette photo apparaît dans les travaux en vedette',
+      '    hero: false, // true = cette photo sera affichée en héros',
+      `    display_order: ${nextDisplayOrder},`,
+      '    created_at: new Date().toISOString(),',
+      '  },',
+    ].join(eol);
 
-    if (updatedContent === content) {
-      throw new Error('Impossible d’insérer la nouvelle photo. Le format du tableau n’a pas été trouvé.');
+    // La photo doit aller à la fin de la liste "photos" : on cherche donc la
+    // fin de liste ("];") qui suit "export const photos". L'ancienne version
+    // prenait la première fin de liste du fichier, qui est celle des
+    // catégories, et y ajoutait la photo par erreur.
+    const photosStart = content.indexOf('export const photos');
+    if (photosStart === -1) {
+      throw new Error('Impossible de trouver la liste "photos" dans le fichier de contenu.');
     }
+    const closingMatch = /\r?\n\];/.exec(content.slice(photosStart));
+    if (!closingMatch) {
+      throw new Error('Impossible d’insérer la nouvelle photo. La fin de la liste "photos" n’a pas été trouvée.');
+    }
+    const insertAt = photosStart + closingMatch.index;
+    const updatedContent = `${content.slice(0, insertAt)}${eol}${newEntry}${content.slice(insertAt)}`;
 
     await fs.writeFile(targetFile, updatedContent, 'utf8');
 

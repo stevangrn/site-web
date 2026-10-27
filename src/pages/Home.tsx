@@ -1,13 +1,14 @@
-import { useEffect } from 'react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { navigate as goTo } from '../lib/router';
-import { buildCloudinarySrcSet, buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
+import { navigate as goTo, toHref } from '../lib/router';
+import {
+  buildCloudinarySrcSet,
+  buildPhotoAlt,
+  HERO_DEFAULT_WIDTH,
+  HERO_WIDTHS,
+  optimizeCloudinaryUrl,
+} from '../lib/seo';
 import type { Profile, Photo } from '../lib/supabase';
 
-// Largeurs générées pour l'image de fond du hero : c'est la plus grande image
-// du site (pleine largeur d'écran) et généralement le LCP (Largest Contentful
-// Paint), la métrique de performance la plus regardée par Google.
-const HERO_WIDTHS = [768, 1280, 1920, 2560];
 // Largeurs pour les vignettes de la grille "Sélection" (3 colonnes max).
 const FEATURED_WIDTHS = [400, 600, 900, 1200];
 
@@ -39,35 +40,18 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Précharge l'image de fond du hero le plus tôt possible : le navigateur
-  // la découvre normalement seulement après avoir lu le HTML puis le JS de
-  // ce composant, ce qui la retarde. Un <link rel="preload"> injecté dans le
-  // <head> dit au navigateur "télécharge-la tout de suite, en parallèle",
-  // ce qui accélère nettement le premier affichage (LCP).
-  useEffect(() => {
-    const heroSrcSet = buildCloudinarySrcSet(heroImage, HERO_WIDTHS);
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = optimizeCloudinaryUrl(heroImage, 1920);
-    if (heroSrcSet) {
-      link.setAttribute('imagesrcset', heroSrcSet);
-      link.setAttribute('imagesizes', '100vw');
-    }
-    document.head.appendChild(link);
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, [heroImage]);
+  // Le préchargement de cette image n'est plus fait ici : il est écrit
+  // directement dans le HTML au moment du build (voir vite.config.ts), ce qui
+  // lance son téléchargement avant même que le JavaScript du site arrive.
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="min-h-[100svh] flex items-center justify-center relative overflow-hidden">
+      {/* Hero Section — reste sombre dans les deux thèmes ("on-dark") */}
+      <section className="on-dark min-h-[100svh] flex items-center justify-center relative overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
-            src={optimizeCloudinaryUrl(heroImage, 1920)}
+            src={optimizeCloudinaryUrl(heroImage, HERO_DEFAULT_WIDTH)}
             srcSet={buildCloudinarySrcSet(heroImage, HERO_WIDTHS)}
             sizes="100vw"
             alt={
@@ -102,7 +86,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
           <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto mb-8 animate-fade-in animation-delay-200" />
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-400">
             <a
-              href="/portfolio"
+              href={toHref('/portfolio')}
               onClick={(event) => {
                 event.preventDefault();
                 navigate('/portfolio');
@@ -113,7 +97,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a
-              href="/contact"
+              href={toHref('/contact')}
               onClick={(event) => {
                 event.preventDefault();
                 navigate('/contact');
@@ -126,10 +110,12 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
         </div>
 
         <button
+          type="button"
           onClick={scrollToPortfolio}
+          aria-label="Faire défiler vers la sélection de photos"
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white hover:text-amber-500 transition-colors animate-bounce"
         >
-          <ChevronDown className="w-8 h-8" />
+          <ChevronDown className="w-8 h-8" aria-hidden="true" />
         </button>
       </section>
 
@@ -147,7 +133,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
               {featuredPhotos.slice(0, 6).map((photo, index) => (
                 <a
                   key={photo.id}
-                  href={`/portfolio?photo=${photo.id}`}
+                  href={toHref(`/portfolio?photo=${photo.id}`)}
                   onClick={(event) => {
                     event.preventDefault();
                     navigate(`/portfolio?photo=${photo.id}`);
@@ -166,7 +152,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                  <div className="on-dark absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                     <p className="text-amber-500 text-xs tracking-widest uppercase mb-1">
                       {photo.categories?.name || 'Photographie'}
                     </p>
@@ -178,14 +164,14 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
 
             <div className="text-center mt-12 md:mt-14">
               <a
-                href="/portfolio"
+                href={toHref('/portfolio')}
                 onClick={(event) => {
                   event.preventDefault();
                   navigate('/portfolio');
                 }}
                 className="inline-flex items-center gap-2 text-amber-500 hover:text-amber-400 transition-colors"
               >
-                <span className="text-sm tracking-wider uppercase">Voir tout le portfolio</span>
+                <span className="text-sm tracking-wider uppercase">Voir le portfolio</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
             </div>
@@ -264,7 +250,7 @@ export function Home({ profile, featuredPhotos, heroPhoto, aboutPreviewPhoto }: 
 
               <div className="mt-8">
                 <a
-                  href="/about"
+                  href={toHref('/about')}
                   onClick={(event) => {
                     event.preventDefault();
                     navigate('/about');

@@ -84,7 +84,11 @@ export function About({ aboutPhoto }: AboutProps) {
 
               {/* Services */}
               <div className="mt-12">
-                <h3 className="text-2xl font-light text-white mb-6">Services</h3>
+                {/* text-theme-primary au lieu de text-white : en mode clair, ce
+                    titre blanc sur fond clair était invisible. H2 (et H3 pour
+                    les cartes) au lieu de H3/H4 : ordre de titres logique après
+                    le H1 de la page. L'apparence ne change pas. */}
+                <h2 className="text-2xl font-light text-theme-primary mb-6">Services</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { title: 'Portraits', desc: 'Individuels, familles, professionnels' },
@@ -96,7 +100,7 @@ export function About({ aboutPhoto }: AboutProps) {
                       key={service.title}
                       className="bg-neutral-800/30 rounded-xl p-4 border border-neutral-700/50"
                     >
-                      <h4 className="text-amber-500 font-medium mb-1">{service.title}</h4>
+                      <h3 className="text-amber-500 font-medium mb-1">{service.title}</h3>
                       <p className="text-sm text-neutral-400">{service.desc}</p>
                     </div>
                   ))}

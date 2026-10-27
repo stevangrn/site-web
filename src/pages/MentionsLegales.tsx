@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { toTelHref } from '../lib/phone';
 import type { Profile } from '../lib/supabase';
 
 interface MentionsLegalesProps {
@@ -20,6 +22,14 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
   const email = profile?.email || 'stevan.garon@gmail.com';
   const phone = profile?.phone || '06 27 24 56 73';
   const location = profile?.location || 'La Chaize-le-Vicomte, Vendée, France';
+
+  // Arrivée par le lien "Politique de confidentialité" (adresse se terminant
+  // par #confidentialite) : on fait défiler jusqu'à cette section.
+  useEffect(() => {
+    if (window.location.hash === '#confidentialite') {
+      document.getElementById('confidentialite')?.scrollIntoView();
+    }
+  }, []);
 
   return (
     <>
@@ -65,7 +75,7 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-amber-500 shrink-0" />
-                <a href={`tel:${phone}`} className="hover:text-amber-500 transition-colors">
+                <a href={toTelHref(phone)} className="hover:text-amber-500 transition-colors">
                   {phone}
                 </a>
               </div>
@@ -119,8 +129,10 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
             </p>
           </div>
 
-          {/* Politique de confidentialité */}
-          <div>
+          {/* Politique de confidentialité — id utilisé par les liens
+              "Politique de confidentialité" (scroll-mt : laisse la place de
+              la barre de navigation fixe en haut de l'écran). */}
+          <div id="confidentialite" className="scroll-mt-24">
             <h2 className="text-2xl font-light text-[var(--text-primary)] mb-4">
               Politique de confidentialité
             </h2>
@@ -133,9 +145,10 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
               <p>
                 <span className="font-medium text-[var(--text-primary)]">Données collectées :</span>{' '}
                 lorsque vous utilisez le formulaire de contact, je peux recueillir votre nom,
-                votre adresse e-mail, votre numéro de téléphone (si vous le renseignez), le
-                type de projet ainsi que votre message. Ces informations sont uniquement
-                utilisées pour répondre à votre demande.
+                votre adresse e-mail, votre numéro de téléphone, le type de projet, la date et
+                le lieu de l'événement (ces trois derniers seulement si vous les renseignez)
+                ainsi que votre message. Ces informations sont uniquement utilisées pour
+                répondre à votre demande.
               </p>
               <p>
                 <span className="font-medium text-[var(--text-primary)]">Finalités :</span>{' '}
@@ -143,17 +156,43 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
                 d’une réponse personnalisée et, si nécessaire, la mise en place d’un projet
                 photographique.
               </p>
-              <p>
-                <span className="font-medium text-[var(--text-primary)]">Prestataires et services tiers :</span>{' '}
-                le formulaire peut transmettre vos données à un service externe de gestion
-                d’e-mails afin d’assurer l’envoi du message. Aucune donnée personnelle n’est
-                vendue ou cédée à des fins commerciales.
-              </p>
+              <div>
+                <p>
+                  <span className="font-medium text-[var(--text-primary)]">Prestataires et services tiers :</span>{' '}
+                  le site s’appuie sur les services suivants, qui peuvent recevoir votre adresse IP
+                  lors de votre visite :
+                </p>
+                <ul className="mt-2 list-disc space-y-1 pl-5">
+                  <li>
+                    <span className="text-[var(--text-primary)]">FormSubmit</span> (formsubmit.co,
+                    États-Unis) : transmet les messages du formulaire de contact à mon adresse e-mail ;
+                  </li>
+                  <li>
+                    <span className="text-[var(--text-primary)]">Cloudinary</span> (États-Unis) :
+                    héberge et diffuse les photographies du site ;
+                  </li>
+                  <li>
+                    <span className="text-[var(--text-primary)]">Google</span> (États-Unis) : fournit,
+                    uniquement si vous l’acceptez, l’outil de mesure d’audience Google Tag Manager ;
+                  </li>
+                  <li>
+                    <span className="text-[var(--text-primary)]">GitHub</span> (États-Unis) : héberge
+                    le site (voir «&nbsp;Hébergement&nbsp;» ci-dessus).
+                  </li>
+                </ul>
+                <p className="mt-2">
+                  Ces prestataires étant établis aux États-Unis, vos données peuvent y être
+                  transférées. Aucune donnée personnelle n’est vendue ou cédée à des fins
+                  commerciales.
+                </p>
+              </div>
               <p>
                 <span className="font-medium text-[var(--text-primary)]">Cookies et stockage local :</span>{' '}
                 ce site n’utilise pas de cookies de suivi publicitaires. Un stockage local de
-                votre navigateur peut toutefois être utilisé pour mémoriser votre préférence de
-                thème (clair ou sombre), et Google Tag Manager n’est chargé qu’après votre accord.
+                votre navigateur est utilisé pour mémoriser votre préférence de thème (clair ou
+                sombre) et votre choix concernant les cookies. Google Tag Manager n’est chargé
+                qu’après votre accord. Vous pouvez modifier ce choix à tout moment grâce au lien
+                «&nbsp;Gérer les cookies&nbsp;» en bas de chaque page.
               </p>
               <p>
                 <span className="font-medium text-[var(--text-primary)]">Conservation :</span>{' '}
@@ -172,7 +211,12 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
                 <span className="font-medium text-[var(--text-primary)]">Contact :</span>{' '}
                 pour exercer vos droits ou pour toute question relative à cette politique,
                 vous pouvez me contacter à{' '}
-                <a href={`mailto:${email}`} className="text-amber-500 hover:text-amber-400 transition-colors">
+                {/* Souligné : un lien au milieu d'une phrase ne doit pas se
+                    distinguer uniquement par sa couleur (accessibilité). */}
+                <a
+                  href={`mailto:${email}`}
+                  className="text-amber-500 underline underline-offset-2 hover:text-amber-400 transition-colors"
+                >
                   {email}
                 </a>
                 .

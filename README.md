@@ -30,16 +30,20 @@ tourner et à entretenir, sans compte externe ni clé à configurer.
 - src/components/ : composants réutilisables comme la navbar, le footer et le layout.
 - src/pages/ : les différentes pages du site : accueil, portfolio, à propos, contact.
 - src/data/content.ts : **le fichier à modifier pour changer le contenu du site** (profil, catégories, photos).
-- src/hooks/useData.ts : charge les données depuis src/data/content.ts.
+- src/hooks/useData.ts : fournit les données de src/data/content.ts aux pages.
 - src/lib/supabase.ts : ne contient plus que les types de données utilisées par le site.
+- src/lib/photos.ts : choix de la photo d'accueil, de la photo À propos et de la sélection de l'accueil.
+- src/lib/seo.ts : titres, descriptions, canonical et images optimisées (Cloudinary).
+- src/lib/router.ts : navigation entre les pages par de vraies adresses.
 - src/index.css : styles globaux et variables de thème.
+- vite.config.ts : configuration du build, dont le préchargement automatique de l'image d'accueil.
 
 ## 4. Plan du site
 
 Le site est organisé en 4 pages principales :
 
 - Accueil : présente le photographe, son titre, une courte bio et deux boutons d'action pour voir le portfolio ou contacter.
-- Portfolio : affiche les photos disponibles, permet de filtrer par catégorie et d'ouvrir une photo en grand dans une lightbox.
+- Portfolio : s'ouvre sur le choix d'une catégorie (une carte par catégorie avec sa photo de couverture), puis affiche les photos de cette catégorie et permet d'en ouvrir une en grand dans une lightbox.
 - À propos : raconte l'histoire du photographe, ses services et son parcours.
 - Contact : propose un formulaire de contact, les coordonnées et une zone de confirmation après envoi.
 
@@ -67,15 +71,22 @@ avec des commentaires expliquant chaque champ :
 En haut du fichier, modifie l'objet `profile` : nom, titre, bio, email, téléphone, localisation, réseaux sociaux.
 
 ### Modifier les catégories
-Modifie la liste `categories`. Chaque catégorie a un nom, un "slug" (identifiant sans espace ni accent), une description et un ordre d'affichage.
+Modifie la liste `categories`. Chaque catégorie a un nom, un "slug" (identifiant sans espace ni accent), une description, une photo de couverture (`cover_photo_id`, l'id d'une photo, ex: `'photo-34'`) et un ordre d'affichage.
 
 ### Ajouter ou modifier des photos
-Modifie la liste `photos`. Pour ajouter une photo :
+Le plus simple : la commande
+```bash
+npm run add:photo
+```
+pose les questions (titre, description, lien de l'image, catégorie) et ajoute la photo à la fin de la liste `photos`.
+
+Pour le faire à la main, modifie la liste `photos` :
 1. Copie un bloc `{ ... }` existant.
 2. Donne-lui un `id` unique (ex: `'photo-9'`).
 3. Renseigne le titre, la description, `image_url` (lien vers l'image),
    la catégorie via `catId('slug-de-la-categorie')`,
-   `featured: true` si la photo doit apparaître en avant sur l'accueil,
+   `featured_home: true` si la photo doit apparaître dans la sélection de l'accueil,
+   `hero: true` pour en faire l'image de fond de l'accueil,
    et `display_order` pour l'ordre d'affichage.
 
 Après modification, sauvegarde le fichier : le site se met à jour automatiquement si `npm run dev` est lancé.
@@ -109,27 +120,19 @@ npm run build
 
 Si la commande réussit, le site est prêt à être publié (le résultat est dans le dossier `dist/`).
 
-### Déploiement : URLs réelles (/portfolio, /about, /contact)
+On peut aussi lancer `npm run typecheck` (vérification des types) et
+`npm run lint` (vérification du code) avant de publier.
 
-Le site utilise maintenant de vraies URLs par page (plus de `#`), ce qui est
-important pour le référencement. Ça veut dire que le serveur qui héberge le
-site doit répondre avec `index.html` pour **toutes** les routes, sinon
-recharger la page sur `/portfolio` (ou y accéder directement) donnera une
-erreur 404. C'est déjà réglé pour les cas les plus courants :
+### Déploiement sur GitHub Pages
 
-- **Netlify** : fichier `public/_redirects` (copié dans `dist/` au build).
-- **Vercel** : fichier `vercel.json` à la racine du projet.
-- **Hébergement Apache classique (OVH, o2switch...)** : fichier
-  `public/.htaccess` (copié dans `dist/` au build).
-- **GitHub Pages** : ne supporte pas nativement ce genre de redirection. La
-  solution la plus simple est de dupliquer `index.html` en `404.html` après
-  le build, pour que GitHub Pages serve le site sur n'importe quelle route :
-  ```bash
-  npm run build
-  cp dist/index.html dist/404.html
-  ```
-- **Autre hébergeur** : chercher une option "SPA fallback" ou "rewrite all
-  routes to index.html" dans sa configuration.
+Le site est publié automatiquement sur GitHub Pages à chaque `git push` sur
+la branche `main`, par le workflow `.github/workflows/deploy.yml`.
+
+Le site utilise de vraies URLs par page (plus de `#`), ce qui est important
+pour le référencement. Pour que recharger la page sur `/portfolio` fonctionne,
+le workflow copie `index.html` dans un dossier par page (`portfolio/`,
+`about/`, `contact/`, `mentions-legales/`) et en `404.html` pour les adresses
+inconnues, qui affichent alors la page « Page introuvable ».
 
 En développement (`npm run dev`) et avec `npm run preview`, Vite gère déjà
 ça automatiquement, aucune configuration n'est nécessaire.

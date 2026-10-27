@@ -7,7 +7,19 @@
 //   - une optimisation automatique des images Cloudinary (point 1.6)
 // ============================================================================
 
-import type { Route } from './router';
+import { toHref, type Route } from './router';
+
+// Adresse officielle du site, utilisée pour le canonical, og:url et les
+// données structurées (jamais l'adresse locale de développement).
+const SITE_URL = 'https://stevangaron.fr';
+
+// Image affichée quand un lien du site est partagé (WhatsApp, Facebook,
+// LinkedIn...). Le fichier est dans public/og-image.png : il est copié tel
+// quel à la racine du site au moment du build, son adresse ne change donc
+// jamais (contrairement aux fichiers de src/ ou static/, renommés par Vite).
+const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
+const SOCIAL_IMAGE_ALT = 'Logo Stevan Garon — photographe et télépilote de drone en Vendée';
+const INSTAGRAM_URL = 'https://www.instagram.com/stevan_raw/';
 
 // ----------------------------------------------------------------------------
 // 1. Titre + description par page
@@ -43,6 +55,10 @@ const PAGE_SEO: Record<Route, { title: string; description: string }> = {
     description:
       "Informations légales relatives à l'édition et à l'hébergement du site stevangaron.fr.",
   },
+  '/404': {
+    title: 'Page introuvable — Stevan Garon Photographe',
+    description: "Cette page n'existe pas ou a été déplacée.",
+  },
 };
 
 function setMetaTag(selector: string, attribute: string, value: string, content: string) {
@@ -55,8 +71,14 @@ function setMetaTag(selector: string, attribute: string, value: string, content:
   tag.setAttribute('content', content);
 }
 
-function setCanonicalUrl(url: string) {
+// Met à jour le canonical, ou le retire (page introuvable : elle ne doit
+// désigner aucune adresse officielle).
+function setCanonicalUrl(url: string | null) {
   let link = document.querySelector('link[rel="canonical"]');
+  if (url === null) {
+    link?.remove();
+    return;
+  }
   if (!link) {
     link = document.createElement('link');
     link.setAttribute('rel', 'canonical');
@@ -66,15 +88,14 @@ function setCanonicalUrl(url: string) {
 }
 
 function setSocialImageMeta() {
-  const imageUrl = 'https://stevangaron.fr/static/logo.png';
-  setMetaTag('meta[property="og:image"]', 'property', 'og:image', imageUrl);
-  setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', imageUrl);
+  setMetaTag('meta[property="og:image"]', 'property', 'og:image', SOCIAL_IMAGE_URL);
+  setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', SOCIAL_IMAGE_URL);
   setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/png');
   setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
   setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
-  setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', 'Stevan Garon — photographe et télépilote de drone en Vendée');
-  setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', imageUrl);
-  setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', 'Stevan Garon — photographe et télépilote de drone en Vendée');
+  setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', SOCIAL_IMAGE_ALT);
+  setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', SOCIAL_IMAGE_URL);
+  setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', SOCIAL_IMAGE_ALT);
 }
 
 function setJsonLd(schema: Record<string, unknown>) {
@@ -88,33 +109,25 @@ function setJsonLd(schema: Record<string, unknown>) {
   script.textContent = JSON.stringify(schema);
 }
 
-function buildStructuredData(route: Route) {
-  const baseUrl = 'https://stevangaron.fr';
-  const pageUrl = new URL(route, baseUrl).toString();
+// Adresse officielle d'une page, avec le "/" final (ex: https://stevangaron.fr/portfolio/).
+function pageUrlFor(route: Route): string {
+  return `${SITE_URL}${toHref(route)}`;
+}
 
-  const baseSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'ProfessionalService',
-    name: 'Stevan Garon Photographe',
-    image: `${baseUrl}/static/logo.png`,
-    url: baseUrl,
-    telephone: '+33627245673',
-    email: 'stevan.garon@gmail.com',
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'La Chaize-le-Vicomte',
-      addressRegion: 'Vendée',
-      addressCountry: 'FR',
-    },
-    areaServed: ['La Chaize-le-Vicomte', 'Vendée', 'La Roche-sur-Yon', 'Fontenay-le-Comte'],
-    sameAs: ['https://instagram.com/stevan_raw'],
-    priceRange: '€€',
-  };
+// Données structurées propres à chaque page. L'activité elle-même
+// (ProfessionalService : nom, adresse, téléphone...) est décrite une seule
+// fois, dans le <script type="application/ld+json"> de index.html : ici, on
+// ajoute seulement ce qui décrit la page affichée, avec des propriétés que
+// chaque type Schema.org prévoit réellement.
+function buildStructuredData(route: Route): Record<string, unknown> | null {
+  const pageUrl = pageUrlFor(route);
+  const seo = PAGE_SEO[route];
 
   if (route === '/portfolio') {
     return {
-      ...baseSchema,
+      '@context': 'https://schema.org',
       '@type': 'ImageGallery',
+      name: seo.title,
       url: pageUrl,
       description: 'Portfolio photo de portraits, événements, sports et paysages en Vendée.',
     };
@@ -122,21 +135,29 @@ function buildStructuredData(route: Route) {
 
   if (route === '/about') {
     return {
-      ...baseSchema,
+      '@context': 'https://schema.org',
       '@type': 'Person',
+      name: 'Stevan Garon',
       url: pageUrl,
       jobTitle: 'Photographe et télépilote de drone',
-      description: 'Photographe professionnel basé en Vendée, spécialisé dans les portraits, événements, sports et prises de vue aériennes.',
+      description:
+        'Photographe basé en Vendée, spécialisé dans les portraits, événements, sports et prises de vue aériennes.',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'La Chaize-le-Vicomte',
+        addressRegion: 'Vendée',
+        addressCountry: 'FR',
+      },
+      sameAs: [INSTAGRAM_URL],
     };
   }
 
   if (route === '/contact') {
     return {
-      ...baseSchema,
-      '@type': 'ContactPoint',
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: seo.title,
       url: pageUrl,
-      contactType: 'Reservation de séance photo',
-      availableLanguage: ['fr'],
     };
   }
 
@@ -149,17 +170,16 @@ function buildStructuredData(route: Route) {
     };
   }
 
+  if (route === '/404') {
+    return null;
+  }
+
   return {
-    ...baseSchema,
+    '@context': 'https://schema.org',
     '@type': 'WebSite',
-    url: pageUrl,
     name: 'Stevan Garon Photographe',
-    description: 'Photographe professionnel en Vendée, spécialisé dans les portraits, événements, sports et prises de vue aériennes.',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${baseUrl}/portfolio`,
-      'query-input': 'required name=search_term_string',
-    },
+    url: pageUrl,
+    inLanguage: 'fr-FR',
   };
 }
 
@@ -167,16 +187,28 @@ function buildStructuredData(route: Route) {
 // À appeler dans un useEffect, à chaque changement de route.
 export function applyPageSeo(route: Route) {
   const seo = PAGE_SEO[route] ?? PAGE_SEO['/'];
-  const canonicalUrl = new URL(route, window.location.origin || 'https://stevangaron.fr').toString();
+  const isNotFound = route === '/404';
+  const canonicalUrl = isNotFound ? null : pageUrlFor(route);
 
   document.title = seo.title;
   setMetaTag('meta[name="description"]', 'name', 'description', seo.description);
+  // Une page introuvable ne doit pas apparaître dans Google.
+  setMetaTag('meta[name="robots"]', 'name', 'robots', isNotFound ? 'noindex, follow' : 'index, follow');
   setMetaTag('meta[property="og:title"]', 'property', 'og:title', seo.title);
   setMetaTag('meta[property="og:description"]', 'property', 'og:description', seo.description);
+  setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalUrl ?? SITE_URL + '/');
   setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Stevan Garon Photographe');
+  setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', seo.title);
+  setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', seo.description);
   setCanonicalUrl(canonicalUrl);
   setSocialImageMeta();
-  setJsonLd(buildStructuredData(route));
+
+  const schema = buildStructuredData(route);
+  if (schema) {
+    setJsonLd(schema);
+  } else {
+    document.querySelector('script[data-seo-schema="true"]')?.remove();
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -226,4 +258,37 @@ export function buildCloudinarySrcSet(url: string, widths: number[]): string | u
     return undefined;
   }
   return widths.map((width) => `${optimizeCloudinaryUrl(url, width)} ${width}w`).join(', ');
+}
+
+// ----------------------------------------------------------------------------
+// 5. Image de fond de l'accueil
+// ----------------------------------------------------------------------------
+// Largeurs générées pour l'image de fond du hero : c'est la plus grande image
+// du site (pleine largeur d'écran) et généralement le LCP (Largest Contentful
+// Paint), la métrique de performance la plus regardée par Google.
+// Partagées entre la page d'accueil (src/pages/Home.tsx) et le préchargement
+// ajouté au HTML pendant le build (vite.config.ts) : les deux doivent
+// demander exactement les mêmes fichiers pour que le préchargement serve.
+export const HERO_WIDTHS = [768, 1280, 1920, 2560];
+export const HERO_DEFAULT_WIDTH = 1920;
+
+// ----------------------------------------------------------------------------
+// 6. Images recadrées par Cloudinary (cartes de catégories du portfolio)
+// ----------------------------------------------------------------------------
+// Pour une carte de format fixe (4/5), on demande à Cloudinary l'image déjà
+// recadrée à ce format (c_fill), centrée automatiquement sur le sujet
+// (g_auto). Le navigateur ne télécharge ainsi que la partie affichée : les
+// couvertures pèsent environ deux fois moins qu'en version non recadrée.
+export function cropCloudinaryUrl(url: string, width: number, aspectRatio = '4:5'): string {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/') || url.includes('/upload/f_auto')) {
+    return url;
+  }
+  return url.replace('/upload/', `/upload/f_auto,q_auto,c_fill,ar_${aspectRatio},g_auto,w_${Math.round(width)}/`);
+}
+
+export function buildCloudinaryCropSrcSet(url: string, widths: number[], aspectRatio = '4:5'): string | undefined {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/') || url.includes('/upload/f_auto')) {
+    return undefined;
+  }
+  return widths.map((width) => `${cropCloudinaryUrl(url, width, aspectRatio)} ${width}w`).join(', ');
 }

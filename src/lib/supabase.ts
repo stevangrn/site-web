@@ -19,6 +19,9 @@ export type Category = {
   name: string;
   slug: string;
   description: string | null;
+  // Id de la photo qui illustre la catégorie sur l'accueil du portfolio
+  // (facultatif : sans elle, la photo la plus récente de la catégorie).
+  cover_photo_id?: string;
   display_order: number;
   created_at: string;
 };

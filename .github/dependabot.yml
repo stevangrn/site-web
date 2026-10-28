@@ -1,0 +1,43 @@
+# ============================================================================
+# Mises à jour automatiques des outils (Dependabot)
+# ============================================================================
+# Une fois par mois, GitHub vérifie si les outils du site ont des mises à
+# jour et, s'il y en a, ouvre une "pull request" (onglet "Pull requests" du
+# dépôt) qui les regroupe toutes. Le workflow "Vérifier les modifications"
+# (.github/workflows/verifier.yml) teste alors automatiquement que le site se
+# construit toujours :
+#   - coche verte : clique sur "Merge pull request", le site est mis à jour
+#     et redéployé tout seul ;
+#   - croix rouge : ne fusionne pas, la mise à jour casse quelque chose.
+#
+# Seules les petites mises à jour (corrections et nouveautés compatibles)
+# sont proposées. Les grandes versions (React 19, Tailwind 4...) demandent
+# des changements dans le code : elles sont ignorées ici et se font à la main.
+# ============================================================================
+version: 2
+updates:
+  # Outils du site (package.json)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "Mise à jour"
+    groups:
+      outils-du-site:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Actions utilisées par les workflows GitHub (.github/workflows/)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "Mise à jour"
+    groups:
+      actions-github:
+        patterns: ["*"]

@@ -16,7 +16,7 @@ Ce site permet de :
 
 - React : pour construire les composants de la page,
 - TypeScript : pour ajouter des types et éviter certaines erreurs,
-- Vite : pour lancer le projet rapidement,
+- Vite (version 8) : pour lancer le projet en local et construire le site,
 - Tailwind CSS : pour le style des pages.
 
 Le site n'utilise plus de base de données externe (Supabase a été retiré) :
@@ -36,7 +36,9 @@ tourner et à entretenir, sans compte externe ni clé à configurer.
 - src/lib/seo.ts : titres, descriptions, canonical et images optimisées (Cloudinary).
 - src/lib/router.ts : navigation entre les pages par de vraies adresses.
 - src/index.css : styles globaux et variables de thème.
-- vite.config.ts : configuration du build, dont le préchargement automatique de l'image d'accueil.
+- src/entry-server.tsx et scripts/prerender.mjs : génération d'une page HTML par adresse au moment du build (voir « Pré-rendu » plus bas), y compris le préchargement de l'image d'accueil.
+- vite.config.ts : configuration du build, dont la liste des navigateurs pris en charge.
+- .github/ : déploiement automatique, vérifications et mises à jour automatiques (voir la partie 9).
 
 ## 4. Plan du site
 
@@ -44,15 +46,17 @@ Le site est organisé en 4 pages principales :
 
 - Accueil : présente le photographe, son titre, une courte bio et deux boutons d'action pour voir le portfolio ou contacter.
 - Portfolio (/portfolio/) : s'ouvre sur le choix d'une catégorie (une carte par catégorie avec sa photo de couverture). Chaque catégorie a sa propre page (/portfolio/sports/, /portfolio/nature/...), où l'on peut ouvrir une photo en grand dans une lightbox.
-
-Les icônes du site (onglet du navigateur, écran d'accueil des téléphones) sont dans `public/` : `favicon.ico`, `favicon-32x32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, et le manifeste `site.webmanifest`.
 - À propos : raconte l'histoire du photographe, ses services et son parcours.
 - Contact : propose un formulaire de contact, les coordonnées et une zone de confirmation après envoi.
 
+Les icônes du site (onglet du navigateur, écran d'accueil des téléphones) sont dans `public/` : `favicon.ico`, `favicon-32x32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, et le manifeste `site.webmanifest`.
+
 ## 5. Installation
 
-1. Ouvrir le projet dans VS Code.
-2. Installer les dépendances :
+1. Avoir Node.js installé, en version 22 ou plus récente (minimum 20.19) : `node -v`
+   dans un terminal affiche la version. Sinon, la télécharger sur nodejs.org
+   (version « LTS »).
+2. Ouvrir le projet dans VS Code, puis installer les dépendances :
    ```bash
    npm install
    ```
@@ -163,6 +167,24 @@ n'est publié et le site en ligne reste tel quel.
 
 En développement (`npm run dev`), Vite affiche le site sans pré-rendu, aucune
 configuration n'est nécessaire.
+
+Le workflow `.github/workflows/verifier.yml` fait les mêmes vérifications sur
+chaque *pull request*, sans rien publier.
+
+### Mises à jour automatiques (Dependabot)
+
+Une fois par mois, GitHub regarde si les outils du site (`package.json`) et
+les actions des workflows ont des mises à jour. S'il y en a, il ouvre une
+*pull request* qui les regroupe (onglet « Pull requests » du dépôt), et le
+workflow de vérification la teste tout seul :
+
+- coche verte : cliquer sur « Merge pull request ». Le site est mis à jour et
+  redéployé automatiquement ;
+- croix rouge : ne pas fusionner, la mise à jour casse quelque chose.
+
+Seules les petites mises à jour, compatibles, sont proposées. Les grandes
+versions (React 19, Tailwind CSS 4...) demandent des changements dans le code
+et se font à la main. Les réglages sont dans `.github/dependabot.yml`.
 
 ## 10. Conseils pour un étudiant débutant
 

@@ -18,9 +18,18 @@
 import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import App from './App';
-import { categories } from './data/content';
+import { categories, photos } from './data/content';
+import { pickHeroPhoto } from './lib/photos';
 import { parsePath, portfolioPath, resolveLocation, toHref, validRoutes } from './lib/router';
-import { buildHeadTags, getPageMeta, SITE_URL } from './lib/seo';
+import {
+  buildCloudinarySrcSet,
+  buildHeadTags,
+  getPageMeta,
+  HERO_DEFAULT_WIDTH,
+  HERO_WIDTHS,
+  optimizeCloudinaryUrl,
+  SITE_URL,
+} from './lib/seo';
 
 export { SITE_URL };
 
@@ -31,6 +40,28 @@ export function getPagePaths(): string[] {
   return [...validRoutes, ...categories.map((category) => portfolioPath(category.slug))].map(toHref);
 }
 
+function escapeAttribute(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// Préchargement de l'image d'accueil
+// L'image de fond de l'accueil est l'élément le plus lourd et le plus visible
+// de la page. Cette balise, écrite seulement dans la page d'accueil, demande
+// au navigateur de la télécharger tout de suite, sans attendre le JavaScript.
+// L'adresse et les tailles sont exactement celles de l'image affichée
+// (src/pages/Home.tsx), pour que le navigateur réutilise le téléchargement.
+// L'image est celle marquée "hero: true" dans src/data/content.ts.
+function heroPreloadTag(): string {
+  const hero = pickHeroPhoto(photos);
+  if (!hero) return '';
+
+  const href = optimizeCloudinaryUrl(hero.image_url, HERO_DEFAULT_WIDTH);
+  const srcset = buildCloudinarySrcSet(hero.image_url, HERO_WIDTHS);
+  const responsive = srcset ? ` imagesrcset="${escapeAttribute(srcset)}" imagesizes="100vw"` : '';
+
+  return `<link rel="preload" as="image" href="${escapeAttribute(href)}"${responsive} fetchpriority="high" />`;
+}
+
 // HTML d'une page et balises de son <head>.
 export function render(path: string): { html: string; head: string } {
   const page = resolveLocation(parsePath(path), categories);
@@ -39,5 +70,9 @@ export function render(path: string): { html: string; head: string } {
       <App initialPath={path} />
     </StrictMode>
   );
-  return { html, head: buildHeadTags(getPageMeta(page.location, page.category)) };
+
+  const head = buildHeadTags(getPageMeta(page.location, page.category));
+  const preload = page.location.route === '/' ? heroPreloadTag() : '';
+
+  return { html, head: preload ? `${preload}\n    ${head}` : head };
 }

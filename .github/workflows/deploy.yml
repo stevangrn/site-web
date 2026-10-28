@@ -26,7 +26,9 @@ jobs:
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Vite 8 demande Node.js 20.19 ou plus récent ; la version 22 est
+          # maintenue jusqu'en avril 2027.
+          node-version: 22
           cache: npm
 
       - name: Installer les dépendances

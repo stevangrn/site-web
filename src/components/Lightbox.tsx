@@ -206,7 +206,7 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
             src={optimizeCloudinaryUrl(photo.image_url, 1600)}
             srcSet={buildCloudinarySrcSet(photo.image_url, LIGHTBOX_WIDTHS)}
             sizes="(max-width: 1024px) 100vw, 1024px"
-            alt={buildPhotoAlt(photo.title, photo.categories?.name)}
+            alt={buildPhotoAlt(photo)}
             draggable={false}
             decoding="async"
             className="max-w-full max-h-[85vh] object-contain rounded-lg"

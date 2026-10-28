@@ -65,7 +65,7 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
             sizes="100vw"
             alt={
               heroPhoto
-                ? buildPhotoAlt(heroPhoto.title)
+                ? buildPhotoAlt(heroPhoto)
                 : 'Stevan Garon, photographe et télépilote de drone en Vendée'
             }
             draggable={false}
@@ -154,7 +154,7 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
                     src={optimizeCloudinaryUrl(photo.image_url, 900)}
                     srcSet={buildCloudinarySrcSet(photo.image_url, FEATURED_WIDTHS)}
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    alt={buildPhotoAlt(photo.title, photo.categories?.name)}
+                    alt={buildPhotoAlt(photo)}
                     draggable={false}
                     loading={index < 2 ? 'eager' : 'lazy'}
                     decoding="async"

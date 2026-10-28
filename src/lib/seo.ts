@@ -362,14 +362,17 @@ export function applyPageSeo(meta: PageMeta) {
 }
 
 // ----------------------------------------------------------------------------
-// 2. Textes alternatifs enrichis pour les photos
+// 2. Textes alternatifs des photos (attribut "alt")
 // ----------------------------------------------------------------------------
-// Ajoute un contexte géographique/métier au titre déjà renseigné dans
-// content.ts, sans avoir à toucher aux 96 fiches photos une par une.
-export function buildPhotoAlt(title: string, categoryName?: string): string {
-  const cleanTitle = title?.trim() || 'Photographie';
-  const suffix = categoryName ? `${categoryName} en Vendée` : 'Photographe en Vendée';
-  return `${cleanTitle} — ${suffix} | Stevan Garon`;
+// Le texte alternatif décrit ce que montre la photo : il est lu par les
+// lecteurs d'écran des personnes malvoyantes et sert à Google Images pour
+// comprendre l'image. On utilise la description rédigée dans content.ts
+// (une phrase précise et différente pour chaque photo), sinon le titre.
+// Pas de mots-clés ajoutés ("en Vendée | Stevan Garon") : répétés sur
+// chaque photo, ils étaient parfois faux (Alpes, côte basque, Japon) et
+// Google les considère comme du bourrage de mots-clés.
+export function buildPhotoAlt(photo: Pick<Photo, 'title' | 'description'>): string {
+  return photo.description?.trim() || photo.title?.trim() || 'Photographie de Stevan Garon';
 }
 
 // ----------------------------------------------------------------------------

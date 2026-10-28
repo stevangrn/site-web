@@ -140,3 +140,30 @@ test("fil d'Ariane pour Google : chaque page sauf l'accueil", async ({ request }
     if (expected[path]) expect(items.map((item) => item.name)).toEqual(expected[path]);
   }
 });
+
+test('textes alternatifs des photos : une vraie description, sans mots-clés ajoutés', async ({ request }) => {
+  for (const path of PAGES) {
+    const html = await (await request.get(path)).text();
+    const content = html.split('<div id="root">')[1] ?? '';
+    const alts = [...content.matchAll(/<img\b[^>]*>/g)].map((match) =>
+      match[0]
+        .match(/\salt="([^"]*)"/)?.[1]
+        ?.replace(/&#x27;/g, "'")
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+    );
+
+    for (const alt of alts) {
+      expect(alt, `${path} : une image n'a pas d'attribut alt`).toBeDefined();
+      expect(alt, `${path} : mots-clés ajoutés au texte alternatif`).not.toMatch(/\| Stevan Garon/);
+    }
+
+    // Pages de catégorie : chaque photo a sa propre description
+    if (/^\/portfolio\/[^/]+\/$/.test(path)) {
+      const described = alts.filter((alt): alt is string => !!alt);
+      expect(described.length, `${path} : photos décrites`).toBeGreaterThan(0);
+      expect(new Set(described).size, `${path} : deux photos ont le même texte`).toBe(described.length);
+      for (const alt of described) expect(alt.length, `${path} : « ${alt} » trop court`).toBeGreaterThanOrEqual(20);
+    }
+  }
+});

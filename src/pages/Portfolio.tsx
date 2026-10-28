@@ -90,10 +90,6 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
     setVisibleCount((current) => current + PAGE_SIZE);
   };
 
-  // Associe chaque photo à son nom de catégorie (pour enrichir le alt SEO),
-  // les photos de content.ts ne portant que le category_id.
-  const categoryNameById = new Map(categories.map((c) => [c.id, c.name]));
-
   // Nombre de photos et photo de couverture de chaque catégorie
   const photosOf = (c: Category) => sortedPhotos.filter((p) => p.category_id === c.id);
   const coverOf = (c: Category) => pickCategoryCover(c, photos);
@@ -244,7 +240,7 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
                           src={optimizeCloudinaryUrl(photo.image_url, 600)}
                           srcSet={buildCloudinarySrcSet(photo.image_url, GRID_WIDTHS)}
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          alt={buildPhotoAlt(photo.title, categoryNameById.get(photo.category_id ?? ''))}
+                          alt={buildPhotoAlt(photo)}
                           draggable={false}
                           loading={index < 6 ? 'eager' : 'lazy'}
                           decoding="async"

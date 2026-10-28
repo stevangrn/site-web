@@ -58,6 +58,11 @@ test.describe('avec le choix des cookies déjà fait', () => {
     await expect(page).toHaveURL(/\/contact\/$/);
     await expect(page.locator('h1')).toHaveText('Travaillons ensemble');
     await expect(page).toHaveTitle(/^Contact —/);
+    // Les informations pour Google suivent le changement de page
+    // (un <script> n'a pas de texte affiché : on lit son contenu brut)
+    await expect
+      .poll(() => page.locator('script[data-seo-breadcrumb="true"]').textContent())
+      .toMatch(/"name":"Contact"/);
 
     if (isMobile) await page.getByRole('button', { name: 'Ouvrir le menu mobile' }).click();
     await menu.getByRole('link', { name: 'À propos', exact: true }).filter({ visible: true }).first().click();

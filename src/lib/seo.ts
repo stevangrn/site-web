@@ -110,6 +110,8 @@ export interface PageMeta {
   robots: string;
   // Données structurées propres à la page (null = aucune)
   schema: Record<string, unknown> | null;
+  // Fil d'Ariane de la page pour Google (null = aucun, ex : l'accueil)
+  breadcrumb: Record<string, unknown> | null;
   // Image d'aperçu quand la page est partagée
   image: SocialImage;
 }
@@ -118,6 +120,38 @@ export interface PageMeta {
 function absoluteUrl(path: string): string {
   return `${SITE_URL}${toHref(path)}`;
 }
+
+// ----------------------------------------------------------------------------
+// Fil d'Ariane (« Accueil › Portfolio › Sports »)
+// ----------------------------------------------------------------------------
+// Décrit à Google le chemin de chaque page dans le site. Google peut alors
+// l'afficher dans ses résultats sur ordinateur, à la place de l'adresse brute
+// (sur mobile, il n'affiche plus que le nom du site depuis 2025). Rien ne
+// change à l'écran sur le site. Les noms sont ceux du menu.
+const BREADCRUMB_NAMES: Record<Exclude<Route, '/404'>, string> = {
+  '/': 'Accueil',
+  '/portfolio': 'Portfolio',
+  '/about': 'À propos',
+  '/contact': 'Contact',
+  '/mentions-legales': 'Mentions légales',
+};
+
+function buildBreadcrumb(items: { name: string; path: string }[]): Record<string, unknown> | null {
+  // Un fil d'Ariane réduit à l'accueil n'apporte rien
+  if (items.length < 2) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
+const HOME_CRUMB = { name: BREADCRUMB_NAMES['/'], path: '/' };
 
 // Calcule les informations d'une page. `category` = la catégorie affichée
 // sur une page /portfolio/<categorie>/ (null sinon), `cover` = sa photo de
@@ -131,7 +165,14 @@ export function getPageMeta(location: SiteLocation, category: Category | null, c
   const { route } = location;
 
   if (route === '/404') {
-    return { ...PAGE_SEO['/404'], canonical: null, robots: 'noindex, follow', schema: null, image: DEFAULT_SOCIAL_IMAGE };
+    return {
+      ...PAGE_SEO['/404'],
+      canonical: null,
+      robots: 'noindex, follow',
+      schema: null,
+      breadcrumb: null,
+      image: DEFAULT_SOCIAL_IMAGE,
+    };
   }
 
   if (route === '/portfolio' && category) {
@@ -151,6 +192,11 @@ export function getPageMeta(location: SiteLocation, category: Category | null, c
         description,
         ...(image !== DEFAULT_SOCIAL_IMAGE ? { image: image.url } : {}),
       },
+      breadcrumb: buildBreadcrumb([
+        HOME_CRUMB,
+        { name: BREADCRUMB_NAMES['/portfolio'], path: '/portfolio' },
+        { name: category.name, path: portfolioPath(category.slug) },
+      ]),
       image,
     };
   }
@@ -192,7 +238,9 @@ export function getPageMeta(location: SiteLocation, category: Category | null, c
     schema = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, url, inLanguage: 'fr-FR' };
   }
 
-  return { ...seo, canonical: url, robots: 'index, follow', schema, image: DEFAULT_SOCIAL_IMAGE };
+  const breadcrumb = route === '/' ? null : buildBreadcrumb([HOME_CRUMB, { name: BREADCRUMB_NAMES[route], path: route }]);
+
+  return { ...seo, canonical: url, robots: 'index, follow', schema, breadcrumb, image: DEFAULT_SOCIAL_IMAGE };
 }
 
 // ----------------------------------------------------------------------------
@@ -204,6 +252,13 @@ function escapeHtml(value: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+// Bloc de données structurées (JSON-LD). L'attribut data-seo-... permet de le
+// retrouver dans le navigateur pour le mettre à jour en changeant de page.
+function jsonLdTag(attribute: string, data: Record<string, unknown> | null): string {
+  if (!data) return '';
+  return `<script type="application/ld+json" ${attribute}="true">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
 }
 
 // Renvoie les balises du <head> d'une page, à insérer dans son fichier HTML.
@@ -231,9 +286,8 @@ export function buildHeadTags(meta: PageMeta): string {
     `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
     `<meta name="twitter:image" content="${escapeHtml(meta.image.url)}" />`,
     `<meta name="twitter:image:alt" content="${escapeHtml(meta.image.alt)}" />`,
-    meta.schema
-      ? `<script type="application/ld+json" data-seo-schema="true">${JSON.stringify(meta.schema).replace(/</g, '\\u003c')}</script>`
-      : '',
+    jsonLdTag('data-seo-schema', meta.schema),
+    jsonLdTag('data-seo-breadcrumb', meta.breadcrumb),
   ];
   return tags.filter(Boolean).join('\n    ');
 }
@@ -267,19 +321,19 @@ function setCanonicalUrl(url: string | null) {
   link.setAttribute('href', url);
 }
 
-function setJsonLd(schema: Record<string, unknown> | null) {
-  let script = document.querySelector('script[data-seo-schema="true"]');
-  if (!schema) {
+function setJsonLd(attribute: string, data: Record<string, unknown> | null) {
+  let script = document.querySelector(`script[${attribute}="true"]`);
+  if (!data) {
     script?.remove();
     return;
   }
   if (!script) {
     script = document.createElement('script');
     script.setAttribute('type', 'application/ld+json');
-    script.setAttribute('data-seo-schema', 'true');
+    script.setAttribute(attribute, 'true');
     document.head.appendChild(script);
   }
-  script.textContent = JSON.stringify(schema);
+  script.textContent = JSON.stringify(data);
 }
 
 // Met à jour le titre de l'onglet et les balises meta selon la page affichée.
@@ -303,7 +357,8 @@ export function applyPageSeo(meta: PageMeta) {
   setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', meta.image.url);
   setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', meta.image.alt);
   setCanonicalUrl(meta.canonical);
-  setJsonLd(meta.schema);
+  setJsonLd('data-seo-schema', meta.schema);
+  setJsonLd('data-seo-breadcrumb', meta.breadcrumb);
 }
 
 // ----------------------------------------------------------------------------

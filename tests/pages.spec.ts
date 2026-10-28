@@ -110,3 +110,33 @@ test("l'image d'accueil est préchargée sur l'accueil seulement", async ({ requ
   expect(await (await request.get('/')).text()).toMatch(preload);
   expect(await (await request.get('/about/')).text()).not.toMatch(preload);
 });
+
+test("fil d'Ariane pour Google : chaque page sauf l'accueil", async ({ request }) => {
+  const expected: Record<string, string[]> = {
+    '/portfolio/': ['Accueil', 'Portfolio'],
+    '/portfolio/sports/': ['Accueil', 'Portfolio', 'Sports'],
+    '/about/': ['Accueil', 'À propos'],
+    '/contact/': ['Accueil', 'Contact'],
+    '/mentions-legales/': ['Accueil', 'Mentions légales'],
+  };
+
+  for (const path of PAGES) {
+    const html = await (await request.get(path)).text();
+    const json = html.match(/<script type="application\/ld\+json" data-seo-breadcrumb="true">([^<]+)<\/script>/)?.[1];
+
+    if (path === '/') {
+      expect(json, "pas de fil d'Ariane sur l'accueil").toBeUndefined();
+      continue;
+    }
+    expect(json, `${path} : fil d'Ariane présent`).toBeDefined();
+    const breadcrumb = JSON.parse(json ?? '{}');
+    expect(breadcrumb['@type']).toBe('BreadcrumbList');
+
+    const items: { position: number; name: string; item: string }[] = breadcrumb.itemListElement;
+    expect(items.map((item) => item.position)).toEqual(items.map((_, index) => index + 1));
+    expect(items[0].item).toBe(`${SITE_URL}/`);
+    // Le dernier élément est la page elle-même
+    expect(items[items.length - 1].item).toBe(`${SITE_URL}${path}`);
+    if (expected[path]) expect(items.map((item) => item.name)).toEqual(expected[path]);
+  }
+});

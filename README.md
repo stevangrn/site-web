@@ -33,7 +33,7 @@ tourner et à entretenir, sans compte externe ni clé à configurer.
 - src/hooks/useData.ts : fournit les données de src/data/content.ts aux pages.
 - src/lib/types.ts : les types des données utilisées par le site (profil, catégories, photos).
 - src/lib/photos.ts : choix de la photo d'accueil, de la photo À propos et de la sélection de l'accueil.
-- src/lib/seo.ts : titres, descriptions, canonical et images optimisées (Cloudinary).
+- src/lib/seo.ts : titres, descriptions, canonical, fil d'Ariane et images de partage de chaque page, et images optimisées (Cloudinary).
 - src/lib/router.ts : navigation entre les pages par de vraies adresses.
 - src/index.css : styles globaux et variables de thème.
 - src/entry-server.tsx et scripts/prerender.mjs : génération d'une page HTML par adresse au moment du build (voir « Pré-rendu » plus bas), y compris le préchargement de l'image d'accueil.
@@ -145,7 +145,8 @@ vrai navigateur (Chromium, avec l'outil Playwright) et vérifient :
   avec son titre, sa description et son adresse officielle ;
 - qu'aucun lien ni fichier interne n'est cassé, et qu'une adresse inconnue
   donne bien la page « introuvable » (code 404) ;
-- les images de partage et le préchargement de l'image d'accueil ;
+- les images de partage, le fil d'Ariane pour Google et le préchargement de
+  l'image d'accueil ;
 - les parcours d'un visiteur, sur ordinateur et sur mobile : choisir une
   catégorie, ouvrir une photo, le menu, le thème, le bandeau cookies, le
   formulaire de contact (envoi réussi et panne de l'envoi).

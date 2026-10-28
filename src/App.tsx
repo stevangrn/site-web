@@ -8,7 +8,7 @@ import { Contact } from './pages/Contact';
 import { MentionsLegales } from './pages/MentionsLegales';
 import { NotFound } from './pages/NotFound';
 import { applyPageSeo, getPageMeta } from './lib/seo';
-import { pickAboutPhoto, pickFeaturedPhotos, pickHeroPhoto } from './lib/photos';
+import { pickAboutPhoto, pickCategoryCover, pickFeaturedPhotos, pickHeroPhoto } from './lib/photos';
 import {
   navigate as goTo,
   parsePath,
@@ -117,11 +117,12 @@ function App({ initialPath }: AppProps) {
   // Met à jour le <title>, la <meta description>, le canonical... quand on
   // change de page sans recharger. Voir src/lib/seo.ts.
   useEffect(() => {
-    applyPageSeo(getPageMeta(page.location, page.category));
-  }, [page]);
+    const cover = page.category ? pickCategoryCover(page.category, photos) : null;
+    applyPageSeo(getPageMeta(page.location, page.category, cover));
+  }, [page, photos]);
 
   // Photos mises en avant : sélection de l'accueil (sans la photo réservée à
-  // À Propos), image de fond de l'accueil et photo de la page À Propos.
+  // À propos), image de fond de l'accueil et photo de la page À propos.
   // Les règles sont dans src/lib/photos.ts.
   const featuredPhotos = pickFeaturedPhotos(photos);
   const heroPhoto = pickHeroPhoto(photos);

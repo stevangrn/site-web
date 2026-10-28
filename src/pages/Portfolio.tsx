@@ -10,6 +10,7 @@ import {
   fetchPriority,
   optimizeCloudinaryUrl,
 } from '../lib/seo';
+import { pickCategoryCover } from '../lib/photos';
 import type { Category, Photo } from '../lib/types';
 
 interface PortfolioProps {
@@ -95,8 +96,7 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
 
   // Nombre de photos et photo de couverture de chaque catégorie
   const photosOf = (c: Category) => sortedPhotos.filter((p) => p.category_id === c.id);
-  const coverOf = (c: Category) =>
-    photos.find((p) => p.id === c.cover_photo_id) ?? photosOf(c)[0] ?? null;
+  const coverOf = (c: Category) => pickCategoryCover(c, photos);
 
   // Change de catégorie (ou revient à l'écran de choix avec null) : chaque
   // catégorie a sa propre page (/portfolio/sports/), App.tsx affiche la bonne
@@ -119,7 +119,7 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
             Portfolio
           </p>
           <h1 className="text-4xl md:text-5xl font-light mb-4">
-            {currentCategory ? currentCategory.name : 'Mes Créations'}
+            {currentCategory ? currentCategory.name : 'Mes créations'}
           </h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
             {currentCategory?.description

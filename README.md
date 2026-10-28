@@ -39,6 +39,8 @@ tourner et à entretenir, sans compte externe ni clé à configurer.
 - src/entry-server.tsx et scripts/prerender.mjs : génération d'une page HTML par adresse au moment du build (voir « Pré-rendu » plus bas), y compris le préchargement de l'image d'accueil.
 - vite.config.ts : configuration du build, dont la liste des navigateurs pris en charge.
 - .github/ : déploiement automatique, vérifications et mises à jour automatiques (voir la partie 9).
+- tests/ et playwright.config.ts : les tests automatiques du site (voir « Tests automatiques »).
+- scripts/serve-dist.mjs : petit serveur qui affiche le site construit exactement comme GitHub Pages (utilisé par les tests).
 
 ## 4. Plan du site
 
@@ -53,7 +55,7 @@ Les icônes du site (onglet du navigateur, écran d'accueil des téléphones) so
 
 ## 5. Installation
 
-1. Avoir Node.js installé, en version 22 ou plus récente (minimum 20.19) : `node -v`
+1. Avoir Node.js installé, en version 24 de préférence (minimum 20.19) : `node -v`
    dans un terminal affiche la version. Sinon, la télécharger sur nodejs.org
    (version « LTS »).
 2. Ouvrir le projet dans VS Code, puis installer les dépendances :
@@ -134,6 +136,34 @@ npm run check
 qui vérifie les types (TypeScript) puis le code (ESLint). Ces mêmes
 vérifications sont faites automatiquement avant chaque mise en ligne.
 
+### Tests automatiques
+
+Le dossier `tests/` contient des tests qui ouvrent le site construit dans un
+vrai navigateur (Chromium, avec l'outil Playwright) et vérifient :
+
+- que chaque page du sitemap s'affiche sans erreur, en thème clair et sombre,
+  avec son titre, sa description et son adresse officielle ;
+- qu'aucun lien ni fichier interne n'est cassé, et qu'une adresse inconnue
+  donne bien la page « introuvable » (code 404) ;
+- les images de partage et le préchargement de l'image d'accueil ;
+- les parcours d'un visiteur, sur ordinateur et sur mobile : choisir une
+  catégorie, ouvrir une photo, le menu, le thème, le bandeau cookies, le
+  formulaire de contact (envoi réussi et panne de l'envoi).
+
+Les photos et les services extérieurs (envoi du formulaire, mesure
+d'audience) sont simulés : les tests n'envoient jamais de vrai message.
+
+Ils se lancent tout seuls avant chaque mise en ligne. Pour les lancer sur ton
+ordinateur :
+```bash
+npx playwright install chromium   # une seule fois : installe le navigateur des tests
+npm run build
+npm test
+```
+Si un test échoue, le message indique la page et ce qui ne va pas. Sur
+GitHub, le rapport détaillé se télécharge en bas de la page du workflow
+(rubrique « Artifacts »).
+
 ### Une vraie page HTML par adresse (pré-rendu)
 
 `npm run build` fait trois choses :
@@ -162,14 +192,15 @@ sinon la page générée au build et celle du navigateur ne correspondent plus
 Le site est publié automatiquement sur GitHub Pages à chaque `git push` sur
 la branche `main`, par le workflow `.github/workflows/deploy.yml` : il installe
 les dépendances, lance les vérifications, construit le site (avec le
-pré-rendu) et publie le dossier `dist/`. Si une vérification échoue, rien
-n'est publié et le site en ligne reste tel quel.
+pré-rendu), lance les tests automatiques et publie le dossier `dist/`. Si une
+vérification ou un test échoue, rien n'est publié et le site en ligne reste
+tel quel.
 
 En développement (`npm run dev`), Vite affiche le site sans pré-rendu, aucune
 configuration n'est nécessaire.
 
-Le workflow `.github/workflows/verifier.yml` fait les mêmes vérifications sur
-chaque *pull request*, sans rien publier.
+Le workflow `.github/workflows/verifier.yml` fait les mêmes vérifications et
+les mêmes tests sur chaque *pull request*, sans rien publier.
 
 ### Mises à jour automatiques (Dependabot)
 

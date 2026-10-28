@@ -102,7 +102,7 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
               }}
               className="group inline-flex items-center gap-3 bg-amber-500/10 backdrop-blur-sm border border-amber-500/50 px-8 py-4 rounded-full text-white hover:bg-amber-500 hover:text-neutral-950 transition-all duration-500 touch-manipulation active:scale-[0.98]"
             >
-              <span className="text-sm tracking-wider uppercase">Voir Portfolio</span>
+              <span className="text-sm tracking-wider uppercase">Voir le portfolio</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a
@@ -113,7 +113,7 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
               }}
               className="inline-flex items-center gap-3 border border-white/20 px-8 py-4 rounded-full text-white hover:border-amber-500 hover:text-amber-500 transition-all duration-500 touch-manipulation active:scale-[0.98]"
             >
-              <span className="text-sm tracking-wider uppercase">Me Contacter</span>
+              <span className="text-sm tracking-wider uppercase">Me contacter</span>
             </a>
           </div>
         </div>
@@ -227,9 +227,9 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
 
             <div className="lg:pl-8 order-1 lg:order-2">
               <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
-                À Propos
+                À propos
               </p>
-              <h2 className="text-3xl md:text-4xl font-light mb-6">Mon Histoire</h2>
+              <h2 className="text-3xl md:text-4xl font-light mb-6">Mon histoire</h2>
               <div className="space-y-6 text-neutral-400 leading-relaxed">
                 <p>
                   Je m'appelle Stevan Garon, photographe et télépilote de drone basé en Vendée. Je travaille sur des portraits, des événements, des sports et des projets de paysage avec un regard à la fois documentaire et artistique.

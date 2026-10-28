@@ -20,9 +20,9 @@ export function About({ aboutPhoto }: AboutProps) {
       <section className="pt-20 pb-12 px-6 bg-neutral-950">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
-            À Propos
+            À propos
           </p>
-          <h1 className="text-4xl md:text-5xl font-light mb-4">Mon Histoire</h1>
+          <h1 className="text-4xl md:text-5xl font-light mb-4">Mon histoire</h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
             Découvrez mon parcours et ma passion pour la photographie.
           </p>
@@ -103,11 +103,16 @@ export function About({ aboutPhoto }: AboutProps) {
                     { title: 'Portraits', desc: 'Individuels, familles, professionnels' },
                     { title: 'Paysages', desc: 'Nature, urbain, architecture' },
                     { title: 'Événements', desc: 'Mariages, célébrations, corporate' },
-                    { title: 'Sports', desc: 'Action, Intensité, Performance' },
+                    { title: 'Sports', desc: 'Action, intensité, performance' },
+                    {
+                      title: 'Drone',
+                      desc: 'Prises de vue aériennes : événements, lieux et paysages vus du ciel',
+                      wide: true,
+                    },
                   ].map((service) => (
                     <div
                       key={service.title}
-                      className="bg-neutral-800/30 rounded-xl p-4 border border-neutral-700/50"
+                      className={`bg-neutral-800/30 rounded-xl p-4 border border-neutral-700/50${service.wide ? ' sm:col-span-2' : ''}`}
                     >
                       <h3 className="text-amber-500 font-medium mb-1">{service.title}</h3>
                       <p className="text-sm text-neutral-400">{service.desc}</p>
@@ -136,7 +141,7 @@ export function About({ aboutPhoto }: AboutProps) {
             }}
             className="inline-flex items-center gap-3 bg-amber-500/10 backdrop-blur-sm border border-amber-500/50 px-8 py-4 rounded-full text-amber-500 hover:bg-amber-500 hover:text-neutral-950 transition-all duration-500"
           >
-            <span className="text-sm tracking-wider uppercase">Me Contacter</span>
+            <span className="text-sm tracking-wider uppercase">Me contacter</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

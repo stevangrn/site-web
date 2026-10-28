@@ -16,19 +16,54 @@
 // ============================================================================
 
 import { portfolioPath, toHref, type Route, type SiteLocation } from './router';
-import type { Category } from './types';
+import type { Category, Photo } from './types';
 
 // Adresse officielle du site, utilisée pour le canonical, og:url et les
 // données structurées (jamais l'adresse locale de développement).
 export const SITE_URL = 'https://stevangaron.fr';
 const SITE_NAME = 'Stevan Garon Photographe';
 
-// Image affichée quand un lien du site est partagé (WhatsApp, Facebook,
-// LinkedIn...). Le fichier est dans public/og-image.png : il est copié tel
-// quel à la racine du site au moment du build, son adresse ne change donc
+// Image d'aperçu affichée quand un lien du site est partagé (WhatsApp,
+// Facebook, LinkedIn...), au format 1200 x 630 attendu par ces services.
+export interface SocialImage {
+  url: string;
+  type: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
+// Image par défaut : le logo, dans public/og-image.png. Le fichier est copié
+// tel quel à la racine du site au moment du build, son adresse ne change donc
 // jamais (contrairement aux fichiers de src/ ou static/, renommés par Vite).
-const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.png`;
-const SOCIAL_IMAGE_ALT = 'Logo Stevan Garon — photographe et télépilote de drone en Vendée';
+const DEFAULT_SOCIAL_IMAGE: SocialImage = {
+  url: `${SITE_URL}/og-image.png`,
+  type: 'image/png',
+  width: 1200,
+  height: 630,
+  alt: 'Logo Stevan Garon — photographe et télépilote de drone en Vendée',
+};
+
+// Image d'aperçu d'une page de catégorie (/portfolio/sports/...) : sa photo
+// de couverture, recadrée par Cloudinary au format 1200 x 630 et centrée
+// automatiquement sur le sujet (g_auto). Elle est demandée en JPEG (f_jpg)
+// et non en format automatique, car certains services de partage ne lisent
+// pas les formats récents (WebP, AVIF). Une photo qui n'est pas sur
+// Cloudinary garde l'image par défaut.
+function categorySocialImage(category: Category, cover: Photo | null): SocialImage {
+  const url = cover?.image_url ?? '';
+  if (!url.includes('res.cloudinary.com') || !url.includes('/upload/') || url.includes('/upload/f_auto')) {
+    return DEFAULT_SOCIAL_IMAGE;
+  }
+  return {
+    url: url.replace('/upload/', '/upload/c_fill,g_auto,w_1200,h_630,q_auto,f_jpg/'),
+    type: 'image/jpeg',
+    width: 1200,
+    height: 630,
+    alt: `${category.name} — ${cover?.description?.trim() || cover?.title?.trim() || 'photo de Stevan Garon'}`,
+  };
+}
+
 const INSTAGRAM_URL = 'https://www.instagram.com/stevan_raw/';
 
 // ----------------------------------------------------------------------------
@@ -75,6 +110,8 @@ export interface PageMeta {
   robots: string;
   // Données structurées propres à la page (null = aucune)
   schema: Record<string, unknown> | null;
+  // Image d'aperçu quand la page est partagée
+  image: SocialImage;
 }
 
 // Adresse officielle d'un chemin, avec le "/" final (ex: https://stevangaron.fr/portfolio/).
@@ -83,21 +120,24 @@ function absoluteUrl(path: string): string {
 }
 
 // Calcule les informations d'une page. `category` = la catégorie affichée
-// sur une page /portfolio/<categorie>/ (null sinon).
+// sur une page /portfolio/<categorie>/ (null sinon), `cover` = sa photo de
+// couverture (voir pickCategoryCover dans photos.ts), utilisée comme image
+// d'aperçu de la page.
 //
 // Les données structurées décrivent la page affichée. L'activité elle-même
 // (ProfessionalService : nom, adresse, téléphone...) est décrite une seule
 // fois, dans le <script type="application/ld+json"> de index.html.
-export function getPageMeta(location: SiteLocation, category: Category | null): PageMeta {
+export function getPageMeta(location: SiteLocation, category: Category | null, cover: Photo | null = null): PageMeta {
   const { route } = location;
 
   if (route === '/404') {
-    return { ...PAGE_SEO['/404'], canonical: null, robots: 'noindex, follow', schema: null };
+    return { ...PAGE_SEO['/404'], canonical: null, robots: 'noindex, follow', schema: null, image: DEFAULT_SOCIAL_IMAGE };
   }
 
   if (route === '/portfolio' && category) {
     const url = absoluteUrl(portfolioPath(category.slug));
     const description = `${category.description ? `${category.description}. ` : ''}Photos réalisées en Vendée et alentours par Stevan Garon, photographe et télépilote de drone.`;
+    const image = categorySocialImage(category, cover);
     return {
       title: `${category.name} — Portfolio photo en Vendée | Stevan Garon`,
       description,
@@ -109,7 +149,9 @@ export function getPageMeta(location: SiteLocation, category: Category | null): 
         name: `${category.name} — Portfolio de Stevan Garon`,
         url,
         description,
+        ...(image !== DEFAULT_SOCIAL_IMAGE ? { image: image.url } : {}),
       },
+      image,
     };
   }
 
@@ -150,7 +192,7 @@ export function getPageMeta(location: SiteLocation, category: Category | null): 
     schema = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, url, inLanguage: 'fr-FR' };
   }
 
-  return { ...seo, canonical: url, robots: 'index, follow', schema };
+  return { ...seo, canonical: url, robots: 'index, follow', schema, image: DEFAULT_SOCIAL_IMAGE };
 }
 
 // ----------------------------------------------------------------------------
@@ -178,17 +220,17 @@ export function buildHeadTags(meta: PageMeta): string {
     '<meta property="og:locale" content="fr_FR" />',
     `<meta property="og:url" content="${escapeHtml(ogUrl)}" />`,
     `<meta property="og:site_name" content="${SITE_NAME}" />`,
-    `<meta property="og:image" content="${SOCIAL_IMAGE_URL}" />`,
-    `<meta property="og:image:secure_url" content="${SOCIAL_IMAGE_URL}" />`,
-    '<meta property="og:image:type" content="image/png" />',
-    '<meta property="og:image:width" content="1200" />',
-    '<meta property="og:image:height" content="630" />',
-    `<meta property="og:image:alt" content="${escapeHtml(SOCIAL_IMAGE_ALT)}" />`,
+    `<meta property="og:image" content="${escapeHtml(meta.image.url)}" />`,
+    `<meta property="og:image:secure_url" content="${escapeHtml(meta.image.url)}" />`,
+    `<meta property="og:image:type" content="${meta.image.type}" />`,
+    `<meta property="og:image:width" content="${meta.image.width}" />`,
+    `<meta property="og:image:height" content="${meta.image.height}" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(meta.image.alt)}" />`,
     '<meta name="twitter:card" content="summary_large_image" />',
     `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
-    `<meta name="twitter:image" content="${SOCIAL_IMAGE_URL}" />`,
-    `<meta name="twitter:image:alt" content="${escapeHtml(SOCIAL_IMAGE_ALT)}" />`,
+    `<meta name="twitter:image" content="${escapeHtml(meta.image.url)}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(meta.image.alt)}" />`,
     meta.schema
       ? `<script type="application/ld+json" data-seo-schema="true">${JSON.stringify(meta.schema).replace(/</g, '\\u003c')}</script>`
       : '',
@@ -252,6 +294,14 @@ export function applyPageSeo(meta: PageMeta) {
   setMetaTag('meta[property="og:url"]', 'property', 'og:url', meta.canonical ?? `${SITE_URL}/`);
   setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', meta.title);
   setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', meta.description);
+  setMetaTag('meta[property="og:image"]', 'property', 'og:image', meta.image.url);
+  setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', meta.image.url);
+  setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', meta.image.type);
+  setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', String(meta.image.width));
+  setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', String(meta.image.height));
+  setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', meta.image.alt);
+  setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', meta.image.url);
+  setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', meta.image.alt);
   setCanonicalUrl(meta.canonical);
   setJsonLd(meta.schema);
 }
@@ -312,7 +362,7 @@ export function buildCloudinarySrcSet(url: string, widths: number[]): string | u
 // du site (pleine largeur d'écran) et généralement le LCP (Largest Contentful
 // Paint), la métrique de performance la plus regardée par Google.
 // Partagées entre la page d'accueil (src/pages/Home.tsx) et le préchargement
-// ajouté au HTML pendant le build (vite.config.ts) : les deux doivent
+// ajouté au HTML pendant le build (src/entry-server.tsx) : les deux doivent
 // demander exactement les mêmes fichiers pour que le préchargement serve.
 export const HERO_WIDTHS = [768, 1280, 1920, 2560];
 export const HERO_DEFAULT_WIDTH = 1920;

@@ -19,7 +19,7 @@ import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import App from './App';
 import { categories, photos } from './data/content';
-import { pickHeroPhoto } from './lib/photos';
+import { pickCategoryCover, pickHeroPhoto } from './lib/photos';
 import { parsePath, portfolioPath, resolveLocation, toHref, validRoutes } from './lib/router';
 import {
   buildCloudinarySrcSet,
@@ -71,7 +71,8 @@ export function render(path: string): { html: string; head: string } {
     </StrictMode>
   );
 
-  const head = buildHeadTags(getPageMeta(page.location, page.category));
+  const cover = page.category ? pickCategoryCover(page.category, photos) : null;
+  const head = buildHeadTags(getPageMeta(page.location, page.category, cover));
   const preload = page.location.route === '/' ? heroPreloadTag() : '';
 
   return { html, head: preload ? `${preload}\n    ${head}` : head };

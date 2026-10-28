@@ -11,6 +11,11 @@ dist
 dist-ssr
 *.local
 
+# Résultats des tests automatiques (npm test)
+test-results
+playwright-report
+blob-report
+
 .vscode/*
 !.vscode/extensions.json
 .idea

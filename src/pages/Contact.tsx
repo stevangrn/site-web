@@ -17,6 +17,41 @@ interface ContactFormData {
   message: string;
 }
 
+// Types de projet proposés dans le formulaire (valeur envoyée, texte affiché)
+const PROJECT_TYPES = [
+  { value: 'mariage', label: 'Mariage' },
+  { value: 'sport', label: 'Sport' },
+  { value: 'evenement', label: 'Événement (concert, gala, fête…)' },
+  { value: 'portrait', label: 'Portrait' },
+  { value: 'drone', label: 'Drone / prise de vue aérienne' },
+  { value: 'paysage', label: 'Paysage' },
+  { value: 'autre', label: 'Autre' },
+];
+
+const DEFAULT_EMAIL = 'stevan.garon@gmail.com';
+
+// Lien qui ouvre la messagerie du visiteur avec un e-mail déjà rempli : son
+// message et ses coordonnées. Proposé quand l'envoi par le formulaire échoue
+// (service d'envoi en panne, connexion coupée...), pour qu'aucune demande ne
+// se perde.
+function buildMailtoHref(recipient: string, data: ContactFormData): string {
+  const projectLabel = PROJECT_TYPES.find((type) => type.value === data.projectType)?.label;
+  const lines = [
+    data.message.trim().replace(/\r?\n/g, '\r\n'),
+    '',
+    '---',
+    `Nom : ${data.name.trim()}`,
+    `E-mail : ${data.email.trim()}`,
+    data.phone.trim() ? `Téléphone : ${data.phone.trim()}` : '',
+    projectLabel ? `Type de projet : ${projectLabel}` : '',
+    data.eventDate.trim() ? `Date : ${data.eventDate.trim()}` : '',
+    data.eventLocation.trim() ? `Lieu : ${data.eventLocation.trim()}` : '',
+  ].filter((line, index) => index < 3 || line !== '');
+  const subject = `Demande depuis le site${data.name.trim() ? ` - ${data.name.trim()}` : ''}`;
+  // Retours à la ligne au format \r\n, celui attendu dans un lien mailto.
+  return `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\r\n'))}`;
+}
+
 const initialFormData: ContactFormData = {
   name: '',
   email: '',
@@ -31,6 +66,8 @@ export function Contact({ profile }: ContactProps) {
   const [submitted, setSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // true quand le service d'envoi a échoué : on propose alors l'envoi par e-mail
+  const [sendFailed, setSendFailed] = useState(false);
   const [formData, setFormData] = useState<ContactFormData>(initialFormData);
   // Champ piège invisible : seuls les robots de spam le remplissent. C'est la
   // protection anti-spam du formulaire (l'ancien code reCAPTCHA, jamais
@@ -47,6 +84,7 @@ export function Contact({ profile }: ContactProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSendFailed(false);
 
     // Champ piège rempli = robot : on fait comme si l'envoi avait réussi,
     // sans rien envoyer.
@@ -54,7 +92,6 @@ export function Contact({ profile }: ContactProps) {
       setSubmitted(true);
       setFormData(initialFormData);
       setHoneypot('');
-      setTimeout(() => setSubmitted(false), 5000);
       return;
     }
 
@@ -89,7 +126,7 @@ export function Contact({ profile }: ContactProps) {
     setIsSending(true);
 
     try {
-      const recipientEmail = profile?.email || 'stevan.garon@gmail.com';
+      const recipientEmail = profile?.email || DEFAULT_EMAIL;
       const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipientEmail)}`, {
         method: 'POST',
         headers: {
@@ -120,10 +157,12 @@ export function Contact({ profile }: ContactProps) {
       setSubmitted(true);
       setFormData(initialFormData);
       setHoneypot('');
-      setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       console.error('Contact form error:', err);
-      setError('L’envoi du message a échoué. Veuillez réessayer ou me contacter directement par email.');
+      // Le message tapé est conservé dans le formulaire : le visiteur peut
+      // réessayer, ou l'envoyer depuis sa messagerie avec le bouton proposé.
+      setSendFailed(true);
+      setError('L’envoi du message a échoué. Vous pouvez réessayer, ou m’envoyer le même message depuis votre messagerie :');
     } finally {
       setIsSending(false);
     }
@@ -143,7 +182,7 @@ export function Contact({ profile }: ContactProps) {
           <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
             Contact
           </p>
-          <h1 className="text-4xl md:text-5xl font-light mb-4">Travaillons Ensemble</h1>
+          <h1 className="text-4xl md:text-5xl font-light mb-4">Travaillons ensemble</h1>
           <p className="text-neutral-400 max-w-2xl mx-auto">
             Disponible pour vos projets photographiques. N'hésitez pas à me
             contacter pour discuter de vos besoins.
@@ -170,7 +209,7 @@ export function Contact({ profile }: ContactProps) {
 
               <div className="space-y-4">
                 <a
-                  href={`mailto:${profile?.email || 'stevan.garon@gmail.com'}`}
+                  href={`mailto:${profile?.email || DEFAULT_EMAIL}`}
                   className="flex items-center gap-4 p-5 bg-neutral-800/30 rounded-xl hover:bg-neutral-800/50 transition-colors group border border-neutral-700/30"
                 >
                   <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500 transition-colors">
@@ -245,8 +284,15 @@ export function Contact({ profile }: ContactProps) {
                     Message envoyé !
                   </h3>
                   <p className="text-neutral-400">
-                    Merci pour votre message. J’ai bien reçu votre demande et je vous répondrai dans les plus brefs délais pour en discuter.
+                    Merci pour votre message. J’ai bien reçu votre demande et je vous réponds sous 24 h pour en discuter.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitted(false)}
+                    className="mt-6 text-sm text-amber-500 underline underline-offset-4 hover:text-amber-400 transition-colors"
+                  >
+                    Envoyer un autre message
+                  </button>
                 </div>
               ) : (
                 <>
@@ -331,13 +377,11 @@ export function Contact({ profile }: ContactProps) {
                         className={`contact-select ${fieldClassName}`}
                       >
                         <option value="">Sélectionnez un type</option>
-                        <option value="mariage">Mariage</option>
-                        <option value="sport">Sport</option>
-                        <option value="evenement">Événement (concert, gala, fête…)</option>
-                        <option value="portrait">Portrait</option>
-                        <option value="drone">Drone / prise de vue aérienne</option>
-                        <option value="paysage">Paysage</option>
-                        <option value="autre">Autre</option>
+                        {PROJECT_TYPES.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
@@ -394,7 +438,18 @@ export function Contact({ profile }: ContactProps) {
                         className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
                       >
                         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                        <span>{error}</span>
+                        <div>
+                          <p>{error}</p>
+                          {sendFailed && (
+                            <a
+                              href={buildMailtoHref(profile?.email || DEFAULT_EMAIL, formData)}
+                              className="mt-3 inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 font-medium text-neutral-950 hover:bg-amber-400 transition-colors"
+                            >
+                              <Mail className="h-4 w-4" aria-hidden="true" />
+                              Envoyer par e-mail
+                            </a>
+                          )}
+                        </div>
                       </div>
                     )}
                     <button

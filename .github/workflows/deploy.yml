@@ -26,9 +26,9 @@ jobs:
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
-          # Vite 8 demande Node.js 20.19 ou plus récent ; la version 22 est
-          # maintenue jusqu'en avril 2027.
-          node-version: 22
+          # Même version que sur l'ordinateur de développement (Node.js 24,
+          # maintenue jusqu'en avril 2028). Vite 8 demande au minimum la 20.19.
+          node-version: 24
           cache: npm
 
       - name: Installer les dépendances
@@ -48,6 +48,26 @@ jobs:
         # par adresse (/, /portfolio/, /portfolio/sports/, /about/...), la
         # page 404.html et le sitemap.xml (voir scripts/prerender.mjs).
         run: npm run build
+
+      # Tests automatiques dans un vrai navigateur (dossier tests/) : chaque
+      # page s'affiche sans erreur, aucun lien n'est cassé, le portfolio, la
+      # visionneuse, le formulaire, le thème et le bandeau cookies marchent,
+      # sur ordinateur et sur mobile. Si un test échoue, rien n'est publié.
+      - name: Installer le navigateur des tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Lancer les tests automatiques
+        run: npm test
+
+      # En cas d'échec, le rapport détaillé (captures, déroulé du test) est
+      # téléchargeable en bas de la page du workflow, rubrique "Artifacts".
+      - name: Garder le rapport des tests en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-des-tests
+          path: playwright-report
+          retention-days: 14
 
       - name: Préparer le déploiement GitHub Pages
         uses: actions/configure-pages@v5

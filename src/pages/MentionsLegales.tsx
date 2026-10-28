@@ -40,7 +40,7 @@ export function MentionsLegales({ profile }: MentionsLegalesProps) {
             Informations légales
           </p>
           <h1 className="text-4xl md:text-5xl font-light mb-4 text-[var(--text-primary)]">
-            Mentions Légales
+            Mentions légales
           </h1>
           <p className="text-[var(--text-secondary)] max-w-2xl mx-auto">
             Conformément à la loi n°2004-575 du 21 juin 2004 pour la confiance

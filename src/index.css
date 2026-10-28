@@ -231,6 +231,13 @@
   color: #a3a3a3 !important;
 }
 
+/* Message d'erreur du formulaire de contact : le rouge clair (red-300) est
+   fait pour le fond sombre. En mode clair, il passe à un rouge foncé lisible
+   (contraste supérieur à 5:1). */
+[data-theme='light'] .text-red-300 {
+  color: #b91c1c;
+}
+
 /* ----------------------------------------------------------------------------
    Éléments qui dépendent du thème, affichés par le CSS
    ----------------------------------------------------------------------------

@@ -18,7 +18,7 @@ export function Navbar({ profile, route, onToggleTheme }: NavbarProps) {
   const navLinks = [
     { name: 'Accueil', path: '/' as Route },
     { name: 'Portfolio', path: '/portfolio' as Route },
-    { name: 'À Propos', path: '/about' as Route },
+    { name: 'À propos', path: '/about' as Route },
     { name: 'Contact', path: '/contact' as Route },
   ];
 

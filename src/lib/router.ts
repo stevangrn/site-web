@@ -113,6 +113,22 @@ export function navigate(path: string) {
   }
 }
 
+// Clic « normal » (bouton gauche, sans touche) sur un lien interne : on
+// change de page sans recharger, avec navigate(). Ctrl + clic, Cmd + clic
+// (Mac), Maj + clic ou clic molette : on laisse faire le navigateur, qui
+// ouvre la page dans un nouvel onglet ou une nouvelle fenêtre, comme sur
+// n'importe quel site. À utiliser au début du onClick d'un lien :
+//   if (!isPlainClick(event)) return;
+export function isPlainClick(event: {
+  button: number;
+  metaKey: boolean;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+}): boolean {
+  return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+}
+
 // Comme navigate(), mais remplace l'adresse au lieu d'en ajouter une à
 // l'historique (utilisé pour convertir une ancienne adresse en nouvelle).
 export function replaceUrl(path: string) {

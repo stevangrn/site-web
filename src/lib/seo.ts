@@ -76,19 +76,20 @@ const PAGE_SEO: Record<Route, { title: string; description: string }> = {
       'Photographe basé à La Chaize-le-Vicomte (Vendée). Portraits, événements, sports et prises de vue aériennes par drone.',
   },
   '/portfolio': {
-    title: 'Portfolio photo — Portraits, Événements, Sports, Nature | Stevan Garon',
+    // Titre court : au-delà d'environ 60 caractères, Google le coupe.
+    title: 'Portfolio photo en Vendée | Stevan Garon',
     description:
-      'Découvrez mes photographies : portraits, événements, sports et paysages, réalisées en Vendée et alentours.',
+      'Mes photos réalisées en Vendée et alentours : sport, événements, mariages, galas, portraits et paysages, dont des prises de vue aériennes par drone.',
   },
   '/about': {
     title: 'À propos — Stevan Garon, photographe en Vendée',
     description:
-      "Parcours, matériel et approche d'un photographe et télépilote de drone basé en Vendée.",
+      'Stevan Garon, photographe et télépilote de drone en Vendée : mon parcours, mes spécialités (sport, événements, mariages, portraits) et mes services.',
   },
   '/contact': {
     title: 'Contact — Réservez une séance photo en Vendée',
     description:
-      'Contactez Stevan Garon pour vos séances portrait, événements ou prises de vue par drone en Vendée.',
+      'Contactez Stevan Garon, photographe en Vendée, pour un mariage, un événement, du sport, un portrait ou des prises de vue par drone. Réponse sous 24 h.',
   },
   '/mentions-legales': {
     title: 'Mentions légales — Stevan Garon Photographe',
@@ -388,15 +389,23 @@ export function buildPhotoAlt(photo: Pick<Photo, 'title' | 'description'>): stri
 // pour une vignette de 400px). C'est le gain de performance le plus important
 // du site : moins de données transférées = chargement plus rapide, surtout
 // sur mobile / 4G.
-export function optimizeCloudinaryUrl(url: string, width?: number): string {
+//
+// Le paramètre `quality` permet de demander une compression un peu plus forte
+// ('eco') pour les vignettes de la grille du portfolio : environ 25 % plus
+// légères, sans différence visible à cette taille. La photo ouverte en grand
+// dans la visionneuse garde la qualité normale.
+export type CloudinaryQuality = 'auto' | 'eco';
+
+export function optimizeCloudinaryUrl(url: string, width?: number, quality: CloudinaryQuality = 'auto'): string {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) {
     return url;
   }
   if (url.includes('/upload/f_auto')) {
     return url; // déjà optimisée
   }
+  const qualityPart = quality === 'eco' ? 'q_auto:eco' : 'q_auto';
   const sizePart = width ? `,c_limit,w_${Math.round(width)}` : '';
-  return url.replace('/upload/', `/upload/f_auto,q_auto${sizePart}/`);
+  return url.replace('/upload/', `/upload/f_auto,${qualityPart}${sizePart}/`);
 }
 
 // ----------------------------------------------------------------------------
@@ -406,11 +415,15 @@ export function optimizeCloudinaryUrl(url: string, width?: number): string {
 // que le navigateur choisisse lui-même la plus petite qui reste nette selon
 // la taille d'écran et la densité de pixels (mobile, tablette, écran Retina...).
 // À utiliser avec l'attribut `sizes` sur la balise <img>.
-export function buildCloudinarySrcSet(url: string, widths: number[]): string | undefined {
+export function buildCloudinarySrcSet(
+  url: string,
+  widths: number[],
+  quality: CloudinaryQuality = 'auto'
+): string | undefined {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/') || url.includes('/upload/f_auto')) {
     return undefined;
   }
-  return widths.map((width) => `${optimizeCloudinaryUrl(url, width)} ${width}w`).join(', ');
+  return widths.map((width) => `${optimizeCloudinaryUrl(url, width, quality)} ${width}w`).join(', ');
 }
 
 // ----------------------------------------------------------------------------
@@ -424,6 +437,10 @@ export function buildCloudinarySrcSet(url: string, widths: number[]): string | u
 // demander exactement les mêmes fichiers pour que le préchargement serve.
 export const HERO_WIDTHS = [768, 1280, 1920, 2560];
 export const HERO_DEFAULT_WIDTH = 1920;
+
+// Largeur de la photo ouverte en grand dans la visionneuse. C'est aussi
+// l'adresse déclarée à Google Images dans le sitemap (src/entry-server.tsx).
+export const LIGHTBOX_DEFAULT_WIDTH = 1600;
 
 // Attribut HTML fetchpriority (priorité de téléchargement d'une image), à
 // placer sur une balise <img> avec {...fetchPriority('high')}. React 18 ne

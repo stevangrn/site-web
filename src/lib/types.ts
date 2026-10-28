@@ -16,6 +16,13 @@ export type Profile = {
   updated_at: string;
 };
 
+// Un chiffre mis en avant sur l'accueil et la page À propos (ex : « 3+ »
+// avec « Années d'expérience » en dessous)
+export type Stat = {
+  value: string;
+  label: string;
+};
+
 export type Category = {
   id: string;
   name: string;
@@ -33,6 +40,10 @@ export type Photo = {
   title: string;
   description: string | null;
   image_url: string;
+  // Taille de l'image d'origine en pixels (sert à réserver sa place dans la
+  // page avant son chargement). Facultatif.
+  width?: number;
+  height?: number;
   category_id: string | null;
   featured: boolean;
   hero?: boolean;

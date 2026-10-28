@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { navigate as goTo, portfolioPath, toHref } from '../lib/router';
+import { isPlainClick, navigate as goTo, portfolioPath, toHref } from '../lib/router';
 import {
   buildCloudinarySrcSet,
   buildPhotoAlt,
@@ -8,6 +8,7 @@ import {
   HERO_WIDTHS,
   optimizeCloudinaryUrl,
 } from '../lib/seo';
+import { stats } from '../data/content';
 import type { Category, Profile, Photo } from '../lib/types';
 
 // Largeurs pour les vignettes de la grille "Sélection" (3 colonnes max).
@@ -86,17 +87,25 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
 
         {/* Content */}
         <div className="relative z-20 text-center px-6 max-w-4xl mx-auto">
-          <p className="text-sm md:text-base tracking-[0.3em] uppercase mb-6 animate-fade-in text-white">
-            {profile?.title || 'Photographe et télépilote de drone'}
-          </p>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight mb-8 animate-fade-in-up text-white">
-            {profile?.name || 'Stevan Garon'}
+          {/* Titre principal (H1) : le métier et le nom, pour que Google
+              comprenne dès le titre de quoi parle le site. L'apparence est
+              la même qu'avant : une petite ligne au-dessus du grand nom. */}
+          <h1 className="mb-8 text-white">
+            <span className="block text-sm md:text-base tracking-[0.3em] uppercase mb-6 animate-fade-in">
+              {profile?.title || 'Photographe et télépilote de drone'} en Vendée
+            </span>
+            <span className="sr-only"> — </span>
+            <span className="block text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight animate-fade-in-up">
+              {profile?.name || 'Stevan Garon'}
+            </span>
           </h1>
           <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto mb-8 animate-fade-in animation-delay-200" />
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-400">
             <a
               href={toHref('/portfolio')}
               onClick={(event) => {
+                // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                if (!isPlainClick(event)) return;
                 event.preventDefault();
                 navigate('/portfolio');
               }}
@@ -108,6 +117,8 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
             <a
               href={toHref('/contact')}
               onClick={(event) => {
+                // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                if (!isPlainClick(event)) return;
                 event.preventDefault();
                 navigate('/contact');
               }}
@@ -144,6 +155,8 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
                   key={photo.id}
                   href={toHref(photoPath(photo))}
                   onClick={(event) => {
+                    // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                    if (!isPlainClick(event)) return;
                     event.preventDefault();
                     navigate(photoPath(photo));
                   }}
@@ -175,6 +188,8 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
               <a
                 href={toHref('/portfolio')}
                 onClick={(event) => {
+                  // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                  if (!isPlainClick(event)) return;
                   event.preventDefault();
                   navigate('/portfolio');
                 }}
@@ -242,25 +257,22 @@ export function Home({ profile, categories, featuredPhotos, heroPhoto, aboutPrev
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 md:gap-6 mt-10">
-                <div className="text-center">
-                  <p className="text-4xl font-light text-amber-500">3+</p>
-                  <p className="text-sm text-neutral-500 mt-1">Années</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-4xl font-light text-amber-500">100%</p>
-                  <p className="text-sm text-neutral-500 mt-1">Retours positifs</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-4xl font-light text-amber-500">100%</p>
-                  <p className="text-sm text-neutral-500 mt-1">Passion</p>
-                </div>
+              {/* Les chiffres sont dans src/data/content.ts (liste "stats") */}
+              <div className="grid grid-cols-3 gap-3 md:gap-6 mt-10">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="text-center min-w-0">
+                    <p className="text-3xl sm:text-4xl font-light text-amber-500">{stat.value}</p>
+                    <p className="text-xs sm:text-sm text-neutral-500 mt-1 break-words">{stat.label}</p>
+                  </div>
+                ))}
               </div>
 
               <div className="mt-8">
                 <a
                   href={toHref('/about')}
                   onClick={(event) => {
+                    // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                    if (!isPlainClick(event)) return;
                     event.preventDefault();
                     navigate('/about');
                   }}

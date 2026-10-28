@@ -22,7 +22,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(root, 'dist');
 const serverEntry = path.join(root, 'dist-ssr', 'entry-server.js');
 
-const { render, getPagePaths, SITE_URL } = await import(pathToFileURL(serverEntry).href);
+const { render, getPagePaths, getPageImages, SITE_URL } = await import(pathToFileURL(serverEntry).href);
 
 const template = await fs.readFile(path.join(distDir, 'index.html'), 'utf8');
 const META_BLOCK = /<!--page-meta-->[\s\S]*?<!--\/page-meta-->/;
@@ -58,13 +58,29 @@ for (const pagePath of pagePaths) {
 await writePage(path.join(distDir, '404.html'), buildPage('/404'));
 console.log('  page générée : 404.html');
 
-// Sitemap : la liste des pages, générée à partir des mêmes adresses
+// Sitemap : la liste des pages, générée à partir des mêmes adresses, avec
+// pour chacune ses photos (balises <image:image>, lues par Google Images).
+const escapeXml = (value) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+let imageCount = 0;
+const sitemapEntries = pagePaths.map((pagePath) => {
+  const images = getPageImages(pagePath);
+  imageCount += images.length;
+  return [
+    '  <url>',
+    `    <loc>${escapeXml(`${SITE_URL}${pagePath}`)}</loc>`,
+    ...images.map((image) => `    <image:image>\n      <image:loc>${escapeXml(image)}</image:loc>\n    </image:image>`),
+    '  </url>',
+  ].join('\n');
+});
+
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
-  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...pagePaths.map((pagePath) => `  <url>\n    <loc>${SITE_URL}${pagePath}</loc>\n  </url>`),
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
+  ...sitemapEntries,
   '</urlset>',
   '',
 ].join('\n');
 await fs.writeFile(path.join(distDir, 'sitemap.xml'), sitemap, 'utf8');
-console.log(`  sitemap.xml : ${pagePaths.length} adresses`);
+console.log(`  sitemap.xml : ${pagePaths.length} adresses, ${imageCount} images`);

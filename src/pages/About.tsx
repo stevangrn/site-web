@@ -1,6 +1,7 @@
 import { ArrowRight, Camera } from 'lucide-react';
 import { navigate as goTo } from '../lib/router';
 import { buildCloudinaryCropSrcSet, cropCloudinaryUrl, fetchPriority } from '../lib/seo';
+import { stats } from '../data/content';
 import type { Profile, Photo } from '../lib/types';
 
 // Largeurs du portrait (format 3/4), recadré par Cloudinary : la photo
@@ -76,19 +77,16 @@ export function About({ aboutPhoto }: AboutProps) {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-6 mt-12 py-8 border-t border-b border-neutral-800">
-                <div className="text-center">
-                  <p className="text-5xl font-light text-amber-500">3+</p>
-                  <p className="text-sm text-neutral-500 mt-2">Années d'expérience</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-5xl font-light text-amber-500">100%</p>
-                  <p className="text-sm text-neutral-500 mt-2">Retours positifs</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-5xl font-light text-amber-500">100%</p>
-                  <p className="text-sm text-neutral-500 mt-2">Passion</p>
-                </div>
+              {/* Les chiffres sont dans src/data/content.ts (liste "stats").
+                  Tailles réduites sur téléphone : en 3 colonnes étroites, les
+                  grands chiffres se chevauchaient. */}
+              <div className="grid grid-cols-3 gap-3 sm:gap-6 mt-12 py-8 border-t border-b border-neutral-800">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="text-center min-w-0">
+                    <p className="text-4xl sm:text-5xl font-light text-amber-500">{stat.value}</p>
+                    <p className="text-xs sm:text-sm text-neutral-500 mt-2 break-words">{stat.label}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Services */}

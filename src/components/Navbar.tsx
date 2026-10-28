@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Menu, X, Camera, Moon, Sun } from 'lucide-react';
-import { navigate as goTo, toHref, type Route } from '../lib/router';
+import { Menu, X, Moon, Sun } from 'lucide-react';
+import { isPlainClick, navigate as goTo, toHref, type Route } from '../lib/router';
 import type { Profile } from '../lib/types';
 
 interface NavbarProps {
@@ -73,13 +73,24 @@ export function Navbar({ profile, route, onToggleTheme }: NavbarProps) {
         <a
           href="/"
           onClick={(event) => {
+            // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+            if (!isPlainClick(event)) return;
             event.preventDefault();
             navigate('/');
           }}
-          className="flex items-center gap-2 text-[var(--text-primary)] font-light tracking-wider"
+          className="flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
         >
-          <Camera className="w-5 h-5 text-amber-500" />
-          <span className="text-lg">{profile?.name?.split(' ')[0] || 'Portfolio'}</span>
+          {/* Monogramme SG de ton logo (public/logo-sg.png). L'image fait 3 fois
+              la taille affichée, pour rester nette sur les écrans haute
+              définition. */}
+          <img
+            src="/logo-sg.png"
+            width={45}
+            height={36}
+            alt={`${profile?.name ?? 'Stevan Garon'} — accueil`}
+            className="h-9 w-auto"
+            draggable={false}
+          />
         </a>
 
         <div className="hidden md:flex items-center gap-6">
@@ -88,6 +99,8 @@ export function Navbar({ profile, route, onToggleTheme }: NavbarProps) {
               key={link.path}
               href={toHref(link.path)}
               onClick={(event) => {
+                // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                if (!isPlainClick(event)) return;
                 event.preventDefault();
                 navigate(link.path);
               }}
@@ -138,6 +151,8 @@ export function Navbar({ profile, route, onToggleTheme }: NavbarProps) {
               key={link.path}
               href={toHref(link.path)}
               onClick={(event) => {
+                // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                if (!isPlainClick(event)) return;
                 event.preventDefault();
                 navigate(link.path);
               }}

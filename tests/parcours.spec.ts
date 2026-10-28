@@ -33,6 +33,60 @@ test.describe('avec le choix des cookies déjà fait', () => {
     await expect(lightbox).toBeHidden();
   });
 
+  test("portfolio : passer d'une catégorie à l'autre par de vrais liens", async ({ page }) => {
+    await page.goto('/portfolio/sports/');
+    const filters = page.getByRole('navigation', { name: 'Changer de catégorie' });
+    await expect(filters.locator('a[aria-current="page"]')).toHaveText('Sports');
+
+    await filters.getByRole('link', { name: 'Nature / Paysages' }).click();
+    await expect(page).toHaveURL(/\/portfolio\/nature\/$/);
+    await expect(page.locator('h1')).toHaveText('Nature / Paysages');
+    await expect(filters.locator('a[aria-current="page"]')).toHaveText('Nature / Paysages');
+
+    await filters.getByRole('link', { name: 'Toutes les catégories' }).click();
+    await expect(page).toHaveURL(/\/portfolio\/$/);
+  });
+
+  test('Ctrl + clic sur un lien est laissé au navigateur (nouvel onglet)', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'pas de Ctrl + clic sur téléphone');
+    await page.goto('/portfolio/sports/');
+    // Attend que le site soit prêt (le JavaScript a pris le relais)
+    await page.waitForLoadState('networkidle');
+
+    // Note, pour chaque clic, si le site a pris la main (defaultPrevented) ou
+    // l'a laissé au navigateur. Le test empêche ensuite l'ouverture réelle de
+    // l'onglet, pour rester rapide et fiable.
+    await page.evaluate(() => {
+      const record = window as unknown as { clics: boolean[] };
+      record.clics = [];
+      window.addEventListener('click', (event) => {
+        record.clics.push(event.defaultPrevented);
+        event.preventDefault();
+      });
+    });
+    const link = page.getByRole('navigation', { name: 'Changer de catégorie' }).getByRole('link', { name: 'Portraits' });
+
+    await link.click({ modifiers: ['ControlOrMeta'] });
+    await expect(page).toHaveURL(/\/portfolio\/sports\/$/);
+
+    await link.click();
+    await expect(page).toHaveURL(/\/portfolio\/portraits\/$/);
+
+    const clics = await page.evaluate(() => (window as unknown as { clics: boolean[] }).clics);
+    // Ctrl + clic : laissé au navigateur ; clic simple : géré par le site
+    expect(clics).toEqual([false, true]);
+  });
+
+  test('les chiffres de la page À propos tiennent dans leur colonne', async ({ page }) => {
+    await page.goto('/about/');
+    const values = page.locator('p', { hasText: /^\d+\+?$/ });
+    await expect(values).toHaveCount(3);
+    for (const value of await values.all()) {
+      const fits = await value.evaluate((el) => el.scrollWidth <= el.clientWidth + 1);
+      expect(fits, `« ${await value.textContent()} » déborde de sa colonne`).toBe(true);
+    }
+  });
+
   test('un lien vers une photo ouvre directement la visionneuse', async ({ page }) => {
     await page.goto('/portfolio/sports/?photo=photo-73');
     await expect(page.getByRole('dialog')).toBeVisible();

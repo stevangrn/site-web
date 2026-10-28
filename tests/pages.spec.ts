@@ -145,8 +145,9 @@ test('textes alternatifs des photos : une vraie description, sans mots-clés ajo
   for (const path of PAGES) {
     const html = await (await request.get(path)).text();
     const content = html.split('<div id="root">')[1] ?? '';
-    const alts = [...content.matchAll(/<img\b[^>]*>/g)].map((match) =>
-      match[0]
+    const images = [...content.matchAll(/<img\b[^>]*>/g)].map((match) => match[0]);
+    const alts = images.map((img) =>
+      img
         .match(/\salt="([^"]*)"/)?.[1]
         ?.replace(/&#x27;/g, "'")
         .replace(/&quot;/g, '"')
@@ -158,12 +159,62 @@ test('textes alternatifs des photos : une vraie description, sans mots-clés ajo
       expect(alt, `${path} : mots-clés ajoutés au texte alternatif`).not.toMatch(/\| Stevan Garon/);
     }
 
-    // Pages de catégorie : chaque photo a sa propre description
+    // Pages de catégorie : chaque photo (hébergée sur Cloudinary, donc hors
+    // logo) a sa propre description
     if (/^\/portfolio\/[^/]+\/$/.test(path)) {
-      const described = alts.filter((alt): alt is string => !!alt);
+      const described = alts.filter(
+        (alt, index): alt is string => !!alt && images[index].includes('res.cloudinary.com')
+      );
       expect(described.length, `${path} : photos décrites`).toBeGreaterThan(0);
       expect(new Set(described).size, `${path} : deux photos ont le même texte`).toBe(described.length);
       for (const alt of described) expect(alt.length, `${path} : « ${alt} » trop court`).toBeGreaterThanOrEqual(20);
     }
+  }
+});
+
+test('sitemap : les photos de chaque catégorie sont déclarées à Google Images', async ({ request }) => {
+  const xml = await (await request.get('/sitemap.xml')).text();
+  // React sépare les morceaux de texte par des commentaires <!-- --> : on les retire
+  const chooser = (await (await request.get('/portfolio/')).text()).replace(/<!-- -->/g, '');
+
+  for (const block of xml.split('<url>').slice(1)) {
+    const page = new URL(block.match(/<loc>([^<]+)<\/loc>/)?.[1] ?? '').pathname;
+    const images = [...block.matchAll(/<image:loc>([^<]+)<\/image:loc>/g)].map((match) => match[1]);
+    for (const image of images) expect(image, page).toMatch(/^https:\/\/res\.cloudinary\.com\//);
+
+    const slug = page.match(/^\/portfolio\/([^/]+)\/$/)?.[1];
+    if (slug) {
+      // Autant d'images que de photos annoncées sur la carte de la catégorie
+      // (y compris celles cachées derrière « Charger plus »)
+      const announced = chooser.match(new RegExp(`href="/portfolio/${slug}/"[\\s\\S]*?(\\d+) photos`))?.[1];
+      expect(images.length, `${page} : images du sitemap`).toBe(Number(announced));
+    }
+    if (page === '/') expect(images.length, 'accueil : images du sitemap').toBeGreaterThan(0);
+  }
+});
+
+test('photos du portfolio : leur taille est connue avant le chargement', async ({ request }) => {
+  const html = await (await request.get('/portfolio/sports/')).text();
+  const grid = [...html.matchAll(/<img\b[^>]*q_auto:eco[^>]*>/g)].map((match) => match[0]);
+  expect(grid.length).toBeGreaterThan(0);
+  for (const img of grid) expect(img).toMatch(/\swidth="\d+" height="\d+"/);
+  // Une seule photo est téléchargée en priorité (la première)
+  expect(grid.filter((img) => img.includes('fetchpriority="high"'))).toHaveLength(1);
+});
+
+test("accueil : le titre principal présente le métier et le nom", async ({ request }) => {
+  const html = await (await request.get('/')).text();
+  const h1 = (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? '').replace(/<[^>]+>/g, '');
+  expect(h1).toContain('Photographe et télépilote de drone');
+  expect(h1).toContain('en Vendée');
+  expect(h1).toContain('Stevan GARON');
+});
+
+test('chiffres : de vrais chiffres, plus de « 100 % »', async ({ request }) => {
+  for (const path of ['/', '/about/']) {
+    const html = await (await request.get(path)).text();
+    expect(html, path).toContain('Événements photographiés');
+    expect(html, path).toContain('Clubs, associations et écoles');
+    expect(html, path).not.toContain('Retours positifs');
   }
 });

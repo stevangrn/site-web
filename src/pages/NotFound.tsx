@@ -1,5 +1,5 @@
 import { ArrowRight } from 'lucide-react';
-import { navigate as goTo, toHref } from '../lib/router';
+import { isPlainClick, navigate as goTo, toHref } from '../lib/router';
 
 // Page affichée quand l'adresse ne correspond à aucune page du site
 // (ex: un ancien lien ou une faute de frappe). Avant, ces adresses
@@ -25,6 +25,8 @@ export function NotFound() {
           <a
             href="/"
             onClick={(event) => {
+              // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+              if (!isPlainClick(event)) return;
               event.preventDefault();
               navigate('/');
             }}
@@ -35,6 +37,8 @@ export function NotFound() {
           <a
             href={toHref('/portfolio')}
             onClick={(event) => {
+              // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+              if (!isPlainClick(event)) return;
               event.preventDefault();
               navigate('/portfolio');
             }}

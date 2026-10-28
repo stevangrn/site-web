@@ -19,17 +19,20 @@ import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import App from './App';
 import { categories, photos } from './data/content';
-import { pickCategoryCover, pickHeroPhoto } from './lib/photos';
+import { pickAboutPhoto, pickCategoryCover, pickFeaturedPhotos, pickHeroPhoto } from './lib/photos';
 import { parsePath, portfolioPath, resolveLocation, toHref, validRoutes } from './lib/router';
 import {
   buildCloudinarySrcSet,
   buildHeadTags,
+  cropCloudinaryUrl,
   getPageMeta,
   HERO_DEFAULT_WIDTH,
   HERO_WIDTHS,
+  LIGHTBOX_DEFAULT_WIDTH,
   optimizeCloudinaryUrl,
   SITE_URL,
 } from './lib/seo';
+import type { Photo } from './lib/types';
 
 export { SITE_URL };
 
@@ -60,6 +63,39 @@ function heroPreloadTag(): string {
   const responsive = srcset ? ` imagesrcset="${escapeAttribute(srcset)}" imagesizes="100vw"` : '';
 
   return `<link rel="preload" as="image" href="${escapeAttribute(href)}"${responsive} fetchpriority="high" />`;
+}
+
+// Images de chaque page, déclarées à Google Images dans le sitemap.
+// - Pages de catégorie : toutes les photos de la catégorie, y compris celles
+//   qui n'apparaissent qu'après « Charger plus » (Google ne clique pas sur ce
+//   bouton : sans le sitemap, il ne les verrait jamais). On déclare la
+//   version grand format, celle de la visionneuse.
+// - Accueil : l'image de fond et la sélection. À propos : le portrait.
+const isCloudinary = (url: string) => url.includes('res.cloudinary.com');
+const largeImage = (photo: Photo) => optimizeCloudinaryUrl(photo.image_url, LIGHTBOX_DEFAULT_WIDTH);
+
+export function getPageImages(path: string): string[] {
+  const { location, category } = resolveLocation(parsePath(path), categories);
+  let urls: string[] = [];
+
+  if (location.route === '/portfolio' && category) {
+    urls = photos
+      .filter((photo) => photo.category_id === category.id && !photo.about)
+      .sort((a, b) => (b.display_order ?? 0) - (a.display_order ?? 0))
+      .map(largeImage);
+  } else if (location.route === '/') {
+    const hero = pickHeroPhoto(photos);
+    urls = [
+      ...(hero ? [optimizeCloudinaryUrl(hero.image_url, HERO_DEFAULT_WIDTH)] : []),
+      ...pickFeaturedPhotos(photos).slice(0, 6).map(largeImage),
+    ];
+  } else if (location.route === '/about') {
+    const portrait = pickAboutPhoto(photos);
+    // Même adresse que le portrait affiché sur la page (src/pages/About.tsx)
+    urls = portrait ? [cropCloudinaryUrl(portrait.image_url, 800, '3:4')] : [];
+  }
+
+  return [...new Set(urls.filter(isCloudinary))];
 }
 
 // HTML d'une page et balises de son <head>.

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Aperture, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Lightbox } from '../components/Lightbox';
-import { navigate as goTo, portfolioPath, toHref } from '../lib/router';
+import { isPlainClick, navigate as goTo, portfolioPath, toHref } from '../lib/router';
 import {
   buildCloudinaryCropSrcSet,
   buildCloudinarySrcSet,
@@ -23,8 +23,16 @@ interface PortfolioProps {
 
 // Largeurs pour les vignettes de la grille en mosaïque (1 à 3 colonnes selon
 // l'écran) : pas besoin d'envoyer une photo de 3000px de large pour une
-// vignette qui n'en affichera jamais plus de 700-800.
-const GRID_WIDTHS = [400, 600, 900, 1200];
+// vignette qui n'en affichera jamais plus de 700-800. Les paliers sont
+// rapprochés (800, 1000) pour que les téléphones reçoivent une image proche
+// de la taille affichée, au lieu de sauter directement de 600 à 900 px.
+const GRID_WIDTHS = [400, 600, 800, 1000, 1200];
+
+// Nombre de vignettes téléchargées tout de suite (la première rangée sur
+// ordinateur) ; les suivantes attendent qu'on approche en faisant défiler.
+// Sur téléphone, une seule colonne : charger plus de photos d'un coup
+// ralentirait l'affichage de la première.
+const EAGER_COUNT = 3;
 
 // Largeurs pour les photos de couverture des cartes de catégories (1 à 4
 // colonnes), recadrées au format de la carte par Cloudinary.
@@ -139,6 +147,8 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
                     key={category.id}
                     href={toHref(portfolioPath(category.slug))}
                     onClick={(event) => {
+                      // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                      if (!isPlainClick(event)) return;
                       event.preventDefault();
                       chooseCategory(category, 'portfolio-galerie');
                     }}
@@ -189,31 +199,43 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
             className="scroll-mt-16 py-6 px-6 bg-neutral-950 sticky top-16 z-40 border-b border-neutral-800/50"
           >
             <div className="max-w-7xl mx-auto">
-              <div className="flex flex-wrap items-center justify-center gap-3" role="group" aria-label="Changer de catégorie">
-                <button
-                  type="button"
-                  onClick={() => chooseCategory(null, 'portfolio-categories')}
+              {/* De vrais liens (et non des boutons) : Google les suit pour
+                  passer d'une catégorie à l'autre, et on peut les ouvrir dans
+                  un nouvel onglet (Ctrl/Cmd + clic). */}
+              <nav className="flex flex-wrap items-center justify-center gap-3" aria-label="Changer de catégorie">
+                <a
+                  href={toHref(portfolioPath())}
+                  onClick={(event) => {
+                    if (!isPlainClick(event)) return;
+                    event.preventDefault();
+                    chooseCategory(null, 'portfolio-categories');
+                  }}
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm tracking-wide border border-[var(--border-color)] text-[var(--text-primary)] hover:border-amber-500 hover:text-amber-500 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                   Toutes les catégories
-                </button>
-                {sortedCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    type="button"
-                    onClick={() => chooseCategory(category, 'portfolio-galerie')}
-                    aria-pressed={selectedCategory === category.id}
-                    className={`px-5 py-2 rounded-full text-sm tracking-wide transition-all ${
-                      selectedCategory === category.id
-                        ? 'bg-amber-500 text-neutral-950'
-                        : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                    }`}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
+                </a>
+                {sortedCategories.map((category) => {
+                  const isCurrent = selectedCategory === category.id;
+                  return (
+                    <a
+                      key={category.id}
+                      href={toHref(portfolioPath(category.slug))}
+                      onClick={(event) => {
+                        if (!isPlainClick(event)) return;
+                        event.preventDefault();
+                        chooseCategory(category, 'portfolio-galerie');
+                      }}
+                      aria-current={isCurrent ? 'page' : undefined}
+                      className={`px-5 py-2 rounded-full text-sm tracking-wide transition-all ${
+                        isCurrent ? 'bg-amber-500 text-neutral-950' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                      }`}
+                    >
+                      {category.name}
+                    </a>
+                  );
+                })}
+              </nav>
             </div>
           </section>
 
@@ -237,12 +259,19 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
                         style={{ animationDelay: `${(index % PAGE_SIZE) * 50}ms` }}
                       >
                         <img
-                          src={optimizeCloudinaryUrl(photo.image_url, 600)}
-                          srcSet={buildCloudinarySrcSet(photo.image_url, GRID_WIDTHS)}
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          src={optimizeCloudinaryUrl(photo.image_url, 600, 'eco')}
+                          srcSet={buildCloudinarySrcSet(photo.image_url, GRID_WIDTHS, 'eco')}
+                          sizes="(max-width: 639px) calc(100vw - 48px), (max-width: 1023px) calc(50vw - 36px), (max-width: 1327px) calc(33vw - 32px), 411px"
+                          // Taille de la photo : la page réserve sa place avant
+                          // qu'elle arrive (pas de décalage pendant le chargement).
+                          width={photo.width}
+                          height={photo.height}
                           alt={buildPhotoAlt(photo)}
                           draggable={false}
-                          loading={index < 6 ? 'eager' : 'lazy'}
+                          loading={index < EAGER_COUNT ? 'eager' : 'lazy'}
+                          // La première photo est souvent la plus grande visible :
+                          // on la télécharge en priorité.
+                          {...fetchPriority(index === 0 ? 'high' : 'auto')}
                           decoding="async"
                           className="w-full transition-transform duration-500 group-hover:scale-105"
                         />
@@ -301,6 +330,8 @@ export function Portfolio({ categories, photos, category }: PortfolioProps) {
           <a
             href={toHref('/contact')}
             onClick={(event) => {
+              // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+              if (!isPlainClick(event)) return;
               event.preventDefault();
               goTo('/contact');
               window.scrollTo({ top: 0, behavior: 'smooth' });

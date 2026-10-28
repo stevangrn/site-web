@@ -51,7 +51,7 @@ Le site est organisé en 4 pages principales :
 - À propos : raconte l'histoire du photographe, ses services et son parcours.
 - Contact : propose un formulaire de contact, les coordonnées et une zone de confirmation après envoi.
 
-Les icônes du site (onglet du navigateur, écran d'accueil des téléphones) sont dans `public/` : `favicon.ico`, `favicon-32x32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, et le manifeste `site.webmanifest`.
+Les icônes du site (onglet du navigateur, écran d'accueil des téléphones) sont dans `public/` : `favicon.ico`, `favicon-32x32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, et le manifeste `site.webmanifest`. Le monogramme SG affiché dans le menu et le pied de page est `public/logo-sg.png` (découpé dans `static/logo.png`).
 
 ## 5. Installation
 
@@ -78,6 +78,12 @@ avec des commentaires expliquant chaque champ :
 ### Modifier les informations du profil
 En haut du fichier, modifie l'objet `profile` : nom, titre, bio, email, téléphone, localisation, réseaux sociaux.
 
+### Modifier les chiffres (accueil et À propos)
+Juste en dessous, la liste `stats` contient les trois chiffres affichés
+(années d'expérience, événements photographiés, clubs, associations et
+écoles). Le commentaire au-dessus liste les clubs comptés : pense à les mettre
+à jour au fil des reportages.
+
 ### Modifier les catégories
 Modifie la liste `categories`. Chaque catégorie a un nom, un "slug" (identifiant sans espace ni accent), une description, une photo de couverture (`cover_photo_id`, l'id d'une photo, ex: `'photo-34'`) et un ordre d'affichage.
 
@@ -86,12 +92,13 @@ Le plus simple : la commande
 ```bash
 npm run add:photo
 ```
-pose les questions (titre, description, lien de l'image, catégorie) et ajoute la photo à la fin de la liste `photos`.
+pose les questions (titre, description, lien de l'image, catégorie) et ajoute la photo à la fin de la liste `photos`. Elle demande aussi à Cloudinary la taille de l'image (`width` et `height`), qui permet à la page de réserver la place de la photo avant son chargement.
 
 Pour le faire à la main, modifie la liste `photos` :
 1. Copie un bloc `{ ... }` existant.
 2. Donne-lui un `id` unique (ex: `'photo-9'`).
 3. Renseigne le titre, la description, `image_url` (lien vers l'image),
+   `width` et `height` (taille de l'image en pixels, facultatif),
    la catégorie via `catId('slug-de-la-categorie')`,
    `featured_home: true` si la photo doit apparaître dans la sélection de l'accueil,
    `hero: true` pour en faire l'image de fond de l'accueil,
@@ -174,7 +181,9 @@ GitHub, le rapport détaillé se télécharge en bas de la page du workflow
 3. lance `scripts/prerender.mjs`, qui écrit pour chaque adresse un fichier
    HTML déjà rempli : `dist/index.html`, `dist/portfolio/index.html`,
    `dist/portfolio/sports/index.html`, `dist/about/index.html`..., plus
-   `dist/404.html` et `dist/sitemap.xml`.
+   `dist/404.html` et `dist/sitemap.xml`. Le sitemap liste aussi les photos de
+   chaque page pour Google Images, y compris celles du portfolio qui ne
+   s'affichent qu'après « Charger plus ».
 
 Chaque page arrive donc avec son contenu, son titre, sa description et son
 image de partage, même sans JavaScript : c'est ce que lisent Google, Bing et

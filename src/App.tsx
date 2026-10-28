@@ -10,6 +10,7 @@ import { NotFound } from './pages/NotFound';
 import { applyPageSeo, getPageMeta } from './lib/seo';
 import { pickAboutPhoto, pickCategoryCover, pickFeaturedPhotos, pickHeroPhoto } from './lib/photos';
 import {
+  isPlainClick,
   navigate as goTo,
   parsePath,
   portfolioPath,
@@ -225,6 +226,8 @@ function App({ initialPath }: AppProps) {
                 <a
                   href={toHref('/mentions-legales#confidentialite')}
                   onClick={(event) => {
+                    // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                    if (!isPlainClick(event)) return;
                     event.preventDefault();
                     openPrivacyPolicy();
                   }}

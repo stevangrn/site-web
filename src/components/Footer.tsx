@@ -1,5 +1,5 @@
-import { Camera, Instagram, Facebook, Mail } from 'lucide-react';
-import { navigate as goTo, toHref, type Route } from '../lib/router';
+import { Instagram, Facebook, Mail } from 'lucide-react';
+import { isPlainClick, navigate as goTo, toHref, type Route } from '../lib/router';
 import type { Profile } from '../lib/types';
 
 interface FooterProps {
@@ -49,10 +49,16 @@ export function Footer({ profile, onManageConsent }: FooterProps) {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           <div className="flex items-center gap-2 justify-center md:justify-start">
-            <Camera className="w-5 h-5 text-amber-500" aria-hidden="true" />
-            <span className="text-lg font-light tracking-wider text-[var(--text-primary)]">
-              {profile?.name?.split(' ')[0] || 'Portfolio'}
-            </span>
+            {/* Même monogramme SG que dans le menu */}
+            <img
+              src="/logo-sg.png"
+              width={45}
+              height={36}
+              alt={profile?.name ?? 'Stevan Garon'}
+              className="h-9 w-auto"
+              loading="lazy"
+              draggable={false}
+            />
           </div>
 
           <div className="flex items-center justify-center gap-6">
@@ -61,6 +67,8 @@ export function Footer({ profile, onManageConsent }: FooterProps) {
                 key={link.path}
                 href={toHref(link.path)}
                 onClick={(event) => {
+                  // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                  if (!isPlainClick(event)) return;
                   event.preventDefault();
                   navigate(link.path);
                 }}
@@ -115,6 +123,8 @@ export function Footer({ profile, onManageConsent }: FooterProps) {
             <a
               href={toHref('/mentions-legales')}
               onClick={(event) => {
+                // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                if (!isPlainClick(event)) return;
                 event.preventDefault();
                 navigate('/mentions-legales');
               }}
@@ -125,6 +135,8 @@ export function Footer({ profile, onManageConsent }: FooterProps) {
             <a
               href={toHref('/mentions-legales#confidentialite')}
               onClick={(event) => {
+                // Ctrl/Cmd + clic ou clic molette : nouvel onglet, comme un lien normal
+                if (!isPlainClick(event)) return;
                 event.preventDefault();
                 openPrivacyPolicy();
               }}

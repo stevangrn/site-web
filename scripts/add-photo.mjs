@@ -54,6 +54,23 @@ function toTsString(value) {
   return JSON.stringify(value);
 }
 
+// Taille de l'image en pixels, demandée à Cloudinary (fl_getinfo). Elle sert
+// à réserver la place de la photo dans la page avant son chargement. Sans
+// connexion, ou pour une image qui n'est pas sur Cloudinary, la photo est
+// ajoutée sans taille (le site fonctionne quand même).
+async function fetchImageSize(url) {
+  if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return null;
+  try {
+    const response = await fetch(url.replace('/upload/', '/upload/fl_getinfo/'));
+    if (!response.ok) return null;
+    const info = await response.json();
+    const { width, height } = info.input ?? {};
+    return Number.isInteger(width) && Number.isInteger(height) ? { width, height } : null;
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
   const options = parseArgs(process.argv);
   const rl = readline.createInterface({ input, output });
@@ -94,12 +111,15 @@ async function main() {
     // mélanger les deux en ajoutant la photo.
     const eol = content.includes('\r\n') ? '\r\n' : '\n';
 
+    const size = await fetchImageSize(imageUrl);
+
     const newEntry = [
       '  {',
       `    id: 'photo-${nextPhotoNumber}',`,
       `    title: ${toTsString(title)},`,
       `    description: ${toTsString(description)},`,
       `    image_url: ${toTsString(imageUrl)},`,
+      ...(size ? [`    width: ${size.width},`, `    height: ${size.height},`] : []),
       `    category_id: catId('${category}'),`,
       "    featured: false, //en vedette sur la page d'acceuil",
       '    featured_home: false, // true = cette photo apparaît dans les travaux en vedette',
@@ -129,6 +149,7 @@ async function main() {
     console.log(`Nouvelle photo ajoutée dans ${path.relative(process.cwd(), targetFile)}.`);
     console.log(`- id: photo-${nextPhotoNumber}`);
     console.log(`- catégorie: ${category}`);
+    console.log(size ? `- taille: ${size.width} x ${size.height} px` : '- taille: inconnue (image hors Cloudinary ou pas de connexion)');
   } catch (error) {
     console.error('Erreur:', error.message);
     process.exitCode = 1;

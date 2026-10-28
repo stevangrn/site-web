@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { buildCloudinarySrcSet, buildPhotoAlt, optimizeCloudinaryUrl } from '../lib/seo';
+import { buildCloudinarySrcSet, buildPhotoAlt, LIGHTBOX_DEFAULT_WIDTH, optimizeCloudinaryUrl } from '../lib/seo';
 import type { Photo } from '../lib/types';
 
 interface LightboxProps {
@@ -203,7 +203,7 @@ export function Lightbox({ photo, photos, onClose, onNavigate }: LightboxProps) 
 
         <div className="max-w-5xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
           <img
-            src={optimizeCloudinaryUrl(photo.image_url, 1600)}
+            src={optimizeCloudinaryUrl(photo.image_url, LIGHTBOX_DEFAULT_WIDTH)}
             srcSet={buildCloudinarySrcSet(photo.image_url, LIGHTBOX_WIDTHS)}
             sizes="(max-width: 1024px) 100vw, 1024px"
             alt={buildPhotoAlt(photo)}

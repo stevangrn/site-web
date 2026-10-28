@@ -127,7 +127,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-4',
-    title: "Photo d'une abeille butinant une fleur",
+    title: "Abeille couverte de pollen",
     description: "Abeille couverte de pollen butinant le cœur d'une fleur orange",
     image_url: 'https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529932/88_vcpm9t.jpg',
     category_id: catId('nature'),
@@ -139,7 +139,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-5',
-    title: "Photo d'une abeille butinant une fleur 2",
+    title: "Abeille sur une fleur rouge",
     description: "Abeille butinant le cœur d'une fleur rouge, isolée sur fond sombre",
     image_url: 'https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529903/87_qhxx7o.jpg',
     category_id: catId('nature'),
@@ -175,7 +175,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-8',
-    title: "Photo d'une fleur rouge",
+    title: "Fleurs rouges en gros plan",
     description: "Gros plan sur des dahlias rouges dans un jardin",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529943/83_bpia61.jpg",
     category_id: catId('nature'),
@@ -187,7 +187,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-9',
-    title: "Montagne dans les alpes",
+    title: "Sommet des Alpes au coucher du soleil",
     description: "Sommet enneigé des Alpes rosi par la lumière du coucher de soleil",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529981/82_zvaolx.jpg",
     category_id: catId('nature'),
@@ -199,7 +199,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-10',
-    title: "Télésièges",
+    title: "Télésiège dans les Alpes enneigées",
     description: "Télésiège qui grimpe une pente enneigée des Alpes, entre les sapins, en noir et blanc",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530004/81_molehc.jpg",
     category_id: catId('nature'),
@@ -223,7 +223,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-12',
-    title: "Abeilles butinant une fleur",
+    title: "Abeille sur de petites fleurs roses",
     description: "Abeille butinant de petites fleurs roses, sur fond sombre",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529995/79_pgbedi.jpg",
     category_id: catId('nature'),
@@ -235,7 +235,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-13',
-    title: "Apéro concert Pass'Yon Judo 1",
+    title: "Apéro-concert Pass'Yon Judo : le groupe sur scène",
     description: "Le groupe Stefany de banc d'essai sur scène, en noir et blanc, lors de la soirée apéro-concert du club Pass'Yon Judo",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529899/79_3_yoe7j1.jpg",
     category_id: catId('evenements'),
@@ -247,7 +247,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-14',
-    title: "Apéro concert Pass'Yon Judo 2",
+    title: "Apéro-concert Pass'Yon Judo : le guitariste chanteur",
     description: "Le guitariste chanteur du groupe en plein morceau, lors de la soirée apéro-concert du club Pass'Yon Judo",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529917/79_2_ljewe5.jpg",
     category_id: catId('evenements'),
@@ -271,7 +271,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-16',
-    title: "Action de Handball",
+    title: "Joueuse du SL Vicomtais au tir",
     description: "Joueuse du SL Vicomtais, maillot jaune, qui s'élève pour tirer lors d'un match de handball",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529932/76_suv3tq.jpg",
     category_id: catId('sports'),
@@ -283,7 +283,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-17',
-    title: "Equipe de Handball",
+    title: "L'équipe de handball du SL Vicomtais",
     description: "L'équipe féminine de handball du SL Vicomtais réunie en cercle, bras dessus bras dessous",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529902/75_igbo6v.jpg",
     category_id: catId('sports'),
@@ -319,7 +319,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-21',
-    title: "Pièce de théâtre du lycée SFDA 1",
+    title: "Théâtre du lycée SFDA : la troupe sur scène",
     description: "La troupe de théâtre du lycée Saint-François-d'Assise réunie sur scène, verres levés",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530005/72_qndg7x.jpg",
     category_id: catId('evenements'),
@@ -343,7 +343,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-23',
-    title: "Pièce de théâtre du lycée SFDA 2",
+    title: "Théâtre du lycée SFDA : la scène du banquet",
     description: "Scène de banquet autour d'une grande table lors d'une pièce de théâtre du lycée Saint-François-d'Assise",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529955/70_xtxwmu.jpg",
     category_id: catId('evenements'),
@@ -355,7 +355,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-24',
-    title: "Répétition de musique de Chaizy acoustique 1",
+    title: "Répétition de Chaizy Acoustique : la batterie",
     description: "Gros plan sur la batterie et les baguettes d'un musicien pendant une répétition",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529925/69_mkeq0b.jpg",
     category_id: catId('evenements'),
@@ -367,7 +367,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-25',
-    title: "Répétition de musique de Chaizy acoustique 2",
+    title: "Répétition de Chaizy Acoustique : le saxophoniste",
     description: "Saxophoniste souriant pendant une répétition en plein air",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529933/68_y6eicd.jpg",
     category_id: catId('evenements'),
@@ -379,7 +379,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-26',
-    title: "Répétition de musique de Chaizy acoustique 3",
+    title: "Répétition de Chaizy Acoustique : le jeune trompettiste",
     description: "Jeune trompettiste qui lit sa partition pendant une répétition en plein air",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529994/67_cso3rl.jpg",
     category_id: catId('evenements'),
@@ -391,7 +391,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-27',
-    title: "Répétition de musique de Chaizy acoustique 4",
+    title: "Répétition de Chaizy Acoustique : la trompette dorée",
     description: "Gros plan sur un trompettiste, bras croisés autour de son instrument doré",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529990/66_kk2ego.jpg",
     category_id: catId('evenements'),
@@ -403,7 +403,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-28',
-    title: "Fête du lycée de SFDA 1",
+    title: "Fête du lycée SFDA : la cour vue du ciel",
     description: "Vue aérienne de la fête du lycée Saint-François-d'Assise : la foule rassemblée dans la cour à la tombée du jour",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529970/65_xeer2d.jpg",
     category_id: catId('evenements'),
@@ -415,7 +415,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-29',
-    title: "Fête du lycée de SFDA 2",
+    title: "Fête du lycée SFDA : la foule au coucher du soleil",
     description: "La foule de la fête du lycée Saint-François-d'Assise vue en hauteur, au coucher du soleil",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529952/64_jmkjgf.jpg",
     category_id: catId('evenements'),
@@ -439,7 +439,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-31',
-    title: "Lycée Saint François d'Assise",
+    title: "Le lycée Saint-François-d'Assise vu du ciel",
     description: "Vue aérienne du lycée Saint-François-d'Assise au coucher du soleil, ses bâtiments en étoile illuminés",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529977/62_kwjqqz.jpg",
     category_id: catId('evenements'),
@@ -463,7 +463,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-33',
-    title: "Portraits d'une femme sur un rocher ",
+    title: "Femme sur un rocher au bord de la mer",
     description: "Femme assise sur un rocher au bord de la mer, dans la lumière dorée de fin de journée",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529942/60_lrzuus.jpg",
     category_id: catId('portraits'),
@@ -475,7 +475,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-34',
-    title: "Portraits d'une femme",
+    title: "Portrait à l'heure dorée",
     description: "Portrait d'une jeune femme, main dans les cheveux, à l'heure dorée",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529989/59_ezfwby.jpg",
     category_id: catId('portraits'),
@@ -487,7 +487,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-35',
-    title: "Gymnaste sur la plage",
+    title: "Gymnaste sur la plage : grand écart en plein saut",
     description: "Gymnaste en plein saut, jambes en grand écart, sur fond de ciel bleu",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529965/58_uuri5i.jpg",
     category_id: catId('sports'),
@@ -499,7 +499,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-36',
-    title: "Stevan GARON",
+    title: "Portrait de Stevan Garon",
     description: "Portrait en noir et blanc de Stevan Garon, assis à califourchon sur une chaise",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783602979/2024_09_28_220_2_d0t3az.jpg",
     category_id: catId('portraits'),
@@ -512,7 +512,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-37',
-    title: "Gymnaste sur la plage 2",
+    title: "Gymnaste sur la plage : équilibre sur une main",
     description: "Gymnaste en équilibre sur une main, jambes en grand écart, au bord de l'eau",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530001/57_ty48ee.jpg",
     category_id: catId('sports'),
@@ -524,7 +524,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-38',
-    title: "Gymnaste sur la plage 3",
+    title: "Gymnaste sur la plage : le pont",
     description: "Gymnaste en pont, une jambe tendue vers le ciel, sur la plage, en noir et blanc",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530003/56_r84ykg.jpg",
     category_id: catId('sports'),
@@ -620,7 +620,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-46',
-    title: "Photographie aérienne de la sortie de l'église par les mariés",
+    title: "Sortie de l'église des mariés vue du ciel",
     description: "Vue aérienne des invités rassemblés devant l'église à la sortie des mariés",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529950/53_2_q8b3g2.jpg",
     category_id: catId('evenements'),
@@ -692,7 +692,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-52',
-    title: "Joueur de Basket du BCEBM",
+    title: "Joueur du BCEBM en pleine percée",
     description: "Joueur balle en main qui s'enfonce dans la défense lors d'un match de basket, en noir et blanc",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529974/45_w5c4ox.jpg",
     category_id: catId('sports'),
@@ -704,7 +704,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-53',
-    title: "Joueur de Basket du BCEBM en plein saut",
+    title: "Joueur du BCEBM au tir en suspension",
     description: "Joueur en pleine suspension au moment de tirer, face à deux défenseurs",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529971/45_2_hb9mxc.jpg",
     category_id: catId('sports'),
@@ -728,7 +728,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-55',
-    title: "Cours de Judo",
+    title: "Cours de judo à Pass'Yon Judo",
     description: "Jeunes judokas alignés sur le tatami pendant un cours à Pass'Yon Judo",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530015/43_fwgzyi.jpg",
     category_id: catId('sports'),
@@ -764,7 +764,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-58',
-    title: "Judoka se rhabillant lors d'un combat",
+    title: "Judoka resserrant sa ceinture à l'Open de Vendée",
     description: "Judoka qui resserre sa ceinture sur le tatami lors de l'Open de Vendée de judo, en noir et blanc",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529996/40_bfstgs.jpg",
     category_id: catId('sports'),
@@ -776,7 +776,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-59',
-    title: "Kimono d'un judoka vendéen",
+    title: "Judogi et ceinture rouge à l'Open de Vendée",
     description: "Gros plan sur le judogi et la ceinture rouge d'un judoka avant son combat, lors de l'Open de Vendée de judo",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530018/39_m95evj.jpg",
     category_id: catId('sports'),
@@ -788,7 +788,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-60',
-    title: "Technique de judo",
+    title: "Projection plongeante à l'Open de Vendée",
     description: "Judoka plongeant tête la première pour projeter son adversaire, un geste interdit en compétition, lors de l'Open de Vendée",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530010/38_lp6ya3.jpg",
     category_id: catId('sports'),
@@ -800,7 +800,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-61',
-    title: "Speaker lors d'un match de Volleyball",
+    title: "Speaker lors d'un match de volley-ball",
     description: "Le speaker, tambour en main, anime les tribunes lors d'un match de volley-ball à La Roche-sur-Yon",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529999/37_h9nyyv.jpg",
     category_id: catId('sports'),
@@ -860,7 +860,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-66',
-    title: "Perdu dans la foule",
+    title: "Perdue dans la foule",
     description: "Femme au regard perdu au milieu de la foule, en noir et blanc",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529937/32_tqgblo.jpg",
     category_id: catId('portraits'),
@@ -884,7 +884,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-68',
-    title: "Focus sur le buste d'un joueur de basket 3X3",
+    title: "Maillot rouge au tournoi 3x3 du BCEBM",
     description: "Gros plan sur le maillot rouge d'un joueur lors du tournoi de basket 3x3 organisé par le BCEBM",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530000/30_jmjesm.jpg",
     category_id: catId('sports'),
@@ -896,7 +896,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-69',
-    title: "Vue du dessus d'un terrain de basket 3X3",
+    title: "Tournoi 3x3 du BCEBM vu du ciel",
     description: "Vue du ciel d'une action sous le panier lors du tournoi de basket 3x3 organisé par le BCEBM",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529937/29_mtyf88.jpg",
     category_id: catId('sports'),
@@ -920,7 +920,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-71',
-    title: "Une équipe ! Une Victoire",
+    title: "Une équipe, une victoire",
     description: "L'équipe féminine de basket pose tout sourire après sa victoire",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529930/27_o7pb74.jpg",
     category_id: catId('sports'),
@@ -932,7 +932,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-72',
-    title: "Un shoot = un panier",
+    title: "Un tir, un panier",
     description: "Plan large de la salle au moment où une basketteuse tire, lors d'un match à La Roche-sur-Yon",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529948/25_iwipwa.jpg",
     category_id: catId('sports'),
@@ -980,7 +980,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-76',
-    title: "Pancarte du mariage d'Elodie&Emeric",
+    title: "Panneau de bienvenue du mariage d'Elodie et Emeric",
     description: "Panneau de bienvenue fleuri à l'entrée du mariage d'Elodie et Emeric",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783530007/21_ujnt9v.jpg",
     category_id: catId('evenements'),
@@ -992,7 +992,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-77',
-    title: "Rituel des rubans en mariage",
+    title: "Rituel des rubans du mariage d'Elodie et Emeric",
     description: "Les mains des mariés liées par des rubans pendant le rituel, en noir et blanc",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529969/20_d7okcl.jpg",
     category_id: catId('evenements'),
@@ -1016,7 +1016,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-79',
-    title: "Cérémonie du bouquet du mariage d'Elodie et Emeric",
+    title: "Bouquet aux rubans du mariage d'Elodie et Emeric",
     description: "Le bouquet de la mariée relié aux rubans des invitées, lors du mariage d'Elodie et Emeric",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529991/18_nskbky.jpg",
     category_id: catId('evenements'),
@@ -1052,7 +1052,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-83',
-    title: "Photo de groupe Karting",
+    title: "Photo de groupe de la sortie karting AIR RT",
     description: "Les participants posent sur la piste lors de la sortie karting organisée par AIR RT",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529979/14_vchchx.jpg",
     category_id: catId('evenements'),
@@ -1064,7 +1064,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-84',
-    title: "Pilote de Karting",
+    title: "Pilote lancé sur la piste de karting",
     description: "Pilote étudiant lancé à pleine vitesse sur la piste, lors de la sortie karting organisée par AIR RT",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529993/13_th3sql.jpg",
     category_id: catId('evenements'),
@@ -1076,7 +1076,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-85',
-    title: "Chorégraphie du gala de danse Happy Dance 1",
+    title: "Gala de danse Happy Dance : bras levés vers le ciel",
     description: "Danseuses en blanc et en noir réunies au centre de la scène, bras levés vers le ciel",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529984/12_q09qvo.jpg",
     category_id: catId('sports'),
@@ -1088,7 +1088,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-86',
-    title: "Chorégraphie du gala de danse Happy Dance 2",
+    title: "Gala de danse Happy Dance : bras tendus en lumière rouge",
     description: "Danseuses éclairées de rouge, debout derrière leurs chaises, bras tendus vers le haut",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529984/11_tp0rjx.jpg",
     category_id: catId('sports'),
@@ -1100,7 +1100,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-87',
-    title: "Chorégraphie du gala de danse Happy Dance 3",
+    title: "Gala de danse Happy Dance : la troupe en plan large",
     description: "Plan large de la troupe alignée derrière des chaises, baignée de lumière rouge",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529954/10_vvva8u.jpg",
     category_id: catId('sports'),
@@ -1112,7 +1112,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-88',
-    title: "Chorégraphie du gala de danse Happy Dance 4",
+    title: "Gala de danse Happy Dance : en robe sous la lumière verte",
     description: "Danseuses en robe alignées et tournées vers le public, sous une lumière verte",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529904/9_aaefyg.jpg",
     category_id: catId('sports'),
@@ -1124,7 +1124,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-89',
-    title: "Chorégraphie du gala de danse Happy Dance 5",
+    title: "Gala de danse Happy Dance : paume contre paume",
     description: "Une petite danseuse et une danseuse adulte, paume contre paume, en contre-jour dans une lumière verte",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529940/8_q7teng.jpg",
     category_id: catId('sports'),
@@ -1136,7 +1136,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-90',
-    title: "Chorégraphie du gala de danse ASLD 1",
+    title: "Gala de danse ASLD : le porté",
     description: "Danseuse portée sur les hanches de sa partenaire, sous un faisceau de lumière",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529928/7_bubnyr.jpg",
     category_id: catId('sports'),
@@ -1148,7 +1148,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-91',
-    title: "Chorégraphie du gala de danse ASLD 2",
+    title: "Gala de danse ASLD : hommage à Martin Luther King",
     description: "Deux danseuses de dos, poing levé, dans la chorégraphie consacrée à Martin Luther King",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529932/6_vkrykj.jpg",
     category_id: catId('sports'),
@@ -1160,7 +1160,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-92',
-    title: "Chorégraphie du gala de danse ASLD 3",
+    title: "Gala de danse ASLD : duo dans la pénombre",
     description: "Un danseur et une danseuse face à face, dans la pénombre de la scène",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529928/5_pvlmcl.jpg",
     category_id: catId('sports'),
@@ -1172,7 +1172,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-93',
-    title: "Chorégraphie du gala de danse ASLD 4",
+    title: "Gala de danse ASLD : un rai de lumière",
     description: "Danseuse en chemisier blanc, le visage saisi par un rai de lumière",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529923/4_ufxlgb.jpg",
     category_id: catId('sports'),
@@ -1184,7 +1184,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-94',
-    title: "Chorégraphie du gala de danse ASLD 5",
+    title: "Gala de danse ASLD : les deux chanteuses",
     description: "Deux chanteuses en blanc, micro en main, entourées de la troupe vêtue de noir",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529937/3_kluinf.jpg",
     category_id: catId('sports'),
@@ -1196,7 +1196,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-95',
-    title: "Chorégraphie du gala de danse ASLD 6",
+    title: "Gala de danse ASLD : costumes traditionnels en lumière rouge",
     description: "Deux danseuses en costume traditionnel, paumes jointes, dans une lumière rouge",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529911/2_dkundw.jpg",
     category_id: catId('sports'),
@@ -1208,7 +1208,7 @@ export const photos: Photo[] = [
   },
   {
     id: 'photo-96',
-    title: "Chorégraphie du gala de danse ASLD 7",
+    title: "Gala de danse ASLD : mains jointes levées",
     description: "Duo de danseuses en costume traditionnel, mains jointes levées, dans un halo de lumière",
     image_url: "https://res.cloudinary.com/qg0yy7u3/image/upload/v1783529906/1_xeeid3.jpg",
     category_id: catId('sports'),
